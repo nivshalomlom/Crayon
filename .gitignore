@@ -6,6 +6,9 @@
 *.user
 *.sln.docstates
 
+# Dependencies
+./Dependencies
+
 # Build results
 
 # Roslyn cache directories

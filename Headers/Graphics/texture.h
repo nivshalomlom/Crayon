@@ -17,8 +17,7 @@ class Texture2D
             glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
 
-    public:
-        Texture2D(int width, int height, GLenum renderFormat = GL_RGBA32F)
+        void InitiallizeTexture(int width, int height, GLenum renderFormat)
         {
             glCreateTextures(GL_TEXTURE_2D, 1, &this->texture);
             this->renderFormat = renderFormat;
@@ -27,10 +26,24 @@ class Texture2D
             glTextureStorage2D(this->texture, 1, renderFormat, width, height);
         }
 
+    public:
+        Texture2D(int width, int height, GLenum renderFormat = GL_RGBA32F)
+        {
+            InitiallizeTexture(width, height, renderFormat);
+        }
+
         void BindToImage(GLuint unit, GLenum access = GL_READ_ONLY)
         {
             glBindImageTexture(unit, this->texture, 0, GL_FALSE, 0, access, this->renderFormat);
         }
+
+        void Resize(int width, int height)
+        {
+            glDeleteTextures(1, &this->texture);
+            InitiallizeTexture(width, height, this->renderFormat);
+        }
+
+        GLuint GetID() { return this->texture; }
 };
 
 #endif

@@ -54,7 +54,7 @@ class Texture2D : public Disposable
 
         void Unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
 
-        void Free() { glDeleteTextures(1, &this->texture); }
+        void Dispose() { glDeleteTextures(1, &this->texture); }
 };
 
 #endif

@@ -52,7 +52,7 @@ void Window::Show(std::function<void(Window*, float)> mainLoop)
     }
 }
 
-void Window::Free()
+void Window::Dispose()
 {
     glfwDestroyWindow(this->window);
     glfwTerminate();

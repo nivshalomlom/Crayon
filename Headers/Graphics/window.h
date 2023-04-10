@@ -9,7 +9,7 @@ class Window : public Disposable
     private:
         GLFWwindow* window;
         std::string title;
-        
+
         float frameFrequency;
         bool showFps;
 
@@ -18,7 +18,7 @@ class Window : public Disposable
 
         Window(int width, int height, const char* title, int fpsCap = 30);
 
-        void Free();
+        void Dispose();
 
         void Show(std::function<void(Window*, float)> mainLoop);
 

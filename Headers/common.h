@@ -16,6 +16,7 @@
 #include <functional>
 
 // GLM
+#define GLM_FORCE_SWIZZLE
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_operation.hpp>
 

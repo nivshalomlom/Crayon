@@ -27,7 +27,7 @@ class TextureRenderer : public Disposable
             glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
         }
 
-        void Free() { glDeleteFramebuffers(1, &this->frameBuffer); }
+        void Dispose() { glDeleteFramebuffers(1, &this->frameBuffer); }
 };
 
 #endif

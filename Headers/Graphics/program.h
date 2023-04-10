@@ -24,7 +24,7 @@ class Program : public Disposable
 
         void Mount() const { glUseProgram(this->progID); }
         
-        void Free() { glDeleteProgram(this->progID);}
+        void Dispose() { glDeleteProgram(this->progID);}
 };
 
 class ShaderProgram : public Program

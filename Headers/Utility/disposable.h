@@ -3,7 +3,7 @@
 
 class Disposable
 {
-    virtual void Free() = 0;
+    virtual void Dispose() = 0;
 };
 
 #endif

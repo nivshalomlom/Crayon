@@ -21,7 +21,7 @@ Window::Window(int width, int height, const char* title, int fpsCap)
     glfwSetWindowSizeCallback(this->window, this->onResize);
 }
 
-void Window::Show(void (*mainLoop)(Window*, float))
+void Window::Show(std::function<void(Window*, float)> mainLoop)
 {
     while (!glfwWindowShouldClose(this->window))
     {

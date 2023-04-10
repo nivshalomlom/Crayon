@@ -17,7 +17,7 @@ class Window : public Disposable
 
         void Free();
 
-        void Show(void (*mainLoop)(Window*, float));
+        void Show(std::function<void(Window*, float)> mainLoop);
 
         void SetFpsCap(int fpsCap) { this->frameFrequency = 1.0f / (float) fpsCap; }
 

@@ -6,10 +6,9 @@
 
 class Program : public Disposable
 {
-    private:
+    protected:
         GLuint progID;
 
-    protected:
         void LinkShader() const
         {
             glLinkProgram(this->progID);
@@ -24,7 +23,8 @@ class Program : public Disposable
         GLuint Id() const { return this->progID; }
 
         void Mount() const { glUseProgram(this->progID); }
-        void Free() const { glDeleteProgram(this->progID);}
+        
+        void Free() { glDeleteProgram(this->progID);}
 };
 
 class ShaderProgram : public Program
@@ -47,7 +47,7 @@ class ShaderProgram : public Program
 class ComputeProgram : public Program
 {
     public:
-        ComputeProgram(std::string computeShaderPath = "") : Program() 
+        ComputeProgram(std::string computeShaderPath) : Program() 
         {
             GLuint compute = 0;
             this->AttachShader(&compute, computeShaderPath, GL_COMPUTE_SHADER); 

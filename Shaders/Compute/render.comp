@@ -1,0 +1,15 @@
+#version 430 core
+
+layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+layout(rgba32F, binding = 0) uniform image2D renderTarget;
+
+void main()
+{
+    ivec2 dimensions = imageSize(renderTarget);
+    ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
+
+    if (coords.x >= dimensions.x || coords.y >= dimensions.y)
+        return;
+
+    imageStore(renderTarget, coords, vec4(1, 0, 0, 1));
+}

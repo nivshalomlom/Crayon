@@ -1,13 +1,15 @@
 #ifndef _TEXTURE_H
 #define _TEXTURE_H
 
+#include "../Utility/disposable.h"
 #include "../common.h"
 
-class Texture2D
+class Texture2D : public Disposable
 {
     private:
         GLenum renderFormat;
         GLuint texture;
+        glm::ivec2 size;
 
         static void SetTextureParameters(GLuint texture)
         {
@@ -21,6 +23,7 @@ class Texture2D
         {
             glCreateTextures(GL_TEXTURE_2D, 1, &this->texture);
             this->renderFormat = renderFormat;
+            this->size = glm::ivec2(width, height);
 
             SetTextureParameters(this->texture);
             glTextureStorage2D(this->texture, 1, renderFormat, width, height);
@@ -43,7 +46,15 @@ class Texture2D
             InitiallizeTexture(width, height, this->renderFormat);
         }
 
-        GLuint GetID() { return this->texture; }
+        GLuint Id() { return this->texture; }
+
+        glm::vec2 Size() { return this->size; }
+
+        void Bind() { glBindTexture(GL_TEXTURE_2D, this->texture); }
+
+        void Unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
+
+        void Free() { glDeleteTextures(1, &this->texture); }
 };
 
 #endif

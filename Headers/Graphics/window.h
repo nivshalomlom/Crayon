@@ -1,9 +1,10 @@
 #ifndef _WINDOW_H
 #define _WINDOW_H
 
+#include "../Utility/disposable.h"
 #include "../common.h"
 
-class Window
+class Window : public Disposable
 {
     private:
         float frameFrequency;
@@ -19,6 +20,13 @@ class Window
         void Show(void (*mainLoop)(Window*, float));
 
         void SetFpsCap(int fpsCap) { this->frameFrequency = 1.0f / (float) fpsCap; }
+
+        glm::vec2 Size() 
+        { 
+            glm::ivec2 size = glm::ivec2(0, 0);
+            glfwGetWindowSize(this->window, &size.x, &size.y);
+            return size;
+        }
 };
 
 #endif

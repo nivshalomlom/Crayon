@@ -7,8 +7,11 @@
 class Window : public Disposable
 {
     private:
-        float frameFrequency;
         GLFWwindow* window;
+        std::string title;
+        
+        float frameFrequency;
+        bool showFps;
 
     public:
         void (*onResize)(GLFWwindow*, int, int) = 0;
@@ -19,7 +22,11 @@ class Window : public Disposable
 
         void Show(std::function<void(Window*, float)> mainLoop);
 
+        void SetTitle(const char* title) { glfwSetWindowTitle(this->window, title); }
+
         void SetFpsCap(int fpsCap) { this->frameFrequency = 1.0f / (float) fpsCap; }
+
+        void ShowFpsCounter(bool value) { this->showFps = value; }
 
         glm::vec2 Size() 
         { 

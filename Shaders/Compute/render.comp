@@ -11,5 +11,6 @@ void main()
     if (coords.x >= dimensions.x || coords.y >= dimensions.y)
         return;
 
-    imageStore(renderTarget, coords, vec4(1, 0, 0, 1));
+    vec2 uv = 2.0 * vec2(coords) / dimensions - 1.0;
+    imageStore(renderTarget, coords, vec4(uv, 0.0, 1.0));
 }

@@ -1,9 +1,10 @@
 #ifndef _PROGRAM_H
 #define _PROGRAM_H
 
+#include "../Utility/disposable.h"
 #include "../common.h"
 
-class Program
+class Program : public Disposable
 {
     private:
         GLuint progID;

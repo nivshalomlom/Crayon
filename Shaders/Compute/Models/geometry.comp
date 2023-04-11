@@ -1,0 +1,13 @@
+struct Material
+{
+    vec3 emissionColor;
+    vec3 baseColor;
+    
+    int reflectance;
+    int roughness;
+    int metallic;
+}
+
+#define GEOMETRY_BASE\
+    Material material;
+    mat4 trannform;

@@ -23,6 +23,8 @@ class Transform
         glm::vec3 Right();
 
         void Rotate(glm::vec3 axis, float angle) { this->transform = glm::rotate(this->transform, glm::radians(angle), axis); };
+
+        void Translate(glm::vec3 translation) { this->transform = glm::translate(this->transform, translation); }
 };
 
 #endif

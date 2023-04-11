@@ -1,0 +1,13 @@
+#include "./geometry.comp"
+
+struct Sphere
+{
+    GEOMETRY_BASE
+    float radius;
+};
+
+struct Plane
+{
+    GEOMETRY_BASE
+    vec3 size;
+};

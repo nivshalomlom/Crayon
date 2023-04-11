@@ -9,6 +9,8 @@ template <typename T>
 class ArrayBuffer : public StorageBuffer
 {
     private:
+        using StorageBuffer::UpdateData;
+
         Array<T>* data;
         size_t itemSize;
 
@@ -28,7 +30,7 @@ class ArrayBuffer : public StorageBuffer
         }
 
     public:
-        ArrayBuffer(T* items, size_t itemSize, int length) : StorageBuffer((void*) InitializeData(items, length), length * itemSize + sizeof(int))
+        ArrayBuffer(T* items, int length, size_t itemSize) : StorageBuffer((void*) InitializeData(items, length), length * itemSize + sizeof(int))
         {
             this->itemSize = itemSize;
         }

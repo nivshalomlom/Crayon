@@ -2,6 +2,23 @@
 
 #define TITLE_FPS_FORMAT "%s [FPS: %f]"
 
+using namespace std;
+
+void DisplayFPSCounter(Window* window, char* titleBuffer, const char* rawTitle, float dt, bool showFPS)
+{
+    if (showFPS)
+    {
+        sprintf(
+            titleBuffer, TITLE_FPS_FORMAT, 
+            rawTitle, 1.0 / dt
+        );
+
+        window->SetTitle(titleBuffer);
+    }
+    else
+        window->SetTitle(rawTitle);
+}
+
 Window::Window(int width, int height, const char* title, int fpsCap)
 {
     // Create window with OpenGL context
@@ -37,14 +54,7 @@ void Window::Show(std::function<void(Window*, float)> mainLoop)
         float dt = glfwGetTime();
         if (dt >= this->frameFrequency)
         {
-            if (this->showFps)
-            {
-                const char* rawTitle = this->title.c_str();
-                const float fps = 1.0 / dt;
-
-                sprintf(titleBuffer, TITLE_FPS_FORMAT, rawTitle, fps);
-                this->SetTitle(titleBuffer);
-            }
+            DisplayFPSCounter(this, titleBuffer, this->title.c_str(), dt, this->showFps);
 
             glfwSetTime(0);
             mainLoop(this, dt);

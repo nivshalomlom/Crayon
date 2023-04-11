@@ -30,7 +30,7 @@ class ArrayBuffer : public StorageBuffer
         }
 
     public:
-        ArrayBuffer(T* items, int length, size_t itemSize) : StorageBuffer((void*) InitializeData(items, length), length * itemSize + sizeof(int))
+        ArrayBuffer(T* items, int length, size_t itemSize, GLuint binding) : StorageBuffer((void*) InitializeData(items, length), length * itemSize + sizeof(int), binding)
         {
             this->itemSize = itemSize;
         }

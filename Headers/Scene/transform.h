@@ -9,9 +9,9 @@ class Transform
         glm::mat4 transform;
 
     public:
-        Transform()
+        Transform(glm::vec3 position = glm::vec3(0))
         {
-            this->transform = glm::identity<glm::mat4>();
+            this->transform = glm::translate(glm::identity<glm::mat4>(), position);
         }
 
         glm::vec3 Position();

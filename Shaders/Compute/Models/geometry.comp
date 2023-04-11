@@ -6,8 +6,8 @@ struct Material
     int reflectance;
     int roughness;
     int metallic;
-}
+};
 
 #define GEOMETRY_BASE\
-    Material material;
-    mat4 trannform;
+    Material material;\
+    mat4 transform;

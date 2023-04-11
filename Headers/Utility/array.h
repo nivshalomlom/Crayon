@@ -6,8 +6,8 @@ template <typename T>
 class Array
 {
     private:
-        T* items;
         int length;
+        T* items;
 
     public:
         Array(T* items, int length)

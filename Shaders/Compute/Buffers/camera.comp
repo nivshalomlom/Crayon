@@ -1,0 +1,23 @@
+#include "../Models/ray.comp"
+
+layout(std430, binding = 2) buffer CameraBuffer
+{
+    mat4 transform;
+    vec3 viewParams;
+} Camera;
+
+Ray createCameraRayFromUV(vec2 uv)
+{
+    vec3 localPoint = vec3(uv, 1) * Camera.viewParams;
+    vec3 viewPoint = (Camera.transform * vec4(localPoint, 1.0)).xyz;
+
+    Ray ray;
+    ray.origin = vec3(
+        Camera.transform[0][3],
+        Camera.transform[1][3],
+        Camera.transform[2][3]
+    );
+    ray.direction = normalize(viewPoint - ray.origin);
+
+    return ray;
+}

@@ -2,6 +2,7 @@
 #define _WINDOW_H
 
 #include "../Utility/disposable.h"
+#include "../Events/event_manager.h"
 #include "../common.h"
 
 class Window : public Disposable
@@ -26,7 +27,9 @@ class Window : public Disposable
 
         void SetFpsCap(int fpsCap) { this->frameFrequency = 1.0f / (float) fpsCap; }
 
-        void ShowFpsCounter(bool value) { this->showFps = value; }
+        void ToggleFpsCounter() { this->showFps = !this->showFps; }
+
+        EventManager* CreateEventManager() { return new EventManager(this->window); } 
 
         glm::vec2 Size() 
         { 

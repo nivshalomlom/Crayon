@@ -15,10 +15,11 @@ class Program : public Disposable
             glValidateProgram(this->progID);
         }
 
+        Program() { this->progID = glCreateProgram(); };
+
         void AttachShader(GLuint* shader, std::string filePath, GLenum shaderType) const;
 
     public:
-        Program() { this->progID = glCreateProgram(); };
 
         GLuint Id() const { return this->progID; }
 

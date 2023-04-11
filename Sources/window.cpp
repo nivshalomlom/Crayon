@@ -4,6 +4,7 @@
 
 Window::Window(int width, int height, const char* title, int fpsCap)
 {
+    // Create window with OpenGL context
     if (glfwInit() == GLFW_FALSE)
         throw new std::runtime_error("GLFW: initialization failed!");
 
@@ -17,11 +18,14 @@ Window::Window(int width, int height, const char* title, int fpsCap)
     
     glfwMakeContextCurrent(this->window);
 
+    // Configure GLEW
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
         throw std::runtime_error("GLEW: initialization failed");
 
     glViewport(0, 0, width, height);
+    
+    // Event handling
     glfwSetWindowSizeCallback(this->window, this->onResize);
 }
 

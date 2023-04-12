@@ -14,6 +14,11 @@ class Transform
             this->transform = glm::translate(glm::identity<glm::mat4>(), position);
         }
 
+        Transform(glm::mat4 transform)
+        {
+            this->transform = transform;
+        }
+
         glm::vec3 Position();
 
         glm::vec3 Up();

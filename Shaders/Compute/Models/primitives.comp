@@ -2,12 +2,12 @@
 
 struct Sphere
 {
-    GEOMETRY_BASE
+    Geometry geometry;
     float radius;
 };
 
 struct Plane
 {
-    GEOMETRY_BASE
+    Geometry geometry;
     vec3 size;
 };

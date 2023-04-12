@@ -1,0 +1,55 @@
+#include "../Buffers/geometry.comp"
+#include "../Buffers/camera.comp"
+
+struct HitInfo
+{
+    Geometry geometry;
+    RayHit hit;
+};
+
+HitInfo createHitInfo(Geometry geometry, vec3 position, vec3 normal)
+{
+    HitInfo info;
+    info.geometry.transform = geometry.transform;
+    info.geometry.material = geometry.material;
+    info.hit.position = position;
+    info.hit.normal = normal;
+    
+    return info;
+}
+
+bool Intersects(Ray ray, Sphere sphere, out HitInfo info)
+{
+    vec3 center = getPosition(sphere.geometry.transform);
+    vec3 rayToSphere = ray.origin - center;
+
+    float a = dot(ray.direction, ray.direction);
+    float b = 2 * dot(ray.direction, rayToSphere);
+    float c = dot(rayToSphere, rayToSphere) - pow(sphere.radius, 2);
+
+    float discriminant = pow(b, 2) - 4 * a * c;
+    if (discriminant < 0)
+        return false;
+
+    float t = -b / 2 * a;
+    if (discriminant > 0)
+    {
+        float root = sqrt(discriminant);
+        float t1 = (-b + root) / 2 * a;
+        float t2 = (-b - root) / 2 * a;
+
+        if (t1 > 0 && t2 > 0)
+            t = min(t1, t2);
+        else
+            t = max(t1, t2);
+    }
+
+    if (t < 0)
+        return false;
+
+    vec3 position = ray.origin + t * ray.direction;
+    vec3 normal = normalize(position - center);
+    info = createHitInfo(sphere.geometry, position, normal);
+
+    return true;
+}

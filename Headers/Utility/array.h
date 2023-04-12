@@ -18,7 +18,10 @@ class Array
 
         Array() : Array(nullptr, 0) {}
 
+        int Length() { return this->length; }
+
         T operator [](int i) const { return this->items[i]; }
+        
         T & operator [](int i) { return this->items[i]; }
 };
 

@@ -11,53 +11,28 @@ class ArrayBuffer : public StorageBuffer
     private:
         using StorageBuffer::UpdateData;
 
-        Array<T>* data;
-        size_t itemSize;
-
-        void Update(int startIndex, int count) 
-        { 
-            this->UpdateData(
-                (void*) &this->data,
-                this->itemSize * count, 
-                this->itemSize * startIndex
-            );
-        }
-
-        Array<T>* InitializeData(T* items, int length)
-        {
-            this->data = new Array<T>(items, length);
-            return this->data;
-        }
+        Array<T> array;
 
     public:
-        ArrayBuffer(T* items, int length, size_t itemSize, GLuint binding) : StorageBuffer((void*) InitializeData(items, length), length * itemSize + sizeof(int), binding)
+        ArrayBuffer(T* items, int count) : StorageBuffer(nullptr, sizeof(int) + count * sizeof(T))
         {
-            this->itemSize = itemSize;
-        }
+            this->array = Array<T>(items, count);
+            this->Bind();
 
-        void Set(int index, T item)
-        {
-            Array<T> array = *this->data;
-            array[index] = item;
-            this->Update(index, 1);
-        }
+            void* bufferPtr = glMapBufferRange(
+                GL_SHADER_STORAGE_BUFFER, 
+                0, sizeof(int) + count * sizeof(T), 
+                GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
+            );
 
-        void SetRange(int startIndex, T* items, int count)
-        {
-            Array<T> array = *this->data;
-            for (int i = 0; i < count; i++)
-            {
-                int index = startIndex + i;
-                array[index] = items[i];
-            }
+            int* lengthPtr = (int*) bufferPtr;
+            T* itemsPtr = (T*)((char*) bufferPtr + sizeof(int));
 
-            this->Update(startIndex, count);
-        }
+            memcpy(lengthPtr, &this->array.length, sizeof(int));
+            memcpy(itemsPtr, this->array.items, count * sizeof(T));
+            glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
-        T Get(int index) 
-        { 
-            Array<T> array = *this->data;
-            return array[index]; 
+            this->Unbind();
         }
 };
 

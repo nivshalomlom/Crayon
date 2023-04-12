@@ -48,7 +48,7 @@ class ArrayBuffer : public StorageBuffer
             for (int i = 0; i < count; i++)
             {
                 int index = startIndex + i;
-                array[index] = items[index];
+                array[index] = items[i];
             }
 
             this->Update(startIndex, count);

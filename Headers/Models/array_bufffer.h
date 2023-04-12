@@ -14,25 +14,26 @@ class ArrayBuffer : public StorageBuffer
         Array<T> array;
 
     public:
-        ArrayBuffer(Array<T> array, int binding) : StorageBuffer(nullptr, sizeof(int) + array.length * sizeof(T), binding), array(array)
+        ArrayBuffer(T* items, int count) : StorageBuffer(nullptr, sizeof(int) + count * sizeof(T))
         {
-            UpdateData(&this->array.length, sizeof(int), 0);
-            UpdateData(this->array.items, this->array.length * sizeof(T), sizeof(int));
-        }
+            this->array = Array<T>(items, count);
+            this->Bind();
 
-        void Set(T item, int index) 
-        {
-            this->array[index] = item;
-            size_t itemSize = sizeof(T);
-
-            this->UpdateData(
-                &this->array[index],
-                itemSize,
-                index * itemSize
+            void* bufferPtr = glMapBufferRange(
+                GL_SHADER_STORAGE_BUFFER, 
+                0, sizeof(int) + count * sizeof(T), 
+                GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
             );
-        }
 
-        T Get(int index) { return this->array[index]; }
+            int* lengthPtr = (int*) bufferPtr;
+            T* itemsPtr = (T*)((char*) bufferPtr + sizeof(int));
+
+            memcpy(lengthPtr, &this->array.length, sizeof(int));
+            memcpy(itemsPtr, this->array.items, count * sizeof(T));
+            glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+            this->Unbind();
+        }
 };
 
 #endif

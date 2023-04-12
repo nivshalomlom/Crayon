@@ -12,49 +12,23 @@ class ArrayBuffer : public StorageBuffer
         using StorageBuffer::UpdateData;
 
         Array<T> array;
-        size_t itemSize;
-
-        char* buildBuffer(T* items, int length, size_t itemSize)
-        {
-            char* buffer = new char[sizeof(int) + length * itemSize];
-            this->array = Array<T>(items, length);
-
-            memcpy(buffer, &this->array.length, sizeof(int));
-            memcpy(buffer + sizeof(int), items, length * itemSize);
-
-            return buffer;
-        }
 
     public:
-        ArrayBuffer(T* items, int length, size_t itemSize, int binding) 
-            : StorageBuffer(this->buildBuffer(items, length, itemSize), sizeof(int) + length * itemSize, binding)
+        ArrayBuffer(Array<T> array, int binding) : StorageBuffer(nullptr, sizeof(int) + array.length * sizeof(T), binding), array(array)
         {
-            this->itemSize = itemSize;
+            UpdateData(&this->array.length, sizeof(int), 0);
+            UpdateData(this->array.items, this->array.length * sizeof(T), sizeof(int));
         }
 
-        void Set(T item, int index)
+        void Set(T item, int index) 
         {
             this->array[index] = item;
+            size_t itemSize = sizeof(T);
 
             this->UpdateData(
-                &this->array[index], 
-                this->itemSize, 
-                sizeof(int) + index * this->itemSize
-            );
-        }
-
-        void SetRange(T* items, int length, int startIndex)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                int index = startIndex + i;
-                this->array[index] = items[i];
-            }
-
-            this->UpdateData(
-                &this->array[startIndex], 
-                this->itemSize * length,
-                sizeof(int) + startIndex * this->itemSize
+                &this->array[index],
+                itemSize,
+                index * itemSize
             );
         }
 

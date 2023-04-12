@@ -5,11 +5,10 @@ template <typename T>
 
 class Array
 {
-    private:
+    public:
         int length;
         T* items;
 
-    public:
         Array(T* items, int length)
         {
             this->items = items;

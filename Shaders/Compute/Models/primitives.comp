@@ -9,5 +9,5 @@ struct Sphere
 struct Plane
 {
     Geometry geometry;
-    vec3 size;
+    vec4 size;
 };

@@ -20,7 +20,7 @@ class ArrayBuffer : public StorageBuffer
             this->Bind();
 
             void* bufferPtr = glMapBufferRange(
-                GL_SHADER_STORAGE_BUFFER, 
+                GL_SHADER_STORAGE_BUFFER,
                 0, sizeof(int) + count * sizeof(T), 
                 GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
             );

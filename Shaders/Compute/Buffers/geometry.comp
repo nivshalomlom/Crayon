@@ -2,12 +2,10 @@
 
 layout(std430, binding = 0) buffer SphereBuffer
 {
-    int numSpheres;
     Sphere spheres[];
 };
 
 layout(std430, binding = 1) buffer PlaneBuffer
 {
-    int numPlanes;
     Plane planes[];
 };

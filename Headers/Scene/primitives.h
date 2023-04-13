@@ -17,11 +17,11 @@ class Sphere : public Geometry
 class Plane : public Geometry
 {
     public:
-        glm::vec3 size;
+        glm::vec4 size;
 
         Plane(glm::vec3 position, glm::vec3 size, Material material) : Geometry(position, material)
         {
-            this->size = size;
+            this->size = glm::vec4(size, 1.0);
         }
 };
 

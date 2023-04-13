@@ -1,7 +1,7 @@
 struct Material
 {
-    vec3 emissionColor;
-    vec3 baseColor;
+    vec4 emissionColor;
+    vec4 baseColor;
     
     int reflectance;
     int roughness;

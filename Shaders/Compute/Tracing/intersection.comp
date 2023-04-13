@@ -1,26 +1,11 @@
-#include "../Buffers/geometry.comp"
-#include "../Buffers/camera.comp"
-
-struct HitInfo
-{
-    Geometry geometry;
-    RayHit hit;
-};
-
-HitInfo createHitInfo(Geometry geometry, vec3 position, vec3 normal)
-{
-    HitInfo info;
-    info.geometry.transform = geometry.transform;
-    info.geometry.material = geometry.material;
-    info.hit.position = position;
-    info.hit.normal = normal;
-    
-    return info;
-}
+#include "./hitinfo.comp"
 
 bool Intersects(Ray ray, Sphere sphere, out HitInfo info)
 {
-    vec3 center = getPosition(sphere.geometry.transform);
+    mat4 transform = sphere.geometry.transform;
+    Ray localRay = transformRayToLocal(ray, transform);
+
+    vec3 center = getPosition(transform);
     vec3 rayToSphere = ray.origin - center;
 
     float a = dot(ray.direction, ray.direction);

@@ -1,16 +1,19 @@
-// FIXME: ray transform not working
-
-vec3 transformVector(vec3 vector, mat4 transform)
+vec3 transformVector(vec3 vector, mat4 transform, bool translate)
 {
     vec4 wrapper = vec4(vector, 1.0);
-    return (transform * wrapper).xyz;
+    vec3 shifted = (transform * wrapper).xyz;
+
+    if (translate)
+        return shifted;
+
+    return shifted - position(transform);
 }
 
 Ray transformRayToLocal(Ray ray, mat4 transform)
 {
     Ray localRay = createRay(
-        transformVector(ray.origin, transform),
-        transformVector(ray.direction, transform)
+        transformVector(ray.origin, transform, false),
+        transformVector(ray.direction, transform, false)
     );
 
     return localRay;

@@ -5,11 +5,11 @@ bool Intersects(Ray ray, Sphere sphere, out HitInfo info)
     mat4 transform = sphere.geometry.transform;
     Ray localRay = transformRayToLocal(ray, transform);
 
-    vec3 center = getPosition(transform);
-    vec3 rayToSphere = ray.origin - center;
+    vec3 center = position(transform);
+    vec3 rayToSphere = localRay.origin - center;
 
-    float a = dot(ray.direction, ray.direction);
-    float b = 2.0 * dot(ray.direction, rayToSphere);
+    float a = dot(localRay.direction, localRay.direction);
+    float b = 2.0 * dot(localRay.direction, rayToSphere);
     float c = dot(rayToSphere, rayToSphere) - pow(sphere.radius, 2.0);
 
     float discriminant = pow(b, 2.0) - 4.0 * a * c;

@@ -7,14 +7,11 @@ class StorageBuffer
 {
     private:
         GLuint storageBuffer;
-        size_t size;
 
     public:
         StorageBuffer(void* data, size_t size)
         {
             glGenBuffers(1, &this->storageBuffer);
-            this->size = size;
-
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->storageBuffer);
             glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_COPY);
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
@@ -33,7 +30,7 @@ class StorageBuffer
         {
             this->Bind();
             
-            glBindBufferRange(GL_SHADER_STORAGE_BUFFER, binding, this->storageBuffer, 0, this->size);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, this->storageBuffer);
             glShaderStorageBlockBinding(
                 program,
                 glGetProgramResourceIndex(program, GL_SHADER_STORAGE_BLOCK, blockName), 

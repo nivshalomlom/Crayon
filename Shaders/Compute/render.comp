@@ -13,7 +13,7 @@ void main()
     if (coords.x >= dimensions.x || coords.y >= dimensions.y)
         return;
 
-    vec2 uv = 2.0 * vec2(coords) / dimensions - 1.0;
+    vec2 uv = vec2(coords) / dimensions;
     Ray ray = createCameraRayFromUV(uv);
 
     vec4 color = vec4(0);

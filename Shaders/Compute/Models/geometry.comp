@@ -6,6 +6,9 @@ struct Material
     int reflectance;
     int roughness;
     int metallic;
+
+    // This is only here to make the material size divisable by 4 to work with std430 rules
+    int padding;
 };
 
 struct Geometry

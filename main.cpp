@@ -16,9 +16,11 @@ int main(int argc, char **argv)
     ComputeProgram* render = new ComputeProgram("./Shaders/Compute/render.comp");
     TextureRenderer* renderer = new TextureRenderer();
 
-    Camera camera = Camera(vec3(0, 0, 0), 30.0f, 16.0f / 9.0f, 5);
+    Camera camera = Camera(vec3(0, 0, 0), 25.0f, 16.0f / 9.0f, 5, 20);
+    camera.transform.LookAt(vec3(0, 0, 20));
+
     Sphere spheres[] = {
-        Sphere(vec3(0, 0, 20), 5, Material(vec3(0.5, 0.0, 0.0)))
+        Sphere(vec3(0, 0, 20), 4, Material(vec3(0.5, 0.0, 0.0)))
     };
 
     StorageBuffer* cameraBuffer = new StorageBuffer(&camera, sizeof(Camera));

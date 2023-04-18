@@ -11,54 +11,29 @@ class ArrayBuffer : public StorageBuffer
     private:
         using StorageBuffer::UpdateData;
 
-        Array<T>* data;
-        size_t itemSize;
-
-        void Update(int startIndex, int count) 
-        { 
-            this->UpdateData(
-                (void*) &this->data,
-                this->itemSize * count, 
-                this->itemSize * startIndex
-            );
-        }
-
-        Array<T>* InitializeData(T* items, int length)
-        {
-            this->data = new Array<T>(items, length);
-            return this->data;
-        }
+        Array<T> array;
 
     public:
-        ArrayBuffer(T* items, int length, size_t itemSize) : StorageBuffer((void*) InitializeData(items, length), length * itemSize + sizeof(int))
+        ArrayBuffer(T* items, int count) : StorageBuffer(items, count * sizeof(T))
         {
-            this->itemSize = itemSize;
+            this->array = Array<T>(items, count);
         }
 
-        void Set(int index, T item)
+        void Set(T* item, int index)
         {
-            Array<T> array = *this->data;
-            array[index] = item;
-            this->Update(index, 1);
+            this->array[index] = item;
+            this->UpdateData(this->array.items + index, sizeof(T), index * sizeof(T));
         }
 
-        void SetRange(int startIndex, T* items, int count)
+        void SetRange(T* items, int length, int startIndex)
         {
-            Array<T> array = *this->data;
-            for (int i = 0; i < count; i++)
-            {
-                int index = startIndex + i;
-                array[index] = items[index];
-            }
+            for (int i = 0; i < length; i++)
+                this->array[startIndex + i] = items[i];
 
-            this->Update(startIndex, count);
+            this->UpdateData(this->array.items + startIndex, length * sizeof(T), startIndex * sizeof(T));
         }
 
-        T Get(int index) 
-        { 
-            Array<T> array = *this->data;
-            return array[index]; 
-        }
+        T Get(int index) { return this->array[index]; }
 };
 
 #endif

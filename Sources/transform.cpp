@@ -2,20 +2,20 @@
 
 using namespace glm;
 
-vec4 GetMatrixRow(mat4 matrix, int row)
+vec4 GetMatrixCol(mat4 matrix, int col)
 {
     return vec4(
-        matrix[0][row],
-        matrix[1][row],
-        matrix[2][row],
-        matrix[3][row]
+        matrix[col][0],
+        matrix[col][1],
+        matrix[col][2],
+        matrix[col][3]
     );
 }
 
-vec3 Transform::Position() { return GetMatrixRow(this->transform, 3).xyz(); }
+vec3 Transform::Position() { return GetMatrixCol(this->transform, 3).xyz(); }
 
-vec3 Transform::Forward() { return GetMatrixRow(this->transform, 2).xyz(); }
+vec3 Transform::Forward() { return GetMatrixCol(this->transform, 2).xyz(); }
 
-vec3 Transform::Up() { return GetMatrixRow(this->transform, 1).xyz(); }
+vec3 Transform::Up() { return GetMatrixCol(this->transform, 1).xyz(); }
 
-vec3 Transform::Right() { return GetMatrixRow(this->transform, 0).xyz(); }
+vec3 Transform::Right() { return GetMatrixCol(this->transform, 0).xyz(); }

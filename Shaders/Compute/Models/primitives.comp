@@ -1,0 +1,11 @@
+#include "./geometry.comp"
+
+struct Sphere
+{
+    Geometry geometry;
+};
+
+struct Plane
+{
+    Geometry geometry;
+};

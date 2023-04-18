@@ -5,11 +5,10 @@ template <typename T>
 
 class Array
 {
-    private:
-        T* items;
-        int length;
-
     public:
+        int length;
+        T* items;
+
         Array(T* items, int length)
         {
             this->items = items;
@@ -18,7 +17,10 @@ class Array
 
         Array() : Array(nullptr, 0) {}
 
+        int Length() { return this->length; }
+
         T operator [](int i) const { return this->items[i]; }
+        
         T & operator [](int i) { return this->items[i]; }
 };
 

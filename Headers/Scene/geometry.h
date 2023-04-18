@@ -11,9 +11,9 @@ class Geometry
         Transform transform;
         Material material;
 
-        Geometry(Material material)
+        Geometry(glm::vec3 position, Material material)
         {
-            this->transform = Transform();
+            this->transform = Transform(position);
             this->material = material;
         }
 };

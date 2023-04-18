@@ -6,22 +6,18 @@
 class Sphere : public Geometry
 {
     public:
-        float radius;
-
         Sphere(glm::vec3 position, float radius, Material material) : Geometry(position, material)
         {
-            this->radius = radius;
+            this->transform.Scale(glm::vec3(radius));
         }
 };
 
 class Plane : public Geometry
 {
     public:
-        glm::vec4 size;
-
         Plane(glm::vec3 position, glm::vec3 size, Material material) : Geometry(position, material)
         {
-            this->size = glm::vec4(size, 1.0);
+            this->transform.Scale(size);
         }
 };
 

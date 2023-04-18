@@ -1,19 +1,17 @@
-vec3 transformVector(vec3 vector, mat4 transform, bool translate)
+vec3 transformVector(vec3 vector, mat4 transform)
 {
     vec4 wrapper = vec4(vector, 1.0);
-    vec3 shifted = (transform * wrapper).xyz;
-
-    if (translate)
-        return shifted;
-
-    return shifted - position(transform);
+    return (transform * wrapper).xyz;
 }
 
-Ray transformRayToLocal(Ray ray, mat4 transform)
+Ray transformRay(Ray ray, mat4 transform)
 {
+    vec3 direction = transformVector(ray.origin + ray.direction, transform);
+    vec3 origin = transformVector(ray.origin, transform);
+
     Ray localRay = createRay(
-        transformVector(ray.origin, transform, false),
-        transformVector(ray.direction, transform, false)
+        origin,
+        normalize(direction - origin)
     );
 
     return localRay;

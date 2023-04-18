@@ -3,11 +3,9 @@
 struct Sphere
 {
     Geometry geometry;
-    float radius;
 };
 
 struct Plane
 {
     Geometry geometry;
-    vec4 size;
 };

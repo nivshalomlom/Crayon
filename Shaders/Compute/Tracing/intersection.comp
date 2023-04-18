@@ -2,12 +2,9 @@
 
 bool Intersects(Ray ray, Sphere sphere, out HitInfo info)
 {
-    vec3 center = position(sphere.geometry.transform);
-    vec3 rayToSphere = ray.origin - center;
-
     float a = dot(ray.direction, ray.direction);
-    float b = 2.0 * dot(ray.direction, rayToSphere);
-    float c = dot(rayToSphere, rayToSphere) - pow(sphere.radius, 2.0);
+    float b = 2.0 * dot(ray.direction, ray.origin);
+    float c = dot(ray.origin, ray.origin) - 1.0;
 
     float discriminant = pow(b, 2.0) - 4.0 * a * c;
     if (discriminant < 0.0)
@@ -30,7 +27,7 @@ bool Intersects(Ray ray, Sphere sphere, out HitInfo info)
         return false;
 
     vec3 position = ray.origin + t * ray.direction;
-    vec3 normal = normalize(position - center);
+    vec3 normal = normalize(position);
     info = createHitInfo(sphere.geometry, position, normal);
 
     return true;

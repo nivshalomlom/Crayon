@@ -29,7 +29,7 @@ class Transform
 
         void Scale(glm::vec3 scale) { this->transform = glm::scale(this->transform, scale); }
 
-        void LookAt(glm::vec3 position) { this->transform *= glm::lookAt(this->Position(), -position, this->Up()); }
+        void LookAt(glm::vec3 position) { this->transform *= glm::lookAt(this->Position(), position, this->Up()); }
 
         void Rotate(glm::vec3 axis, float angle) { this->transform = glm::rotate(this->transform, glm::radians(angle), axis); };
 

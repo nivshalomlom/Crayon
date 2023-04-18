@@ -16,12 +16,13 @@ void main()
 
     vec2 uv = vec2(coords) / dimensions;
     Ray ray = createCameraRayFromUV(uv);
-
-    vec4 color = vec4(0);
+    
+    vec4 color = vec4(0.0);
     HitInfo info;
 
-    // ray = transformRayToLocal(ray, spheres[0].geometry.transform);
-    
+    mat4 inv = inverse(spheres[0].geometry.transform);
+    ray = transformRay(ray, inv);
+
     if (Intersects(ray, spheres[0], info))
         color = info.geometry.material.baseColor;
 

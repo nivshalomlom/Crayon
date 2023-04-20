@@ -9,7 +9,7 @@ class Transform
         glm::mat4 localToWorld;
 
     public:
-        Transform(glm::vec3 position = glm::vec3(0), glm::vec3 lookkAt = glm::vec3(0, 0, 1), glm::vec3 up = glm::vec3(0, 1, 0))
+        Transform(glm::vec3 position = glm::vec3(0))
         {
             this->localToWorld = glm::translate(glm::identity<glm::mat4>(), position);
         }

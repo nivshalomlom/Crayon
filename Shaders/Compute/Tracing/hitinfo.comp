@@ -10,8 +10,7 @@ struct HitInfo
 HitInfo createHitInfo(Geometry geometry, vec3 position, vec3 normal)
 {
     HitInfo info;
-    info.geometry.transform = geometry.transform;
-    info.geometry.material = geometry.material;
+    info.geometry = geometry;
     info.hit = createRayHit(position, normal);
     
     return info;

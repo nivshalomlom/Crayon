@@ -20,7 +20,7 @@ void main()
     vec4 color = vec4(0.0);
     HitInfo info;
 
-    mat4 inv = inverse(spheres[0].geometry.transform);
+    mat4 inv = inverse(spheres[0].geometry.localToWorld);
     ray = transformRay(ray, inv);
 
     if (Intersects(ray, spheres[0], info))

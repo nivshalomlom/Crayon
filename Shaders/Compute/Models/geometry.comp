@@ -3,12 +3,10 @@ struct Material
     vec4 emissionColor;
     vec4 baseColor;
     
+    float emissionStrength;
     float reflectance;
     float roughness;
     float metallic;
-
-    // This is only here to make the material size divisable by 4 to work with std430 rules
-    float padding;
 };
 
 struct Geometry

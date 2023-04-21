@@ -1,7 +1,7 @@
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
-#include "../Scene./transform.h"
+#include "../Geometry/transform.h"
 #include "../common.h"
 
 class Camera

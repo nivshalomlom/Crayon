@@ -1,10 +1,10 @@
-#include "./Headers/Graphics/texrenderer.h"
+#include "./Headers/Textures/texrenderer.h"
+#include "./Headers/Textures/texture.h"
 #include "./Headers/Graphics/program.h"
 #include "./Headers/Graphics/window.h"
-#include "./Headers/Models/camera.h"
-#include "./Headers/Models/texture.h"
-#include "./Headers/Models/array_bufffer.h"
-#include "./Headers/Scene/primitives.h"
+#include "./Headers/Graphics/camera.h"
+#include "./Headers/Buffers/array_bufffer.h"
+#include "./Headers/Geometry/primitives.h"
 
 using namespace std;
 using namespace glm;

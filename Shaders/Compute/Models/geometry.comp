@@ -17,4 +17,4 @@ struct Transform
 
 #define GEOMETRY_BASE\
     Transform transform;\
-    Material material;\
+    Material material;

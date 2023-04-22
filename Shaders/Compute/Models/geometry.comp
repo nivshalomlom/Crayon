@@ -12,5 +12,6 @@ struct Material
 struct Geometry
 {
     mat4 localToWorld;
+    mat4 worldToLocal;
     Material material;
 };

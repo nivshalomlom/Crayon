@@ -3,17 +3,18 @@
 
 layout(std430, binding = 2) buffer CameraBuffer
 {
-    mat4 transform;
+    mat4 localToWorld;
+    mat4 worldToLocal;
     vec3 viewParams;
 } Camera;
 
 Ray createCameraRayFromUV(vec2 uv)
 {
     vec3 localPoint = vec3(uv - 0.5, 1) * Camera.viewParams;
-    vec3 viewPoint = (Camera.transform * vec4(localPoint, 1.0)).xyz;
+    vec3 viewPoint = (Camera.localToWorld * vec4(localPoint, 1.0)).xyz;
 
     Ray ray;
-    ray.origin = position(Camera.transform);
+    ray.origin = position(Camera.localToWorld);
     ray.direction = normalize(viewPoint - ray.origin);
 
     return ray;

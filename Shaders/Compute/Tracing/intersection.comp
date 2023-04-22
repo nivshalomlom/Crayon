@@ -28,7 +28,7 @@ bool Intersects(Ray ray, Sphere sphere, out HitInfo info)
 
     vec3 position = ray.origin + t * ray.direction;
     vec3 normal = normalize(position);
-    info = createHitInfo(sphere.geometry, position, normal);
+    info = createHitInfo(sphere.transform, sphere.material, position, normal);
 
     return true;
 }

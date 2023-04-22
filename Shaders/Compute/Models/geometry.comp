@@ -9,9 +9,19 @@ struct Material
     float metallic;
 };
 
-struct Geometry
+struct Transform
 {
     mat4 localToWorld;
     mat4 worldToLocal;
-    Material material;
 };
+
+#define GEOMETRY_BASE\
+    Transform transform;\
+    Material material;\
+
+// struct Geometry
+// {
+//     mat4 localToWorld;
+//     mat4 worldToLocal;
+//     Material material;
+// };

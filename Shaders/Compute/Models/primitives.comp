@@ -2,10 +2,10 @@
 
 struct Sphere
 {
-    Geometry geometry;
+    GEOMETRY_BASE
 };
 
 struct Plane
 {
-    Geometry geometry;
+    GEOMETRY_BASE
 };

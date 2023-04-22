@@ -18,10 +18,3 @@ struct Transform
 #define GEOMETRY_BASE\
     Transform transform;\
     Material material;\
-
-// struct Geometry
-// {
-//     mat4 localToWorld;
-//     mat4 worldToLocal;
-//     Material material;
-// };

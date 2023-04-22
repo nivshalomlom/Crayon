@@ -2,9 +2,8 @@
 #define _TEXRENDERER_H
 
 #include "../Utility/disposable.h"
-#include "../Models/texture.h"
-#include "./window.h"
-#include "./program.h"
+#include "./texture.h"
+#include "../common.h"
 
 class TextureRenderer : public Disposable
 {

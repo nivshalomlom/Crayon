@@ -3,16 +3,25 @@ struct Material
     vec4 emissionColor;
     vec4 baseColor;
     
-    int reflectance;
-    int roughness;
-    int metallic;
-
-    // This is only here to make the material size divisable by 4 to work with std430 rules
-    int padding;
+    float emissionStrength;
+    float reflectance;
+    float roughness;
+    float metallic;
 };
 
-struct Geometry
+struct Transform
 {
-    mat4 transform;
-    Material material;
+    mat4 localToWorld;
+    mat4 worldToLocal;
 };
+
+#define GEOMETRY_BASE\
+    Transform transform;\
+    Material material;\
+
+// struct Geometry
+// {
+//     mat4 localToWorld;
+//     mat4 worldToLocal;
+//     Material material;
+// };

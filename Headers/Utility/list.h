@@ -1,9 +1,11 @@
 #ifndef _LIST_H
 #define _LIST_H
 
+#include "./disposable.h"
+
 template <typename T>
 
-class List
+class List : public Disposable
 {
     private:
         int capacity;
@@ -38,6 +40,28 @@ class List
 
             this->array[this->count++] = item;
         }
+
+        int IndexOf(T item, int (*comparator)(T, T))
+        {
+            for (int i = 0; i < this->count; i++)
+                if (comparator(item, this->array[i]) == 0)
+                    return i;
+
+            return -1;
+        }
+
+        T* ToArray()
+        {
+            T* array = new T[this->count];
+            for (int i = 0; i < this->count; i++)
+                array[i] = this->array[i];
+
+            return array;
+        }
+        
+        void Dispose() { delete [] this->array; }
+
+        void Set(T item, int index) { this->array[index] = item; }
 
         T Get(int index) const { return this->array[index]; }
 

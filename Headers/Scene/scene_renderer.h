@@ -2,6 +2,7 @@
 #define _SCENE_RENDERER_H
 
 #include "../Buffers/array_bufffer.h"
+#include "../Buffers/object_buffer.h"
 #include "../Graphics/program.h"
 #include "../Graphics/camera.h"
 #include "../Textures/texture.h"
@@ -37,52 +38,26 @@ class SceneRenderer : public Disposable
         static BufferInfo* BUFFERS_INFO;
 
         ArrayBuffer<Geometry>* geometryBuffers;
+        ObjectBuffer<Camera> cameraBuffer;
+
         ComputeProgram renderShader;
         Texture2D renderTexture;
         glm::ivec3 dispatchGroups;
 
     public:
-        SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex = 0)
-        {
-            this->renderShader = ComputeProgram("./Shaders/Compute/render.comp");
-            this->renderTexture = Texture2D(textureWidth, textureHeight);
-            
-            this->renderTexture.BindToImage(imageIndex);
-            this->dispatchGroups = glm::ivec3(
-                ceilf(textureWidth / 32.0f), 
-                ceilf(textureHeight / 32.0f),
-                1
-            );
-        }
+        SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex = 0);
 
-        void SetScene(Scene scene)
-        {
-            if (this->geometryBuffers != nullptr)
-            {
-                for (int i = 0; i < NUM_BUFFERS; i++)
-                    this->geometryBuffers[i].Dispose();
+        void SetScene(Scene scene);
 
-                delete [] this->geometryBuffers;
-            }
-
-            this->geometryBuffers = new ArrayBuffer<Geometry>[NUM_BUFFERS];
-            for (int i = 0; i < NUM_BUFFERS; i++)
-            {
-                List<Geometry> geometry = scene.GetAllGeometry((GEOMETRY_TYPE) (i - 1));
-                BufferInfo info = BUFFERS_INFO[i];
-
-                this->geometryBuffers[i] = ArrayBuffer<Geometry>(geometry.ToArray(), geometry.Count(), info.ItemSize());
-                this->geometryBuffers[i].BindToStorageBlock(this->renderShader.Id(), info.Binding(), info.Name());
-            }
-        }
-
-        void MutateGeometry(GEOMETRY_TYPE type, int index, std::function<Geometry(Geometry)> mutation)
+        void ModifyGeometry(GEOMETRY_TYPE type, int index, std::function<Geometry(Geometry)> modification)
         {
             Geometry geometry = this->geometryBuffers[type].Get(index);
-            geometry = mutation(geometry);
+            geometry = modification(geometry);
 
             this->geometryBuffers[type].Set(&geometry, index);
         }
+
+        void ModifyCamera(std::function<Camera(Camera)> modification) { this->cameraBuffer.ModifyObject(modification); }
 
         void Render()
         {
@@ -100,7 +75,11 @@ class SceneRenderer : public Disposable
             this->renderTexture.Dispose();
         }
 
-        Texture2D RenderTexture() { return this->renderTexture; }
+        const Texture2D RenderTexture() const { return this->renderTexture; }
+
+        const Camera SceneCamera() const { return this->cameraBuffer.Data(); }
+
+        const ArrayBuffer<Geometry> GetAllGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
 };
 
 BufferInfo* SceneRenderer::BUFFERS_INFO = new BufferInfo[NUM_BUFFERS] {

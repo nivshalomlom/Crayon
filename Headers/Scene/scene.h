@@ -25,7 +25,13 @@ class Scene : public Disposable
                 this->geometries[i] = List<Geometry>();
         }
 
-        void Add(Geometry geometry, GEOMETRY_TYPE type) { this->geometries[type].Add(geometry); }
+        int Add(Geometry geometry, GEOMETRY_TYPE type) 
+        { 
+            List<Geometry> list = this->geometries[type];
+            list.Add(geometry);
+            
+            return list.Count() - 1;
+        }
 
         List<Geometry> GetAllGeometry(GEOMETRY_TYPE type) { return this->geometries[type]; }
 

@@ -2,6 +2,7 @@
 #define _SCENE_H
 
 #include "../Geometry/primitives.h"
+#include "../Utility/disposable.h"
 #include "../Utility/list.h"
 #include "../common.h"
 
@@ -11,7 +12,7 @@ enum GEOMETRY_TYPE
     PLANE_TYPE
 };
 
-class Scene
+class Scene : public Disposable
 {
     private:
         List<Geometry>* geometries;
@@ -27,6 +28,8 @@ class Scene
         void Add(Geometry geometry, GEOMETRY_TYPE type) { this->geometries[type].Add(geometry); }
 
         List<Geometry> GetAllGeometry(GEOMETRY_TYPE type) { return this->geometries[type]; }
+
+        void Dispose() { this->geometries->Dispose(); }
 };
 
 #endif

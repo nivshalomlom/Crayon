@@ -3,6 +3,7 @@
 
 #include "../Buffers/array_bufffer.h"
 #include "../Graphics/program.h"
+#include "../Graphics/camera.h"
 #include "../Textures/texture.h"
 #include "../Utility/disposable.h"
 #include "./scene.h"
@@ -41,7 +42,7 @@ class SceneRenderer : public Disposable
         glm::ivec3 dispatchGroups;
 
     public:
-        SceneRenderer(Scene scene, int textureWidth, int textureHeight, GLint imageIndex = 0)
+        SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex = 0)
         {
             this->renderShader = ComputeProgram("./Shaders/Compute/render.comp");
             this->renderTexture = Texture2D(textureWidth, textureHeight);
@@ -57,7 +58,12 @@ class SceneRenderer : public Disposable
         void SetScene(Scene scene)
         {
             if (this->geometryBuffers != nullptr)
+            {
+                for (int i = 0; i < NUM_BUFFERS; i++)
+                    this->geometryBuffers[i].Dispose();
+
                 delete [] this->geometryBuffers;
+            }
 
             this->geometryBuffers = new ArrayBuffer<Geometry>[NUM_BUFFERS];
             for (int i = 0; i < NUM_BUFFERS; i++)
@@ -68,6 +74,14 @@ class SceneRenderer : public Disposable
                 this->geometryBuffers[i] = ArrayBuffer<Geometry>(geometry.ToArray(), geometry.Count(), info.ItemSize());
                 this->geometryBuffers[i].BindToStorageBlock(this->renderShader.Id(), info.Binding(), info.Name());
             }
+        }
+
+        void MutateGeometry(GEOMETRY_TYPE type, int index, std::function<Geometry(Geometry)> mutation)
+        {
+            Geometry geometry = this->geometryBuffers[type].Get(index);
+            geometry = mutation(geometry);
+
+            this->geometryBuffers[type].Set(&geometry, index);
         }
 
         void Render()

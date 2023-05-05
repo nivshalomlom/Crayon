@@ -36,6 +36,12 @@ class ArrayBuffer : public StorageBuffer
         }
 
         T Get(int index) { return this->array[index]; }
+
+        void Dispose()
+        {
+            StorageBuffer::Dispose();
+            this->array.Dispose();
+        }
 };
 
 #endif

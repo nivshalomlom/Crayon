@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     };
 
     StorageBuffer* cameraBuffer = new StorageBuffer(&camera, sizeof(Camera));
-    ArrayBuffer<Sphere>* sphereBuffer = new ArrayBuffer<Sphere>(spheres, 1);
+    ArrayBuffer<Sphere>* sphereBuffer = new ArrayBuffer<Sphere>(spheres, 1, sizeof(Sphere));
 
     cameraBuffer->BindToStorageBlock(render->Id(), 2, "CameraBuffer");
     sphereBuffer->BindToStorageBlock(render->Id(), 0, "SphereBuffer");

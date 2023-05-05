@@ -12,10 +12,16 @@ class ObjectBuffer : public StorageBuffer
         size_t size;
 
     public:
-        ObjectBuffer(T data = NULL, size_t size = 0) : StorageBuffer(&data, size)
+        ObjectBuffer(T data, size_t size) : StorageBuffer(&data, size)
         {
             this->data = data;
             this->size = size;
+        }
+
+        ObjectBuffer() : StorageBuffer(nullptr, 0)
+        {
+            this->data = T{};
+            this->size = 0;
         }
 
         void ModifyObject(std::function<T(T)> modification)

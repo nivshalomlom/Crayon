@@ -1,6 +1,11 @@
 #include "../Headers/Scene/scene_renderer.h"
 
-SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex = 0)
+BufferInfo* SceneRenderer::BUFFERS_INFO = new BufferInfo[SceneRenderer::NUM_BUFFERS] {
+    BufferInfo("SphereBuffer", sizeof(Sphere), 0),
+    BufferInfo("PlaneBuffer", sizeof(Plane), 1)
+};
+
+SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex)
 {
     this->renderShader = ComputeProgram("./Shaders/Compute/render.comp");
     this->renderTexture = Texture2D(textureWidth, textureHeight);
@@ -12,14 +17,16 @@ SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int t
         1
     );
 
+    this->geometryBuffers = NULL;
     this->SetScene(scene);
+
     this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
     this->cameraBuffer.BindToStorageBlock(this->renderShader.Id(), 2, "CameraBuffer");
 }
 
 void SceneRenderer::SetScene(Scene scene)
 {
-    if (this->geometryBuffers != nullptr)
+    if (this->geometryBuffers != NULL)
     {
         for (int i = 0; i < NUM_BUFFERS; i++)
             this->geometryBuffers[i].Dispose();

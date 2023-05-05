@@ -15,13 +15,13 @@ class ArrayBuffer : public StorageBuffer
         size_t itemSize;
 
     public:
-        ArrayBuffer(T* items = {}, int count = 0, size_t itemSize = 0) : StorageBuffer(items, count * itemSize)
+        ArrayBuffer(T* items = nullptr, int count = 0, size_t itemSize = 0) : StorageBuffer(items, count * itemSize)
         {
             this->array = Array<T>(items, count);
             this->itemSize = itemSize;
         }
 
-        void Set(T* item, int index)
+        void Set(T item, int index)
         {
             this->array[index] = item;
             this->UpdateData(this->array.items + index, this->itemSize, index * this->itemSize);
@@ -36,6 +36,8 @@ class ArrayBuffer : public StorageBuffer
         }
 
         T Get(int index) { return this->array[index]; }
+
+        int Length() { return this->array.Length(); }
 
         void Dispose()
         {

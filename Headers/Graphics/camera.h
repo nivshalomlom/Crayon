@@ -19,7 +19,7 @@ class Camera
         glm::vec2 nearPlaneSize;
         float nearPlaneDistance;
 
-        Camera(glm::vec3 position, float fov, float aspectRatio, float near, float far)
+        Camera(glm::vec3 position = glm::vec3(0), float fov = 25.0f, float aspectRatio = 1.777, float near = 5, float far = 20)
         {
             this->transform = Transform(position);
             this->UpdateNearPlane(glm::radians(fov), aspectRatio, near);

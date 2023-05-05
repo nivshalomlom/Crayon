@@ -20,17 +20,15 @@ class Scene : public Disposable
     public:
         Scene()
         {
-            this->geometries = new List<Geometry>[PLANE_TYPE];
-            for (int i = 0; i < PLANE_TYPE; i++)
+            this->geometries = new List<Geometry>[PLANE_TYPE + 1];
+            for (int i = 0; i <= PLANE_TYPE; i++)
                 this->geometries[i] = List<Geometry>();
         }
 
         int Add(Geometry geometry, GEOMETRY_TYPE type) 
         { 
-            List<Geometry> list = this->geometries[type];
-            list.Add(geometry);
-            
-            return list.Count() - 1;
+            this->geometries[type].Add(geometry);
+            return this->geometries[type].Count() - 1;
         }
 
         List<Geometry> GetAllGeometry(GEOMETRY_TYPE type) { return this->geometries[type]; }

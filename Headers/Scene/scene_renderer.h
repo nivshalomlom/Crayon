@@ -54,7 +54,7 @@ class SceneRenderer : public Disposable
             Geometry geometry = this->geometryBuffers[type].Get(index);
             geometry = modification(geometry);
 
-            this->geometryBuffers[type].Set(&geometry, index);
+            this->geometryBuffers[type].Set(geometry, index);
         }
 
         void ModifyCamera(std::function<Camera(Camera)> modification) { this->cameraBuffer.ModifyObject(modification); }
@@ -80,11 +80,6 @@ class SceneRenderer : public Disposable
         const Camera SceneCamera() const { return this->cameraBuffer.Data(); }
 
         const ArrayBuffer<Geometry> GetAllGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
-};
-
-BufferInfo* SceneRenderer::BUFFERS_INFO = new BufferInfo[NUM_BUFFERS] {
-    BufferInfo("SphereBuffer", sizeof(Sphere), 0),
-    BufferInfo("PlaneBuffer", sizeof(Plane), 1)
 };
 
 #endif

@@ -1,0 +1,6 @@
+#include "./transform.comp"
+#include "./material.comp"
+
+#define GEOMETRY_BASE\
+    Transform transform;\
+    Material material;

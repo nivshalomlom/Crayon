@@ -12,11 +12,12 @@ int main(int argc, char **argv)
     Scene scene = Scene();
 
     scene.Add(Sphere(vec3(0, 0, 20), 3, Material(vec3(0.5, 0.0, 0.0))), SPHERE_TYPE);
-    
     SceneRenderer* sceneRenderer = new SceneRenderer(scene, camera, 1280, 720);
-    TextureRenderer* textureRenderer = new TextureRenderer();
 
+    TextureRenderer* textureRenderer = new TextureRenderer();
     Texture2D renderTexture = sceneRenderer->RenderTexture();
+
+    window.ToggleFpsCounter();
     window.Show([sceneRenderer, textureRenderer, renderTexture](Window* window, float dt) 
     {
         sceneRenderer->Render();

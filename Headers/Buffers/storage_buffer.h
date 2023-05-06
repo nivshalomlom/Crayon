@@ -1,9 +1,10 @@
 #ifndef _STORAGE_BUFFER_H
 #define _STORAGE_BUFFER_H
 
+#include "../Utility/disposable.h"
 #include "../common.h"
 
-class StorageBuffer
+class StorageBuffer : public Disposable
 {
     private:
         GLuint storageBuffer;
@@ -43,6 +44,8 @@ class StorageBuffer
         void Bind() { glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->storageBuffer); }
 
         void Unbind() { glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); }
+
+        virtual void Dispose() { glDeleteBuffers(1, &this->storageBuffer); }
 };
 
 #endif

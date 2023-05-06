@@ -57,7 +57,11 @@ class SceneRenderer : public Disposable
             this->geometryBuffers[type].Set(geometry, index);
         }
 
-        void ModifyCamera(std::function<Camera(Camera)> modification) { this->cameraBuffer.ModifyObject(modification); }
+        void ModifyCamera(std::function<Camera(Camera)> modification) 
+        {
+            Camera camera = modification(this->cameraBuffer.GetValue());
+            this->cameraBuffer.SetValue(camera);
+        }
 
         void Render()
         {
@@ -77,7 +81,7 @@ class SceneRenderer : public Disposable
 
         const Texture2D RenderTexture() const { return this->renderTexture; }
 
-        const Camera SceneCamera() const { return this->cameraBuffer.Data(); }
+        const Camera SceneCamera() const { return this->cameraBuffer.GetValue(); }
 
         const ArrayBuffer<Geometry> GetAllGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
 };

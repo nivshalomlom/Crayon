@@ -4,3 +4,7 @@
 #define GEOMETRY_BASE\
     Transform transform;\
     Material material;
+
+struct Sphere { GEOMETRY_BASE };
+
+struct Plane { GEOMETRY_BASE };

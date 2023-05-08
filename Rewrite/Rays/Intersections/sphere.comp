@@ -1,0 +1,32 @@
+bool Intersects(Sphere sphere, Ray ray, out RayHit rayHit)
+{
+    float a = dot(ray.direction, ray.direction);
+    float b = 2.0 * dot(ray.direction, ray.origin);
+    float c = dot(ray.origin, ray.origin) - 1.0;
+
+    float discriminant = pow(b, 2.0) - 4.0 * a * c;
+    if (discriminant < 0.0)
+        return false;
+
+    float t = -b / (2.0 * a);
+    if (discriminant > 0.0)
+    {
+        float root = sqrt(discriminant);
+        float t1 = (-b + root) / (2.0 * a);
+        float t2 = (-b - root) / (2.0 * a);
+
+        if (t1 > 0.0 && t2 > 0.0)
+            t = min(t1, t2);
+        else
+            t = max(t1, t2);
+    }
+
+    if (t < 0.0)
+        return false;
+
+    vec3 point = ray.origin + t * ray.direction;
+    vec3 normal = normalize(point);
+    rayHit = createRayHit(sphere.transform, sphere.material, point, normal);
+
+    return true;
+}

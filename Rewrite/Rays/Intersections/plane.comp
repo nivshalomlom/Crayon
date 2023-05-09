@@ -6,15 +6,15 @@ bool Intersects(Plane plane, Ray ray, out RayHit rayHit)
     if (lower == 0.0)
         return false;
 
-    float diff = vec3(0.0) - ray.origin;
+    vec3 diff = vec3(0.0) - ray.origin;
     float uppper = dot(diff, normal);
 
-    float t = upper / lower;
+    float t = uppper / lower;
     if (t < 0.0)
         return false;
 
     vec3 point = ray.origin + t * ray.direction;
-    if (length(point) > 1)
+    if (length(point) > 1.0)
         return false;
 
     rayHit = createRayHit(plane.transform, plane.material, point, normal);

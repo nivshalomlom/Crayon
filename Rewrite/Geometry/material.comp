@@ -25,20 +25,20 @@ struct BRDFPoint
     vec3 normal;
 };
 
-vec3 Fresnel(vec3 HoV, vec3 f0) 
+vec3 Fresnel(float HoV, vec3 f0) 
 {
-    vec3 raw = pow(vec3(1.0) - HoV, 5.0);
+    float raw = pow(1.0 - HoV, 5.0);
     vec3 inv = vec3(1.0) - f0;
     return f0 + inv * raw;
 }
 
-float Distribution(vec3 normal, vec3 half, float roughness)
+float Distribution(vec3 normal, vec3 halfV, float roughness)
 {
-    float NoH = clamp(dot(half, normal), 0.0, 1.0);
+    float NoH = clamp(dot(halfV, normal), 0.0, 1.0);
     float alpha_2 = pow(roughness, 4.0);
 
     float inner = pow(NoH, 2.0) * (alpha_2 - 1.0) + 1.0;
-    return alpha_2 / (PI * pow(inner, 2.0));
+    return alpha_2 / (M_PI * pow(inner, 2.0));
 }
 
 float Geometry(float NoV, float roughness)
@@ -50,22 +50,22 @@ float Geometry(float NoV, float roughness)
 
 vec3 BRDF(BRDFPoint point, Material material)
 {
-    vec3 half = normalize(point.incomingDirection + point.outgoingDirection);
-    vec3 rhoD = material.baseColor * (1.0 - material.metallic);
-    vec3 f0 = vec3(0.16 * pow(material.reflectance, 2));
-    f0 = mix(f0, material.baseColor, material.metallic);
+    vec3 halfV = normalize(point.incomingDirection + point.outgoingDirection);
+    vec3 rhoD = material.baseColor.xyz * (1.0 - material.metallic);
+    vec3 f0 = vec3(0.16 * pow(material.reflectance, 2.0));
+    f0 = mix(f0, material.baseColor.xyz, material.metallic);
 
     float NoV = clamp(dot(point.outgoingDirection, point.normal), 0.0, 1.0);
     float NoL = clamp(dot(point.incomingDirection, point.normal), 0.0, 1.0);
-    float HoV = clamp(dot(point.outgoingDirection, half), 0.0, 1.0);
-    float HoL = clamp(dot(point.incomingDirection, half), 0.0, 1.0);
+    float HoV = clamp(dot(point.outgoingDirection, halfV), 0.0, 1.0);
+    float HoL = clamp(dot(point.incomingDirection, halfV), 0.0, 1.0);
 
     vec3 F = Fresnel(HoV, f0);
-    float D = Distribution(point.normal, half, material.roughness);
+    float D = Distribution(point.normal, halfV, material.roughness);
     float G = Geometry(NoV, material.roughness) * Geometry(NoL, material.roughness);
     
     vec3 specular = (F * D * G) / (4.0 * max(NoV, 0.001) * max(NoL, 0.001));
-    vec3 diffuse = rhoD * PI * (vec3(1.0) - F);
+    vec3 diffuse = rhoD * M_PI * (vec3(1.0) - F);
 
     return specular + diffuse;
 }

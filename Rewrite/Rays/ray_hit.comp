@@ -9,7 +9,7 @@ struct Impact
 struct RayHit
 {
     GEOMETRY_BASE
-    Impact Impact;
+    Impact impact;
 };
 
 Impact createImpact(vec3 point, vec3 normal)

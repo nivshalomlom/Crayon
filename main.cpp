@@ -5,13 +5,33 @@
 using namespace std;
 using namespace glm;
 
+/*
+REPEAT FOR X RAYS PER PIXEL
+
+var ray = computeRay();
+var closest = 0;
+
+foreach geometry in geometries:
+    if intersects(geometry, ray, out hit) && (closest == 0 || closest.dst > hit.dst):
+        closest = dst;
+
+var color = hitColor(hit);
+if ray.canBounce:
+    var reflected = reflect(hit, ray);
+    color = BRDF(hit, shoot(reflected));
+
+return color
+*/
+
 int main(int argc, char **argv)
 {
     Window window = Window(1280, 720, "Ray Tracing Demo", 60);
     Camera camera = Camera(vec3(0, 0, 0), 25.0f, 16.0f / 9.0f, 5, 20);
     Scene scene = Scene();
 
-    scene.Add(Sphere(vec3(0, 0, 20), 3, Material(vec3(0.5, 0.0, 0.0))), SPHERE_TYPE);
+    scene.Add(Sphere(vec3(3, -1, 20), 2, Material(vec3(0.5, 0.0, 0.0))), SPHERE_TYPE);
+    scene.Add(Sphere(vec3(-3, -1, 20), 2, Material(vec3(0.0, 0.5, 0.0))), SPHERE_TYPE);
+    scene.Add(Sphere(vec3(0, 2, 20), 2, Material(vec3(0.0, 0.0, 0.5))), SPHERE_TYPE);
     SceneRenderer* sceneRenderer = new SceneRenderer(scene, camera, 1280, 720);
 
     TextureRenderer* textureRenderer = new TextureRenderer();

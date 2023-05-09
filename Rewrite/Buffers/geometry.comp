@@ -1,9 +1,0 @@
-layout(std430, binding = 0) buffer SphereBuffer
-{
-    Sphere spheres[];
-};
-
-layout(std430, binding = 1) buffer PlaneBuffer
-{
-    Plane planes[];
-};

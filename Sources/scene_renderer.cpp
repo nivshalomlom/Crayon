@@ -7,7 +7,7 @@ BufferInfo* SceneRenderer::BUFFERS_INFO = new BufferInfo[SceneRenderer::NUM_BUFF
 
 SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex)
 {
-    this->renderShader = ComputeProgram("./Shaders/Compute/render.comp");
+    this->renderShader = ComputeProgram("./Shaders/Compute/rayTrace.comp");
     this->renderTexture = Texture2D(textureWidth, textureHeight);
     
     this->renderTexture.BindToImage(imageIndex);

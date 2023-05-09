@@ -1,6 +1,6 @@
 #include "./ray_hit.comp"
 
-Ray TransformRay(Ray ray, mat4 transform)
+Ray transformRay(Ray ray, mat4 transform)
 {
     vec4 far = vec4(ray.origin + ray.direction, 1.0);
     vec4 origin = transform * vec4(ray.origin, 1.0);
@@ -8,7 +8,7 @@ Ray TransformRay(Ray ray, mat4 transform)
     return createRay(origin.xyz, direction.xyz);
 }
 
-Impact TransformImpact(Impact impact, mat4 transform)
+Impact transformImpact(Impact impact, mat4 transform)
 {
     vec4 far = vec4(impact.point + impact.normal, 1.0);
     vec4 point = transform * vec4(impact.point, 1.0);
@@ -18,8 +18,3 @@ Impact TransformImpact(Impact impact, mat4 transform)
 
 #include "./Intersections/sphere.comp"
 #include "./Intersections/plane.comp"
-
-#define INTERSECTS(ray, geometry, rayHit)\
-    Ray t_ray = TransformRay(ray, geometry.transform.worldToLocal);\
-    Intersects(geometry, t_ray, out rayHit);\
-    rayHit.impact = TransformImpact(rayHit.impact, geometry.transform.localToWorld);

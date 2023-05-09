@@ -25,6 +25,15 @@ struct BRDFPoint
     vec3 normal;
 };
 
+BRDFPoint createBRDFPoint(vec3 incomingDirection, vec3 outgoingDirection, vec3 normal)
+{
+    BRDFPoint point;
+    point.incomingDirection = incomingDirection;
+    point.outgoingDirection = outgoingDirection;
+    point.normal = normal;
+    return point;
+}
+
 vec3 Fresnel(float HoV, vec3 f0) 
 {
     float raw = pow(1.0 - HoV, 5.0);

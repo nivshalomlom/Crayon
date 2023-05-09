@@ -8,29 +8,29 @@ template <typename T>
 class ObjectBuffer : public StorageBuffer
 {
     private:
-        T data;
+        T value;
         size_t size;
 
     public:
         ObjectBuffer(T data, size_t size) : StorageBuffer(&data, size)
         {
-            this->data = data;
+            this->value = data;
             this->size = size;
         }
 
         ObjectBuffer() : StorageBuffer(nullptr, 0)
         {
-            this->data = T{};
+            this->value = T{};
             this->size = 0;
         }
 
-        void ModifyObject(std::function<T(T)> modification)
+        void SetValue(T data)
         {
-            this->data = modification(this->data);
-            this->UpdateData(&this->data, this->size, 0);
+            this->value = data;
+            this->UpdateData(&this->value, this->size, 0);
         }
 
-        const T Data() const { return this->data; }
+        const T GetValue() const { return this->value; }
 };
 
 #endif

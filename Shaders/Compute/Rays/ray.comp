@@ -1,0 +1,13 @@
+struct Ray
+{
+    vec3 origin;
+    vec3 direction;
+};
+
+Ray createRay(vec3 origin, vec3 direction)
+{
+    Ray ray;
+    ray.origin = origin;
+    ray.direction = direction;
+    return ray;
+}

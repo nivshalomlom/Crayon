@@ -1,3 +1,9 @@
+struct Transform
+{
+    mat4 localToWorld;
+    mat4 worldToLocal;
+};
+
 vec4 getMatrixCol(mat4 matrix, int col)
 {
     return vec4(
@@ -8,7 +14,7 @@ vec4 getMatrixCol(mat4 matrix, int col)
     );
 }
 
-vec3 position(mat4 transform) { return getMatrixCol(transform, 3).xyz; }
+vec3 Position(mat4 transform) { return getMatrixCol(transform, 3).xyz; }
 
 vec3 Forward(mat4 transform) { return getMatrixCol(transform, 2).xyz; }
 

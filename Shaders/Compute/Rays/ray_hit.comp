@@ -1,0 +1,30 @@
+#include "../Buffers/buffers.comp"
+
+struct Impact
+{
+    vec3 point;
+    vec3 normal;
+};
+
+struct RayHit
+{
+    GEOMETRY_BASE
+    Impact impact;
+};
+
+Impact createImpact(vec3 point, vec3 normal)
+{
+    Impact impact;
+    impact.point = point;
+    impact.normal = normal;
+    return impact;
+}
+
+RayHit createRayHit(Transform transform, Material material, vec3 point, vec3 normal)
+{
+    RayHit rayHit;
+    rayHit.transform = transform;
+    rayHit.material = material;
+    rayHit.impact = createImpact(point, normal);
+    return rayHit;
+}

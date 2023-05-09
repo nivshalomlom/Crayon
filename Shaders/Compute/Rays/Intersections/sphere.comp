@@ -1,6 +1,4 @@
-#include "./hitinfo.comp"
-
-bool Intersects(Ray ray, Sphere sphere, out HitInfo info)
+bool Intersects(Sphere sphere, Ray ray, out RayHit rayHit)
 {
     float a = dot(ray.direction, ray.direction);
     float b = 2.0 * dot(ray.direction, ray.origin);
@@ -26,9 +24,9 @@ bool Intersects(Ray ray, Sphere sphere, out HitInfo info)
     if (t < 0.0)
         return false;
 
-    vec3 position = ray.origin + t * ray.direction;
-    vec3 normal = normalize(position);
-    info = createHitInfo(sphere.transform, sphere.material, position, normal);
+    vec3 point = ray.origin + t * ray.direction;
+    vec3 normal = normalize(point);
+    rayHit = createRayHit(sphere.transform, sphere.material, point, normal);
 
     return true;
 }

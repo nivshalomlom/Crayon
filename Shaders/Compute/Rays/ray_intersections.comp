@@ -1,0 +1,20 @@
+#include "./ray_hit.comp"
+
+Ray transformRay(Ray ray, mat4 transform)
+{
+    vec4 far = vec4(ray.origin + ray.direction, 1.0);
+    vec4 origin = transform * vec4(ray.origin, 1.0);
+    vec4 direction = normalize(transform * far - origin);
+    return createRay(origin.xyz, direction.xyz);
+}
+
+Impact transformImpact(Impact impact, mat4 transform)
+{
+    vec4 far = vec4(impact.point + impact.normal, 1.0);
+    vec4 point = transform * vec4(impact.point, 1.0);
+    vec4 normal = normalize(transform * far - point);
+    return createImpact(point.xyz, normal.xyz);
+}
+
+#include "./Intersections/sphere.comp"
+#include "./Intersections/plane.comp"

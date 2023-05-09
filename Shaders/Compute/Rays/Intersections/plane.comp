@@ -17,6 +17,6 @@ bool Intersects(Plane plane, Ray ray, out RayHit rayHit)
     if (abs(point.x) > 1.0 || abs(point.y) > 1.0 || abs(point.z) > 1.0)
         return false;
 
-    rayHit = createRayHit(plane.transform, plane.material, point, normal);
+    rayHit = CreateRayHit(plane.transform, plane.material, point, normal);
     return true;
 }

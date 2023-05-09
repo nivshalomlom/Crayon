@@ -25,7 +25,7 @@ struct BRDFPoint
     vec3 normal;
 };
 
-BRDFPoint createBRDFPoint(vec3 incomingDirection, vec3 outgoingDirection, vec3 normal)
+BRDFPoint CreateBRDFPoint(vec3 incomingDirection, vec3 outgoingDirection, vec3 normal)
 {
     BRDFPoint point;
     point.incomingDirection = incomingDirection;

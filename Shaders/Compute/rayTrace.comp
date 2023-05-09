@@ -3,6 +3,23 @@
 #include "./Rays/ray_intersections.comp"
 #include "./Random/random.comp"
 
+#define ITERATE_GEOMERTY(array, ray, rayHit, closest)\
+    for (int i = 0; i < spheres.length(); i++)\
+    {\
+        Ray t_ray = transformRay(ray, array[i].transform.worldToLocal);\
+        if (Intersects(array[i], t_ray, rayHit))\
+        {\
+            rayHit.impact = transformImpact(rayHit.impact, array[i].transform.localToWorld);\
+            float geometryDist = length(rayHit.impact.point - ray.origin);\
+            \
+            if (geometryDist < closestDist || closestDist < 0.0)\
+            {\
+                closestDist = geometryDist;\
+                closest = rayHit;\
+            }\
+        }\
+    }
+
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 layout(rgba32F, binding = 0) uniform image2D renderTarget;
 
@@ -10,23 +27,9 @@ vec4 fireRay(Ray ray)
 {
     float closestDist = -1.0;
     RayHit rayHit, closest;
-    Ray t_ray;
 
-    for (int i = 0; i < spheres.length(); i++)
-    {
-        t_ray = transformRay(ray, spheres[i].transform.worldToLocal);
-        if (Intersects(spheres[i], t_ray, rayHit))
-        {
-            rayHit.impact = transformImpact(rayHit.impact, spheres[i].transform.localToWorld);
-            float geometryDist = length(rayHit.impact.point - ray.origin);
-
-            if (geometryDist < closestDist || closestDist < 0.0)
-            {
-                closestDist = geometryDist;
-                closest = rayHit;
-            }
-        }
-    }
+    ITERATE_GEOMERTY(spheres, ray, rayHit, closest);
+    ITERATE_GEOMERTY(planes, ray, rayHit, closest);
 
     return closestDist < 0.0 ? vec4(0.0) : closest.material.baseColor;
 }

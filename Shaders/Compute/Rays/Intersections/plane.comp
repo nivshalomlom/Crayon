@@ -14,7 +14,7 @@ bool Intersects(Plane plane, Ray ray, out RayHit rayHit)
         return false;
 
     vec3 point = ray.origin + t * ray.direction;
-    if (length(point) > 1.0)
+    if (abs(point.x) > 1.0 || abs(point.y) > 1.0 || abs(point.z) > 1.0)
         return false;
 
     rayHit = createRayHit(plane.transform, plane.material, point, normal);

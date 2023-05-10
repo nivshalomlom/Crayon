@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     scene.Add(Sphere(vec3(-5, -1, 20), 1, Material(vec3(0.5, 0.0, 0.0))), SPHERE_TYPE);
     scene.Add(Sphere(vec3(-1, 0, 20), 2, Material(vec3(0.0, 0.5, 0.0))), SPHERE_TYPE);
     scene.Add(Sphere(vec3(4.5, 1, 20), 3, Material(vec3(0.0, 0.0, 0.5))), SPHERE_TYPE);
-    scene.Add(Plane(vec3(0, -2, 20), vec3(7.0), Material(vec3(0.0, 0.5, 0.5))), PLANE_TYPE);
+    scene.Add(Plane(vec3(0, -2, 20), vec3(7.0), Material(vec3(1.0))), PLANE_TYPE);
     SceneRenderer* sceneRenderer = new SceneRenderer(scene, camera, 1280, 720);
 
     TextureRenderer* textureRenderer = new TextureRenderer();

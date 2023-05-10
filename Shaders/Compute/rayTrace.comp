@@ -18,20 +18,15 @@ const float antiAliasingIterations = 8.0;
 const uint raysPerPixel = 10;
 const uint rayBounces = 3;
 
-vec3 EnvironmentLight(Ray ray)
+vec3 EnvironmentLight(vec3 direction)
 {
-    float skyGradientT = pow(smoothstep(0.0, 0.4, ray.direction.y), 0.35);
+    float skyGradientT = pow(smoothstep(0.0, 0.4, direction.y), 0.35);
     vec3 skyGradient = mix(skyColor, zenithColor, skyGradientT);
-    float sun = pow(max(0, dot(ray.direction, -sunlightDirection)), sunFocus) * sunItensity;
+    float sun = pow(max(0, dot(direction, -sunlightDirection)), sunFocus) * sunItensity;
 
-    float groundToSkyT = smoothstep(-0.01, 0.0, ray.direction.y);
+    float groundToSkyT = smoothstep(-0.01, 0.0, direction.y);
     float sunMask = groundToSkyT >= 1.0 ? sun : 0.0;
     return mix(groundColor, skyGradient, groundToSkyT) + sunMask;
-}
-
-void TraceRay(Ray ray, uint numBounces)
-{
-
 }
 
 void main()
@@ -54,7 +49,7 @@ void main()
         if (FireRay(ray, hit))
             color += hit.material.baseColor;
         else
-            color += vec4(EnvironmentLight(ray), 1.0);
+            color += vec4(EnvironmentLight(ray.direction), 1.0);
     }
 
     imageStore(renderTarget, coords, color / antiAliasingIterations);

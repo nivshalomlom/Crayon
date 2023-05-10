@@ -45,7 +45,7 @@ Ray CreateReflection(RayHit rayHit, inout uint state)
         }\
     }
 
-bool fireRay(Ray ray, out RayHit hit)
+bool FireRay(Ray ray, out RayHit hit)
 {
     float closestDist = -1.0;
     RayHit temp;

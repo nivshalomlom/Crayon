@@ -24,7 +24,7 @@ void main()
         vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
         Ray ray = CreateCameraRayFromUV(uv);
 
-        if (fireRay(ray, hit))
+        if (FireRay(ray, hit))
             color += hit.material.baseColor;
     }
 

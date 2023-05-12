@@ -52,7 +52,7 @@ float Geometry(float NoV, float roughness)
 {
     float k = pow(roughness, 2.0) / 2.0;
     float lower = NoV * (1.0 - k) + k;
-    return NoV / lower;
+    return max(NoV, 0.001) / lower;
 }
 
 vec3 BRDF(BRDFPoint point, Material material)

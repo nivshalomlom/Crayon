@@ -14,8 +14,7 @@ const vec3 sunlightDirection = vec3(-0.5, -1.0, 0.0);
 const float sunItensity = 1;
 const float sunFocus = 3;
 
-const float antiAliasingIterations = 8.0;
-const uint raysPerPixel = 10;
+const float antiAliasingIterations = 50.0;
 const uint rayBounces = 3;
 
 vec3 EnvironmentLight(vec3 direction)
@@ -40,12 +39,20 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
         if (FireRay(ray, rayHit))
         {
             Material material = rayHit.material;
+            BRDFPoint point = CreateBRDFPoint(
+                -ray.direction,
+                normalize(rayHit.impact.normal + RandomDirection(state)),
+                rayHit.impact.normal
+            );
 
-            vec4 emission = material.emissionColor * material.emissionStrength;
-            ray = CreateReflection(rayHit, state);
+            ray.origin = rayHit.impact.point;
+            ray.direction = point.outgoingDirection;
 
+            // ray = CreateReflection(rayHit, state);
+            // rayColor *= BRDF(point, material);
+            
             rayColor *= material.baseColor.xyz; 
-            incomingLight += emission.xyz * rayColor;
+            incomingLight += Emission(material) * rayColor;
         }
         else
         {

@@ -11,12 +11,10 @@ struct Material
     float metallic;
 };
 
-/*
-
-outgoingDirection - the direction from the reflection point to the eye
-incomingDirection - the direction from the reflection point to the light source
-
-*/
+vec3 Emission(Material material)
+{
+    return (material.emissionStrength * material.emissionColor).xyz;
+}
 
 struct BRDFPoint
 {

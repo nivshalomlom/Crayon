@@ -11,11 +11,11 @@ const vec3 zenithColor = vec3(0.270, 0.470, 0.611);
 const vec3 groundColor = vec3(0.3);
 
 const vec3 sunlightDirection = vec3(-0.5, -1.0, 0.0);
-const float sunItensity = 1;
+const float sunItensity = 10;
 const float sunFocus = 3;
 
-const float antiAliasingIterations = 50.0;
-const uint rayBounces = 3;
+const float antiAliasingIterations = 10.0;
+const uint rayBounces = 4;
 
 vec3 EnvironmentLight(vec3 direction)
 {
@@ -46,12 +46,11 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
             );
 
             ray.origin = rayHit.impact.point;
-            ray.direction = point.outgoingDirection;
+            ray.direction = point.lightDirection;
 
-            // ray = CreateReflection(rayHit, state);
-            // rayColor *= BRDF(point, material);
+            // rayColor *= material.baseColor.xyz;
             
-            rayColor *= material.baseColor.xyz; 
+            rayColor *= BRDF(point, material);
             incomingLight += Emission(material) * rayColor;
         }
         else

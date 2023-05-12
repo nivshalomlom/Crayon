@@ -10,6 +10,9 @@ SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int t
     this->renderShader = ComputeProgram("./Shaders/Compute/rayTrace.comp");
     this->renderTexture = Texture2D(textureWidth, textureHeight);
     
+    this->frameCounterLocation = glGetUniformLocation(this->renderShader.Id(), "frameCounter");
+    this->frameCounter = 0;
+
     this->renderTexture.BindToImage(imageIndex);
     this->dispatchGroups = glm::ivec3(
         ceilf(textureWidth / 32.0f), 

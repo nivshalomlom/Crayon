@@ -44,6 +44,11 @@ class SceneRenderer : public Disposable
         Texture2D renderTexture;
         glm::ivec3 dispatchGroups;
 
+        GLint frameCounterLocation; 
+        GLuint frameCounter;
+
+        void IncrementFrameCounter() { glUniform1ui(this->frameCounterLocation, ++this->frameCounter); }
+
     public:
         SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex = 0);
 
@@ -70,6 +75,8 @@ class SceneRenderer : public Disposable
                 this->dispatchGroups,
                 GL_SHADER_IMAGE_ACCESS_BARRIER_BIT
             );
+
+            this->IncrementFrameCounter();
         }
 
         void Dispose()

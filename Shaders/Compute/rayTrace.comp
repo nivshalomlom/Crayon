@@ -11,11 +11,13 @@ const vec3 zenithColor = vec3(0.270, 0.470, 0.611);
 const vec3 groundColor = vec3(0.3);
 
 const vec3 sunlightDirection = vec3(-0.5, -1.0, 0.0);
-const float sunItensity = 10;
+const float sunItensity = 3;
 const float sunFocus = 3;
 
-const float antiAliasingIterations = 10.0;
-const uint rayBounces = 4;
+const float antiAliasingIterations = 8.0;
+const uint rayBounces = 3;
+
+uniform uint frameCounter;
 
 vec3 EnvironmentLight(vec3 direction)
 {
@@ -39,18 +41,19 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
         if (FireRay(ray, rayHit))
         {
             Material material = rayHit.material;
+            vec3 normal = rayHit.impact.normal;
+
             BRDFPoint point = CreateBRDFPoint(
                 -ray.direction,
                 normalize(rayHit.impact.normal + RandomDirection(state)),
-                rayHit.impact.normal
+                normal
             );
 
-            ray.origin = rayHit.impact.point;
+            ray.origin = rayHit.impact.point + point.lightDirection * 0.001;
             ray.direction = point.lightDirection;
 
-            // rayColor *= material.baseColor.xyz;
-            
-            rayColor *= BRDF(point, material);
+            // rayColor *= BRDF(point, material);
+            rayColor *= material.baseColor.xyz;
             incomingLight += Emission(material) * rayColor;
         }
         else
@@ -63,6 +66,13 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
     return vec4(incomingLight, 1.0);
 }
 
+void UpdateImage(ivec2 coords, vec4 value)
+{
+    vec4 prev = imageLoad(renderTarget, coords);
+    vec4 avg = (prev * frameCounter + value) / (frameCounter + 1);
+    imageStore(renderTarget, coords, avg);
+}
+
 void main()
 {
     ivec2 dimensions = imageSize(renderTarget);
@@ -71,7 +81,7 @@ void main()
     if (coords.x >= dimensions.x || coords.y >= dimensions.y)
         return;
 
-    uint state = coords.x + coords.y * dimensions.x;    
+    uint state = coords.x + coords.y * dimensions.x + frameCounter * 6647369;    
     vec4 color = vec4(0.0);
 
     for (int i = 0; i < antiAliasingIterations; i++)
@@ -81,5 +91,5 @@ void main()
         color += Trace(ray, rayBounces, state);
     }
 
-    imageStore(renderTarget, coords, color / antiAliasingIterations);
+    UpdateImage(coords, color / antiAliasingIterations);
 }

@@ -17,10 +17,10 @@ struct Reservoir
 
 bool WeightedCoinFlip(float weight1, float weight2, inout uint state)
 {
-    float sum = weight1 + weight2;
     float rand = RandomValue(state);
+    float sum = weight1 + weight2;
 
-    if (rand * sum > weight1)
+    if ((rand * sum) > weight1)
         return true;
 
     return false;

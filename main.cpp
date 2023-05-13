@@ -5,24 +5,6 @@
 using namespace std;
 using namespace glm;
 
-/*
-REPEAT FOR X RAYS PER PIXEL
-
-var ray = computeRay();
-var closest = 0;
-
-foreach geometry in geometries:
-    if intersects(geometry, ray, out hit) && (closest == 0 || closest.dst > hit.dst):
-        closest = dst;
-
-var color = hitColor(hit);
-if ray.canBounce:
-    var reflected = reflect(hit, ray);
-    color = BRDF(hit, shoot(reflected));
-
-return color
-*/
-
 int main(int argc, char **argv)
 {
     Window window = Window(1280, 720, "Ray Tracing Demo", 60);

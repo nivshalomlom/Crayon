@@ -1,5 +1,4 @@
-#include "../Random/random.comp"
-#include "./ray_hit.comp"
+#include "../Reservoir/reservoir.comp"
 
 Ray TransformRay(Ray ray, mat4 transform)
 {

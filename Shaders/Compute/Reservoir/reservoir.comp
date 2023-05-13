@@ -1,0 +1,56 @@
+#include "../Random/random.comp"
+#include "../Rays/ray_hit.comp"
+
+struct ReservoirSample
+{
+    RayHit rayHit;
+    vec4 color;
+};
+
+struct Reservoir
+{
+    ReservoirSample value;
+    float valueWeight;
+    float totalWeight;
+    uint numSamples;
+};
+
+bool WeightedCoinFlip(float weight1, float weight2, inout uint state)
+{
+    float sum = weight1 + weight2;
+    float rand = RandomValue(state);
+
+    if (rand * sum > weight1)
+        return true;
+
+    return false;
+}
+
+Reservoir CreateReservoir()
+{
+    Reservoir reservoir;
+    reservoir.valueWeight = 0.0;
+    reservoir.totalWeight = 0.0;
+    reservoir.numSamples = 0;
+    return reservoir;
+}
+
+void AddToReservoir(Reservoir reservoir, ReservoirSample value, float weight, inout uint state)
+{
+    if (WeightedCoinFlip(reservoir.totalWeight, weight, state))
+    {
+        reservoir.value = value;
+        reservoir.valueWeight = weight;
+    }
+
+    reservoir.numSamples++;
+    reservoir.totalWeight += weight;
+}
+
+void MergeReservoirs(Reservoir destination, Reservoir source, inout uint state)
+{
+    AddToReservoir(destination, source.value, source.totalWeight, state);
+    destination.numSamples += source.numSamples - 1;
+}
+
+float ReservoirCorrectionWeight(Reservoir reservoir) { return (reservoir.totalWeight / float(reservoir.numSamples)) / reservoir.valueWeight; }

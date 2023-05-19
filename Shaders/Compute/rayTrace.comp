@@ -16,7 +16,7 @@ const float sunFocus = 3;
 const float gamma = 1.0;
 
 const float antiAliasingIterations = 8.0;
-const uint rayBounces = 3;
+const uint rayBounces = 2;
 
 uniform uint frameCounter;
 

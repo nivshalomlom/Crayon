@@ -13,6 +13,7 @@ const vec3 groundColor = vec3(0.3);
 const vec3 sunlightDirection = vec3(-0.5, -1.0, 0.0);
 const float sunItensity = 10;
 const float sunFocus = 3;
+const float gamma = 4.0;
 
 const float antiAliasingIterations = 8.0;
 const uint rayBounces = 3;
@@ -92,5 +93,8 @@ void main()
         color += Trace(ray, rayBounces, state);
     }
 
-    UpdateImage(coords, color / antiAliasingIterations);
+    color /= antiAliasingIterations;
+    color.rgb = pow(color.rgb, vec3(1.0 / gamma));
+
+    UpdateImage(coords, color);
 }

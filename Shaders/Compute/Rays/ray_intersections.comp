@@ -28,7 +28,7 @@ Ray CreateReflection(RayHit rayHit, inout uint state)
 #include "./Intersections/plane.comp"
 
 #define ITERATE_GEOMERTY(array, ray, rayHit, closest)\
-    for (int i = 0; i < spheres.length(); i++)\
+    for (int i = 0; i < array.length(); i++)\
     {\
         Ray t_ray = TransformRay(ray, array[i].transform.worldToLocal);\
         if (Intersects(array[i], t_ray, rayHit))\

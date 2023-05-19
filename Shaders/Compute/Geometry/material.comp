@@ -1,4 +1,5 @@
 const float M_PI = 3.14159265358979323846264338327950288;
+const float EPS = 0.001;
 
 struct Material
 {
@@ -48,7 +49,7 @@ float Geometry(float NoV, float roughness)
 {
     float k = pow(roughness, 2.0) / 2.0;
     float lower = NoV * (1.0 - k) + k;
-    return max(NoV, 0.001) / lower;
+    return max(NoV, EPS) / lower;
 }
 
 vec3 BRDF(BRDFPoint point, Material material)
@@ -58,16 +59,16 @@ vec3 BRDF(BRDFPoint point, Material material)
     vec3 f0 = vec3(0.16 * pow(material.reflectance, 2.0));
     f0 = mix(f0, material.baseColor.xyz, material.metallic);
 
-    float NoV = clamp(dot(point.viewerDirection, point.normal), 0.0, 1.0);
-    float NoL = clamp(dot(point.lightDirection, point.normal), 0.0, 1.0);
-    float HoV = clamp(dot(point.viewerDirection, halfV), 0.0, 1.0);
-    float HoN = clamp(dot(point.normal, halfV), 0.0, 1.0);
+    float NoV = clamp(dot(point.viewerDirection, point.normal), EPS, 1.0);
+    float NoL = clamp(dot(point.lightDirection, point.normal), EPS, 1.0);
+    float HoV = clamp(dot(point.viewerDirection, halfV), EPS, 1.0);
+    float HoN = clamp(dot(point.normal, halfV), EPS, 1.0);
     
     vec3 F = Fresnel(HoV, f0);
-    float D = Distribution(HoN, material.roughness);
+    float D = max(Distribution(HoN, material.roughness), EPS);
     float G = Geometry(NoV, material.roughness) * Geometry(NoL, material.roughness);
     
-    vec3 specular = (F * D * G) / (4.0 * max(NoV, 0.001) * max(NoL, 0.001));
+    vec3 specular = (F * D * G) / (4.0 * max(NoV, EPS) * max(NoL, EPS));
     vec3 diffuse = (rhoD * (vec3(1.0) - F)) / M_PI;
 
     return specular + diffuse;

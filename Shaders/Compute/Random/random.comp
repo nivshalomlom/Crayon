@@ -16,7 +16,7 @@ vec2 RandomVector2(inout uint state)
 
 float RandomValueNormalDistribution(inout uint state)
 {
-    float theta = 2 * 3.1415926 * RandomValue(state);
+    float theta = 2 * M_PI * RandomValue(state);
     float rho = sqrt(-2 * log(RandomValue(state)));
     return rho * cos(theta);
 }
@@ -27,4 +27,9 @@ vec3 RandomDirection(inout uint state)
     float y = RandomValueNormalDistribution(state);
     float z = RandomValueNormalDistribution(state);
     return normalize(vec3(x, y, z));
+}
+
+float RandomDirectionPDF(vec3 direction, vec3 normal)
+{
+    return dot(direction, normal) / M_PI;
 }

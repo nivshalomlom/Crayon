@@ -1,5 +1,5 @@
-#include "../Random/random.comp"
 #include "../Rays/ray_hit.comp"
+#include "../Random/random.comp"
 
 struct ReservoirSample
 {

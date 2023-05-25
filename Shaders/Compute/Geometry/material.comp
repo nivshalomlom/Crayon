@@ -1,4 +1,5 @@
 const float M_PI = 3.14159265358979323846264338327950288;
+const float EPS = 0.0001;
 
 struct Material
 {
@@ -11,61 +12,81 @@ struct Material
     float metallic;
 };
 
-/*
-
-outgoingDirection - the direction from the reflection point to the eye
-incomingDirection - the direction from the reflection point to the light source
-
-*/
+vec3 Emission(Material material)
+{
+    return (material.emissionStrength * material.emissionColor).xyz;
+}
 
 struct BRDFPoint
 {
-    vec3 incomingDirection;
-    vec3 outgoingDirection;
+    vec3 viewerDirection;
+    vec3 lightDirection;
     vec3 normal;
 };
 
-vec3 Fresnel(float HoV, vec3 f0) 
+BRDFPoint CreateBRDFPoint(vec3 viewerDirection, vec3 lightDirection, vec3 normal)
 {
-    float raw = pow(1.0 - HoV, 5.0);
-    vec3 inv = vec3(1.0) - f0;
-    return f0 + inv * raw;
+    BRDFPoint point;
+    point.viewerDirection = viewerDirection;
+    point.lightDirection = lightDirection;
+    point.normal = normal;
+    return point;
 }
 
-float Distribution(vec3 normal, vec3 halfV, float roughness)
+vec3 Fresnel(float HoV, vec3 f0) 
 {
-    float NoH = clamp(dot(halfV, normal), 0.0, 1.0);
-    float alpha_2 = pow(roughness, 4.0);
+    return f0 + (vec3(1.0) - f0) * pow(1.0 - HoV, 5.0);
+}
 
-    float inner = pow(NoH, 2.0) * (alpha_2 - 1.0) + 1.0;
+float Distribution(float HoN, float roughness)
+{
+    float alpha_2 = pow(roughness, 4.0);
+    float inner = pow(HoN, 2.0) * (alpha_2 - 1.0) + 1.0;
     return alpha_2 / (M_PI * pow(inner, 2.0));
 }
 
 float Geometry(float NoV, float roughness)
 {
+    if (roughness == 0.0)
+        return 1.0;
+
     float k = pow(roughness, 2.0) / 2.0;
     float lower = NoV * (1.0 - k) + k;
-    return NoV / lower;
+    return max(NoV, EPS) / lower;
+}
+
+float fresnelSchlick90(float HoV, float f0, float f90) {
+  return f0 + (f90 - f0) * pow(1.0 - HoV, 5.0);
+} 
+
+float disneyDiffuseFactor(float NoV, float NoL, float VoH, float roughness) {
+  float alpha = roughness * roughness;
+  float f90 = 0.5 + 2.0 * alpha * VoH * VoH;
+  
+  float F_in = fresnelSchlick90(NoL, 1.0, f90);
+  float F_out = fresnelSchlick90(NoV, 1.0, f90);
+
+  return F_in * F_out;
 }
 
 vec3 BRDF(BRDFPoint point, Material material)
 {
-    vec3 halfV = normalize(point.incomingDirection + point.outgoingDirection);
+    vec3 halfV = normalize(point.viewerDirection + point.lightDirection);
     vec3 rhoD = material.baseColor.xyz * (1.0 - material.metallic);
     vec3 f0 = vec3(0.16 * pow(material.reflectance, 2.0));
     f0 = mix(f0, material.baseColor.xyz, material.metallic);
 
-    float NoV = clamp(dot(point.outgoingDirection, point.normal), 0.0, 1.0);
-    float NoL = clamp(dot(point.incomingDirection, point.normal), 0.0, 1.0);
-    float HoV = clamp(dot(point.outgoingDirection, halfV), 0.0, 1.0);
-    float HoL = clamp(dot(point.incomingDirection, halfV), 0.0, 1.0);
-
+    float NoV = clamp(dot(point.viewerDirection, point.normal), EPS, 1.0);
+    float NoL = clamp(dot(point.lightDirection, point.normal), EPS, 1.0);
+    float HoV = clamp(dot(point.viewerDirection, halfV), EPS, 1.0);
+    float HoN = clamp(dot(point.normal, halfV), EPS, 1.0);
+    
     vec3 F = Fresnel(HoV, f0);
-    float D = Distribution(point.normal, halfV, material.roughness);
+    float D = max(Distribution(HoN, material.roughness), EPS);
     float G = Geometry(NoV, material.roughness) * Geometry(NoL, material.roughness);
     
-    vec3 specular = (F * D * G) / (4.0 * max(NoV, 0.001) * max(NoL, 0.001));
-    vec3 diffuse = rhoD * M_PI * (vec3(1.0) - F);
+    vec3 specular = (F * D * G) / (4.0 * max(NoV, EPS) * max(NoL, EPS));
+    vec3 diffuse = (rhoD * (vec3(1.0) - F) * disneyDiffuseFactor(NoV, NoL, HoV, material.roughness)) / M_PI;
 
     return specular + diffuse;
 }

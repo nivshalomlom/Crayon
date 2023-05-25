@@ -1,20 +1,57 @@
-#include "./ray_hit.comp"
+#include "../Reservoir/reservoir.comp"
 
-Ray transformRay(Ray ray, mat4 transform)
+Ray TransformRay(Ray ray, mat4 transform)
 {
     vec4 far = vec4(ray.origin + ray.direction, 1.0);
     vec4 origin = transform * vec4(ray.origin, 1.0);
     vec4 direction = normalize(transform * far - origin);
-    return createRay(origin.xyz, direction.xyz);
+    return CreateRay(origin.xyz, direction.xyz);
 }
 
-Impact transformImpact(Impact impact, mat4 transform)
+Impact TransformImpact(Impact impact, mat4 transform)
 {
     vec4 far = vec4(impact.point + impact.normal, 1.0);
     vec4 point = transform * vec4(impact.point, 1.0);
     vec4 normal = normalize(transform * far - point);
-    return createImpact(point.xyz, normal.xyz);
+    return CreateImpact(point.xyz, normal.xyz);
+}
+
+Ray CreateReflection(RayHit rayHit, inout uint state)
+{
+    return CreateRay(
+        rayHit.impact.point,
+        normalize(rayHit.impact.normal + RandomDirection(state))
+    );
 }
 
 #include "./Intersections/sphere.comp"
 #include "./Intersections/plane.comp"
+
+#define ITERATE_GEOMERTY(array)\
+    for (int i = 0; i < array.length(); i++)\
+    {\
+        Ray t_ray = TransformRay(ray, array[i].transform.worldToLocal);\
+        if (Intersects(array[i], t_ray, rayHit))\
+        {\
+            rayHit.impact = TransformImpact(rayHit.impact, array[i].transform.localToWorld);\
+            vec3 hitDirection = rayHit.impact.point - ray.origin;\
+            float geometryDist = dot(hitDirection, hitDirection);\
+            \
+            if (geometryDist < closestDist || closestDist < 0.0)\
+            {\
+                closestDist = geometryDist;\
+                closest = rayHit;\
+            }\
+        }\
+    }
+
+bool FireRay(Ray ray, out RayHit closest)
+{
+    float closestDist = -1.0;
+    RayHit rayHit;
+
+    ITERATE_GEOMERTY(spheres);
+    ITERATE_GEOMERTY(planes);
+
+    return closestDist > 0.0;
+}

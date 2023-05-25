@@ -12,7 +12,7 @@ struct RayHit
     Impact impact;
 };
 
-Impact createImpact(vec3 point, vec3 normal)
+Impact CreateImpact(vec3 point, vec3 normal)
 {
     Impact impact;
     impact.point = point;
@@ -20,11 +20,11 @@ Impact createImpact(vec3 point, vec3 normal)
     return impact;
 }
 
-RayHit createRayHit(Transform transform, Material material, vec3 point, vec3 normal)
+RayHit CreateRayHit(Transform transform, Material material, vec3 point, vec3 normal)
 {
     RayHit rayHit;
     rayHit.transform = transform;
     rayHit.material = material;
-    rayHit.impact = createImpact(point, normal);
+    rayHit.impact = CreateImpact(point, normal);
     return rayHit;
 }

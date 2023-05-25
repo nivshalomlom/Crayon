@@ -1,4 +1,4 @@
-float RandomFloat(inout uint state)
+float RandomValue(inout uint state)
 {
     state = state * 747796405 + 2891336453;
     uint result = ((state >> ((state >> 28) + 4)) ^ state) * 277803737;
@@ -9,20 +9,27 @@ float RandomFloat(inout uint state)
 vec2 RandomVector2(inout uint state)
 {
     return vec2(
-        RandomFloat(state),
-        RandomFloat(state)
+        RandomValue(state),
+        RandomValue(state)
     );
 }
 
-vec3 RandomDirectionInHeimsphere(vec3 normal, inout uint state)
+float RandomValueNormalDistribution(inout uint state)
 {
-    float x = RandomFloat(state);
-    float y = RandomFloat(state);
-    float z = RandomFloat(state);
+    float theta = 2 * M_PI * RandomValue(state);
+    float rho = sqrt(-2 * log(RandomValue(state)));
+    return rho * cos(theta);
+}
 
-    vec3 direction = normalize(vec3(x, y, z));
-    if (dot(direction, normal) < 0)
-        return -direction;
+vec3 RandomDirection(inout uint state)
+{
+    float x = RandomValueNormalDistribution(state);
+    float y = RandomValueNormalDistribution(state);
+    float z = RandomValueNormalDistribution(state);
+    return normalize(vec3(x, y, z));
+}
 
-    return direction;
+float RandomDirectionPDF(vec3 direction, vec3 normal)
+{
+    return dot(direction, normal) / M_PI;
 }

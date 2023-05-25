@@ -1,5 +1,5 @@
 const float M_PI = 3.14159265358979323846264338327950288;
-const float EPS = 0.001;
+const float EPS = 0.0001;
 
 struct Material
 {
@@ -47,9 +47,26 @@ float Distribution(float HoN, float roughness)
 
 float Geometry(float NoV, float roughness)
 {
+    if (roughness == 0.0)
+        return 1.0;
+
     float k = pow(roughness, 2.0) / 2.0;
     float lower = NoV * (1.0 - k) + k;
     return max(NoV, EPS) / lower;
+}
+
+float fresnelSchlick90(float HoV, float f0, float f90) {
+  return f0 + (f90 - f0) * pow(1.0 - HoV, 5.0);
+} 
+
+float disneyDiffuseFactor(float NoV, float NoL, float VoH, float roughness) {
+  float alpha = roughness * roughness;
+  float f90 = 0.5 + 2.0 * alpha * VoH * VoH;
+  
+  float F_in = fresnelSchlick90(NoL, 1.0, f90);
+  float F_out = fresnelSchlick90(NoV, 1.0, f90);
+
+  return F_in * F_out;
 }
 
 vec3 BRDF(BRDFPoint point, Material material)
@@ -69,7 +86,7 @@ vec3 BRDF(BRDFPoint point, Material material)
     float G = Geometry(NoV, material.roughness) * Geometry(NoL, material.roughness);
     
     vec3 specular = (F * D * G) / (4.0 * max(NoV, EPS) * max(NoL, EPS));
-    vec3 diffuse = (rhoD * (vec3(1.0) - F)) / M_PI;
+    vec3 diffuse = (rhoD * (vec3(1.0) - F) * disneyDiffuseFactor(NoV, NoL, HoV, material.roughness)) / M_PI;
 
     return specular + diffuse;
 }

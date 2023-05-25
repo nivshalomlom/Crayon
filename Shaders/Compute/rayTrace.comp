@@ -15,7 +15,7 @@ const float sunItensity = 10;
 const float sunFocus = 3;
 const float gamma = 1.0;
 
-const float antiAliasingIterations = 8.0;
+const uint antiAliasingIterations = 8;
 const uint rayBounces = 2;
 
 uniform uint frameCounter;
@@ -50,7 +50,7 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
                 normal
             );
 
-            ray.origin = rayHit.impact.point + normal * 0.0001;
+            ray.origin = rayHit.impact.point + normal * EPS;
             ray.direction = point.lightDirection;
 
             rayColor *= BRDF(point, material);
@@ -94,7 +94,7 @@ void main()
         color += Trace(ray, rayBounces, state);
     }
 
-    color /= antiAliasingIterations;
+    color /= float(antiAliasingIterations);
     if (gamma != 1.0)
         color.rgb = pow(color.rgb, vec3(1.0 / gamma));
 

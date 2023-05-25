@@ -65,20 +65,6 @@ float Geometry(float NoV, float roughness)
     return max(NoV, EPS) / lower;
 }
 
-float fresnelSchlick90(float HoV, float f0, float f90) {
-  return f0 + (f90 - f0) * pow(1.0 - HoV, 5.0);
-} 
-
-float disneyDiffuseFactor(float NoV, float NoL, float VoH, float roughness) {
-  float alpha = roughness * roughness;
-  float f90 = 0.5 + 2.0 * alpha * VoH * VoH;
-  
-  float F_in = fresnelSchlick90(NoL, 1.0, f90);
-  float F_out = fresnelSchlick90(NoV, 1.0, f90);
-
-  return F_in * F_out;
-}
-
 vec3 BRDF(BRDFPoint point, Material material)
 {
     vec3 halfV = normalize(point.viewerDirection + point.lightDirection);

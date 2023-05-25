@@ -34,7 +34,8 @@ Ray CreateReflection(RayHit rayHit, inout uint state)
         if (Intersects(array[i], t_ray, rayHit))\
         {\
             rayHit.impact = TransformImpact(rayHit.impact, array[i].transform.localToWorld);\
-            float geometryDist = length(rayHit.impact.point - ray.origin);\
+            vec3 hitDirection = rayHit.impact.point - ray.origin;\
+            float geometryDist = dot(hitDirection, hitDirection);\
             \
             if (geometryDist < closestDist || closestDist < 0.0)\
             {\

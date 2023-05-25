@@ -55,6 +55,9 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
 
             rayColor *= BRDF(point, material);
             incomingLight += Emission(material) * rayColor;
+
+            if (max(rayColor.x, max(rayColor.y, rayColor.z)) <= EPS)
+                break;
         }
         else
         {

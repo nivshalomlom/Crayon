@@ -14,17 +14,12 @@ struct Material
 
 vec3 Emission(Material material)
 {
-    return (material.emissionStrength * material.emissionColor).xyz;
+    return material.emissionStrength * material.emissionColor.rgb;
 }
 
-vec3 rgb2lin(vec3 rgb) 
-{     
-    return pow(rgb, vec3(2.2));
-}
-
-vec3 lin2rgb(vec3 lin) 
+float Vec3Max(vec3 v) 
 {
-    return pow(lin, vec3(1.0 / 2.2));
+    return max(v.x, max(v.y, v.z));
 }
 
 struct BRDFPoint

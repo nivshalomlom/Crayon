@@ -39,10 +39,14 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
     RayHit rayHit;
     for (uint i = 0; i <= bounceLimit; i++)
     {
+        if (Vec3Max(rayColor) <= EPS)
+            break;
+
         if (FireRay(ray, rayHit))
         {
             Material material = rayHit.material;
             vec3 normal = rayHit.impact.normal;
+            vec3 emission = Emission(material);
 
             BRDFPoint point = CreateBRDFPoint(
                 -ray.direction,
@@ -50,14 +54,11 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
                 normal
             );
 
-            ray.origin = rayHit.impact.point + normal * EPS;
+            ray.origin = rayHit.impact.point + normal * 0.0001;
             ray.direction = point.lightDirection;
 
             rayColor *= BRDF(point, material);
-            incomingLight += Emission(material) * rayColor;
-
-            if (max(rayColor.x, max(rayColor.y, rayColor.z)) <= EPS)
-                break;
+            incomingLight += emission * rayColor;
         }
         else
         {

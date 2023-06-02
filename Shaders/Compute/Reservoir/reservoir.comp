@@ -19,7 +19,7 @@ Reservoir CreateReservoir()
     return reservoir;
 }
 
-void AddToReservoir(Reservoir reservoir, vec4 color, float weight, inout uint state)
+void AddToReservoir(inout Reservoir reservoir, vec4 color, float weight, inout uint state)
 {
     reservoir.totalWeight += weight;
     reservoir.numItems++;
@@ -38,12 +38,12 @@ void AddToReservoir(Reservoir reservoir, vec4 color, float weight, inout uint st
 
 vec4 GetReservoirValue(Reservoir reservoir)
 {
-    float avrageWeight = reservoir.totalWeight / reservoir.numItems;
+    float avarageWeight = reservoir.totalWeight / reservoir.numItems;
     vec4 avarageSample = vec4(0.0);
     
     for (int i = 0; i < ReservoirSize; i++)
     {
-        float correction = avrageWeight / reservoir.weights[i];
+        float correction = avarageWeight / reservoir.weights[i];
         avarageSample += reservoir.colors[i] * correction;
     }
 

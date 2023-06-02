@@ -70,7 +70,7 @@ void main()
         Ray ray = CreateCameraRayFromUV(uv);
         
         vec4 rayColor = Trace(ray, rayBounces, state);
-        AddToReservoir(reservoir, rayColor, length(rayColor.xyz), state);
+        AddToReservoir(reservoir, rayColor, dot(rayColor, rayColor), state);
     }
 
     vec4 color = GetReservoirValue(reservoir);

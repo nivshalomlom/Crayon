@@ -24,11 +24,11 @@ void AddToReservoir(Reservoir reservoir, vec4 color, float weight, inout uint st
     reservoir.totalWeight += weight;
     reservoir.numItems++;
 
-    float ratio = weight / reservoir.totalWeight;
+    float ratio = weight / max(reservoir.totalWeight, EPS);
     for (int i = 0; i < ReservoirSize; i++)
     {
         float rand = RandomValue(state);
-        if (rand <= ratio)
+        if (reservoir.numItems == 1 || rand <= ratio)
         {
             reservoir.colors[i] = color;
             reservoir.weights[i] = weight;

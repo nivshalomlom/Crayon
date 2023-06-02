@@ -5,31 +5,7 @@
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 layout(rgba32F, binding = 0) uniform image2D renderTarget;
 
-// TODO: Move to buffered class
-const vec3 skyColor = vec3(0.529, 0.808, 0.922);
-const vec3 zenithColor = vec3(0.270, 0.470, 0.611);
-const vec3 groundColor = vec3(0.3);
-
-const vec3 sunlightDirection = vec3(-0.5, -1.0, 0.0);
-const float sunItensity = 10;
-const float sunFocus = 3;
-const float gamma = 1.0;
-
-const uint antiAliasingIterations = 8;
-const uint rayBounces = 2;
-
 uniform uint frameCounter;
-
-vec3 EnvironmentLight(vec3 direction)
-{
-    float skyGradientT = pow(smoothstep(0.0, 0.4, direction.y), 0.35);
-    vec3 skyGradient = mix(skyColor, zenithColor, skyGradientT);
-    float sun = pow(max(0, dot(direction, -sunlightDirection)), sunFocus) * sunItensity;
-
-    float groundToSkyT = smoothstep(-0.01, 0.0, direction.y);
-    float sunMask = groundToSkyT >= 1.0 ? sun : 0.0;
-    return mix(groundColor, skyGradient, groundToSkyT) + sunMask;
-}
 
 vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
 {
@@ -85,17 +61,19 @@ void main()
     if (coords.x >= dimensions.x || coords.y >= dimensions.y)
         return;
 
-    uint state = coords.x + coords.y * dimensions.x + frameCounter * 6647369;    
-    vec4 color = vec4(0.0);
+    uint state = coords.x + coords.y * dimensions.x + frameCounter * 6647369;
+    Reservoir reservoir = CreateReservoir();
 
-    for (int i = 0; i < antiAliasingIterations; i++)
+    for (int i = 0; i < raysPerPixel; i++)
     {
         vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
         Ray ray = CreateCameraRayFromUV(uv);
-        color += Trace(ray, rayBounces, state);
+        
+        vec4 rayColor = Trace(ray, rayBounces, state);
+        AddToReservoir(reservoir, rayColor, length(rayColor.xyz), state);
     }
 
-    color /= float(antiAliasingIterations);
+    vec4 color = GetReservoirValue(reservoir);
     if (gamma != 1.0)
         color.rgb = pow(color.rgb, vec3(1.0 / gamma));
 

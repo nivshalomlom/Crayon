@@ -1,56 +1,51 @@
 #include "../Rays/ray_hit.comp"
 #include "../Random/random.comp"
 
-struct ReservoirSample
-{
-    RayHit rayHit;
-    vec4 color;
-};
+const uint ReservoirSize = 8;
 
 struct Reservoir
 {
-    ReservoirSample value;
-    float valueWeight;
+    vec4 colors[ReservoirSize];
+    float weights[ReservoirSize];
     float totalWeight;
-    uint numSamples;
+    uint numItems;
 };
-
-bool WeightedCoinFlip(float weight1, float weight2, inout uint state)
-{
-    float rand = RandomValue(state);
-    float sum = weight1 + weight2;
-
-    if ((rand * sum) > weight1)
-        return true;
-
-    return false;
-}
 
 Reservoir CreateReservoir()
 {
     Reservoir reservoir;
-    reservoir.valueWeight = 0.0;
     reservoir.totalWeight = 0.0;
-    reservoir.numSamples = 0;
+    reservoir.numItems = 0;
     return reservoir;
 }
 
-void AddToReservoir(Reservoir reservoir, ReservoirSample value, float weight, inout uint state)
+void AddToReservoir(Reservoir reservoir, vec4 color, float weight, inout uint state)
 {
-    if (WeightedCoinFlip(reservoir.totalWeight, weight, state))
+    reservoir.totalWeight += weight;
+    reservoir.numItems++;
+
+    float ratio = weight / reservoir.totalWeight;
+    for (int i = 0; i < ReservoirSize; i++)
     {
-        reservoir.value = value;
-        reservoir.valueWeight = weight;
+        float rand = RandomValue(state);
+        if (rand <= ratio)
+        {
+            reservoir.colors[i] = color;
+            reservoir.weights[i] = weight;
+        }
+    }
+}
+
+vec4 GetReservoirValue(Reservoir reservoir)
+{
+    float avrageWeight = reservoir.totalWeight / reservoir.numItems;
+    vec4 avarageSample = vec4(0.0);
+    
+    for (int i = 0; i < ReservoirSize; i++)
+    {
+        float correction = avrageWeight / reservoir.weights[i];
+        avarageSample += reservoir.colors[i] * correction;
     }
 
-    reservoir.numSamples++;
-    reservoir.totalWeight += weight;
+    return avarageSample / ReservoirSize;
 }
-
-void MergeReservoirs(Reservoir destination, Reservoir source, inout uint state)
-{
-    AddToReservoir(destination, source.value, source.totalWeight, state);
-    destination.numSamples += source.numSamples - 1;
-}
-
-float ReservoirCorrectionWeight(Reservoir reservoir) { return (reservoir.totalWeight / float(reservoir.numSamples)) / reservoir.valueWeight; }

@@ -40,14 +40,18 @@ BRDFPoint CreateBRDFPoint(vec3 viewerDirection, vec3 lightDirection, vec3 normal
 
 vec3 Fresnel(float HoV, vec3 f0) 
 {
-    return f0 + (vec3(1.0) - f0) * pow(1.0 - HoV, 5.0);
+    float base = 1.0 - HoV;
+    float base_2 = base * base;
+    float base_5 = base_2 * base_2 * base;
+
+    return f0 + (vec3(1.0) - f0) * base_5;
 }
 
 float Distribution(float HoN, float roughness)
 {
     float alpha_2 = pow(roughness, 4.0);
-    float inner = pow(HoN, 2.0) * (alpha_2 - 1.0) + 1.0;
-    return alpha_2 / (M_PI * pow(inner, 2.0));
+    float inner = HoN * HoN * (alpha_2 - 1.0) + 1.0;
+    return alpha_2 / (M_PI * inner * inner);
 }
 
 float Geometry(float NoV, float roughness)
@@ -55,7 +59,7 @@ float Geometry(float NoV, float roughness)
     if (roughness == 0.0)
         return 1.0;
 
-    float k = pow(roughness, 2.0) / 2.0;
+    float k = 0.5 * roughness * roughness;
     float lower = NoV * (1.0 - k) + k;
     return max(NoV, EPS) / lower;
 }
@@ -64,7 +68,7 @@ vec3 BRDF(BRDFPoint point, Material material)
 {
     vec3 halfV = normalize(point.viewerDirection + point.lightDirection);
     vec3 rhoD = material.baseColor.xyz * (1.0 - material.metallic);
-    vec3 f0 = vec3(0.16 * pow(material.reflectance, 2.0));
+    vec3 f0 = vec3(0.16 * material.reflectance * material.reflectance);
     f0 = mix(f0, material.baseColor.xyz, material.metallic);
 
     float NoV = clamp(dot(point.viewerDirection, point.normal), EPS, 1.0);
@@ -76,7 +80,7 @@ vec3 BRDF(BRDFPoint point, Material material)
     float D = Distribution(HoN, material.roughness);
     float G = Geometry(NoV, material.roughness) * Geometry(NoL, material.roughness);
     
-    vec3 specular = max((F * D * G), EPS) / (4.0 * NoV * NoL);
+    vec3 specular = 0.25 * max((F * D * G), EPS) / (NoV * NoL);
     vec3 diffuse = (rhoD * (vec3(1.0) - F)) / M_PI;
 
     return specular + diffuse;

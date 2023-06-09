@@ -79,7 +79,7 @@ vec3 BRDF(BRDFPoint point, Material material)
     float D = Distribution(HoN, material.roughness);
     float G = Geometry(NoV, material.roughness) * Geometry(NoL, material.roughness);
     
-    vec3 specular = 0.25 * F * D * G / (NoV * NoL);
+    vec3 specular = 0.25 * max(F * D * G, EPS) / (NoV * NoL);
     vec3 diffuse = (rhoD * (vec3(1.0) - F)) / M_PI;
 
     return specular + diffuse;

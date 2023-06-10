@@ -61,11 +61,11 @@ class List : public Disposable
         
         void Dispose() { delete [] this->array; }
 
-        void Set(T item, int index) { this->array[index] = item; }
-
-        T Get(int index) const { return this->array[index]; }
-
         int Count() const { return this->count; }
+
+        T operator [](int index) const { return array[index]; }
+        
+        T & operator [](int index) { return array[index]; }
 };
 
 #endif

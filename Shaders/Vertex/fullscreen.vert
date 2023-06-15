@@ -1,6 +1,6 @@
 #version 430
 
-const ivec2 vertcies = {
+const ivec2 vertcies[3] = {
     ivec2(-1, -1),
     ivec2( 3, -1),
     ivec2(-1,  3)

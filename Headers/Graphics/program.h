@@ -2,6 +2,7 @@
 #define _PROGRAM_H
 
 #include "../Utility/disposable.h"
+#include "../Textures/texture.h"
 #include "../common.h"
 
 class Program : public Disposable
@@ -43,6 +44,8 @@ class ShaderProgram : public Program
         }
 
         ShaderProgram() : Program() {}
+
+        virtual void Draw() = 0;
 };
 
 class ComputeProgram : public Program
@@ -64,6 +67,17 @@ class ComputeProgram : public Program
             glDispatchCompute(groups.x, groups.y, groups.z);
             glMemoryBarrier(barrierMask);
         }
+};
+
+class PostProcesingProgram : public ShaderProgram
+{
+    public:
+        PostProcesingProgram(std::string fragmentShaderPath) 
+            : ShaderProgram(fragmentShaderPath, "./Shaders/Vertex/fullscreen.vert") {}
+
+        void Draw() { glDrawArrays(GL_TRIANGLES, 0, 3); }
+
+        virtual void BindTextures(Texture2D source, Texture2D target) = 0;
 };
 
 #endif

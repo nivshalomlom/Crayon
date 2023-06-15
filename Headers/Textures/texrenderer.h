@@ -46,7 +46,7 @@ class TextureRenderer : public Disposable
                     Texture2D source = i > 0 ? textures[i - 1] : texture;
 
                     program->Mount();
-                    program->BindTextures(source, textures[i] = Texture2D(textureSize.x, textureSize.y, texture.RenderFormat()));
+                    program->LoadTextures(source, textures[i] = Texture2D(textureSize.x, textureSize.y, texture.RenderFormat()));
                     program->Draw();
                 }
 

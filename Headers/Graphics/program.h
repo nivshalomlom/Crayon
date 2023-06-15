@@ -26,7 +26,7 @@ class Program : public Disposable
 
         void Mount() const { glUseProgram(this->progID); }
         
-        void Dispose() { glDeleteProgram(this->progID);}
+        virtual void Dispose() { glDeleteProgram(this->progID);}
 };
 
 class ShaderProgram : public Program
@@ -71,13 +71,42 @@ class ComputeProgram : public Program
 
 class PostProcesingProgram : public ShaderProgram
 {
+    private:
+        const GLenum DRAW_BUFFERS[1] = {GL_COLOR_ATTACHMENT0};
+
+        GLuint frameBuffer;
+
     public:
-        PostProcesingProgram(std::string fragmentShaderPath) 
-            : ShaderProgram(fragmentShaderPath, "./Shaders/Vertex/fullscreen.vert") {}
+        PostProcesingProgram(std::string fragmentShaderPath) : ShaderProgram(fragmentShaderPath, "./Shaders/Vertex/fullscreen.vert") 
+        {
+            glGenFramebuffers(1, &this->frameBuffer);
+        }
 
-        void Draw() { glDrawArrays(GL_TRIANGLES, 0, 3); }
+        void Draw() 
+        { 
+            glBindFramebuffer(GL_FRAMEBUFFER, this->frameBuffer);
+            glDrawArrays(GL_TRIANGLES, 0, 3); 
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
 
-        virtual void BindTextures(Texture2D source, Texture2D target) = 0;
+        void LoadTextures(Texture2D source, Texture2D target)
+        {
+            this->Mount();
+            this->LoadSourceTexture(source);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, this->frameBuffer);
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target.Id(), 0);
+            glDrawBuffers(1, DRAW_BUFFERS);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+
+        void Dispose()
+        {
+            Program::Dispose(); 
+            glDeleteFramebuffers(1, &this->frameBuffer);
+        }
+
+        virtual void LoadSourceTexture(Texture2D source) = 0;
 };
 
 #endif

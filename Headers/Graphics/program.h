@@ -95,7 +95,7 @@ class PostProcesingProgram : public ShaderProgram
             this->LoadSourceTexture(source);
 
             glBindFramebuffer(GL_FRAMEBUFFER, this->frameBuffer);
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target.Id(), 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target.Id(), 0);
             glDrawBuffers(1, DRAW_BUFFERS);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
@@ -106,7 +106,7 @@ class PostProcesingProgram : public ShaderProgram
             glDeleteFramebuffers(1, &this->frameBuffer);
         }
 
-        virtual void LoadSourceTexture(Texture2D source) = 0;
+        virtual void LoadSourceTexture(const Texture2D source) = 0;
 };
 
 #endif

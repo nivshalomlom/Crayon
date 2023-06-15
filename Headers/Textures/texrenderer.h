@@ -38,13 +38,15 @@ class TextureRenderer : public Disposable
             else
             {
                 Array<Texture2D> textures = Array<Texture2D>(this->postProcesing.Count());
+                glm::vec2 textureSize = texture.Size();
+
                 for (int i = 0; i < textures.Count(); i++)
                 {
                     PostProcesingProgram* program = this->postProcesing[i];
                     Texture2D source = i > 0 ? textures[i - 1] : texture;
 
                     program->Mount();
-                    program->BindTextures(source, textures[i]);
+                    program->BindTextures(source, textures[i] = Texture2D(textureSize.x, textureSize.y, texture.RenderFormat()));
                     program->Draw();
                 }
 

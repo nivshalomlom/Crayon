@@ -13,6 +13,26 @@ class Enumerable : public Disposable
         virtual T & operator [](int index) = 0;
 
         virtual int Count() const = 0;
+
+        template <typename U>
+
+        static void DisposeEnumerable(Enumerable<U>* enumerable)
+        {
+            for (int i = 0; i < enumerable->Count(); i++)
+                (*enumerable)[i].Dispose();
+
+            enumerable->Dispose();
+        }
+
+        template <typename U>
+
+        static void DisposeEnumerable(Enumerable<U*>* enumerable)
+        {
+            for (int i = 0; i < enumerable->Count(); i++)
+                (*enumerable)[i]->Dispose();
+
+            enumerable->Dispose();
+        }
 };
 
 #endif

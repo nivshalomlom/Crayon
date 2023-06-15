@@ -2,10 +2,11 @@
 #define _LIST_H
 
 #include "./disposable.h"
+#include "./enumerable.h"
 
 template <typename T>
 
-class List : public Disposable
+class List : public Enumerable<T>
 {
     private:
         int capacity;

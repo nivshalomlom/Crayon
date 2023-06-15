@@ -46,6 +46,8 @@ class Texture2D : public Disposable
             InitiallizeTexture(width, height, this->renderFormat);
         }
 
+        GLenum RenderFormat() { return this->renderFormat; }
+
         GLuint Id() { return this->texture; }
 
         glm::vec2 Size() { return this->size; }

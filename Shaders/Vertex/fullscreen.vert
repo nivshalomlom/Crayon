@@ -12,4 +12,5 @@ void main()
 {
     ivec2 vertex = vertcies[gl_VertexID];
     texCoords = vec2(vertex + 1) * 0.5;
+    gl_Position = vec4(vertex, 0, 1);
 }

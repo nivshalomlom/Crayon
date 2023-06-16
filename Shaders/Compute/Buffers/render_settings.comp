@@ -1,11 +1,11 @@
 // TODO: create buffer
-const vec3 skyColor = vec3(0.529, 0.808, 0.922);
-const vec3 zenithColor = vec3(0.270, 0.470, 0.611);
-const vec3 groundColor = vec3(0.3);
+const vec3 skyColor = vec3(0.264, 0.404, 0.461);
+const vec3 zenithColor = vec3(0.135, 0.235, 0.305);
+const vec3 groundColor = vec3(0.15);
 
 const vec3 sunlightDirection = vec3(-0.5, -1.0, 0.0);
-const float sunItensity = 10;
-const float sunFocus = 3;
+const float sunItensity = 5;
+const float sunFocus = 10;
 const float gamma = 1.0;
 
 const uint raysPerPixel = 8;

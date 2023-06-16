@@ -35,7 +35,7 @@ class Texture2D : public Disposable
             InitiallizeTexture(width, height, renderFormat);
         }
 
-        void BindToImage(GLuint unit, GLenum access = GL_READ_ONLY)
+        void BindToImage(GLuint unit, GLenum access = GL_READ_ONLY) const
         {
             glBindImageTexture(unit, this->texture, 0, GL_FALSE, 0, access, this->renderFormat);
         }
@@ -46,13 +46,15 @@ class Texture2D : public Disposable
             InitiallizeTexture(width, height, this->renderFormat);
         }
 
-        GLuint Id() { return this->texture; }
+        GLenum RenderFormat() const { return this->renderFormat; }
 
-        glm::vec2 Size() { return this->size; }
+        GLuint Id() const { return this->texture; }
 
-        void Bind() { glBindTexture(GL_TEXTURE_2D, this->texture); }
+        glm::vec2 Size() const { return this->size; }
 
-        void Unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
+        void Bind() const { glBindTexture(GL_TEXTURE_2D, this->texture); }
+
+        void Unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
         void Dispose() { glDeleteTextures(1, &this->texture); }
 };

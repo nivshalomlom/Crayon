@@ -34,8 +34,8 @@ void main()
     vec3 bloomColor = color * step(bloomThreshold, color);
     vec3 blurredColor = vec3(0.0);
 
-    for (int i = -1; i <= 1; ++i)
-        for (int j = -1; j <= 1; ++j)
+    for (int i = -1; i <= 1; i++)
+        for (int j = -1; j <= 1; j++)
         {
             vec2 samplePoint = vec2(i, j) * texelSize + texCoords;
             if (isInBounds(samplePoint, textureSize))

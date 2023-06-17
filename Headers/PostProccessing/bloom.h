@@ -10,8 +10,9 @@ class BloomProgram : public PostProcesingProgram
         GLuint textureLocation;
 
     public:
-        BloomProgram(float bloomThreshold, float bloomIntensity) : PostProcesingProgram("./Shaders/Fragment/bloom.frag")
+        BloomProgram(float bloomThreshold = 0.8, float bloomIntensity = 0.8) : PostProcesingProgram("./Shaders/Fragment/bloom.frag")
         {
+            this->Mount();
             this->textureSizeLocation = glGetUniformLocation(this->Id(), "textureSize");
             this->textureLocation = glGetUniformLocation(this->Id(), "textureSampler");
 

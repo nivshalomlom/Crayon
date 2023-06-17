@@ -1,8 +1,8 @@
 #include "./Headers/Textures/texture_buffer.h"
 #include "./Headers/Graphics/window.h"
 #include "./Headers/Scene/scene_renderer.h"
-#include "./Headers/PostProccessing/bloom.h"
-#include "./Headers/PostProccessing/tone_mapping.h"
+#include "./Headers/PostProcessing/bloom.h"
+#include "./Headers/PostProcessing/tone_mapping.h"
 
 using namespace std;
 using namespace glm;

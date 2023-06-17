@@ -1,7 +1,7 @@
 #ifndef _TEXRENDERER_H
 #define _TEXRENDERER_H
 
-#include "../PostProccessing/texture_copy.h"
+#include "../PostProcessing/texture_copy.h"
 #include "../Utility/array.h"
 #include "../Utility/list.h"
 

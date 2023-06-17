@@ -14,11 +14,13 @@ class TextureFile
             this->colorForamt = colorForamt;
         }
 
+        GLenum Format() { return this->colorForamt; }
+        
         virtual glm::ivec2 Dimensions() = 0;
 
-        virtual std::byte* GetBytes() = 0;
+        virtual std::byte* ReadBytes() = 0;
 
-        GLenum Format() { return this->colorForamt; }
+        virtual TextureFile* WriteBytes(Texture2D texture) = 0;
 };
 
 #endif

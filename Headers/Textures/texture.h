@@ -39,7 +39,7 @@ class Texture2D : public Disposable
 
             this->Bind();
             SetTextureParameters(this->texture);
-            glTexImage2D(GL_TEXTURE_2D, 0, renderFormat, size.x, size.x, 0, file->Format(), GL_UNSIGNED_BYTE, file->GetBytes());
+            glTexImage2D(GL_TEXTURE_2D, 0, renderFormat, size.x, size.x, 0, file->Format(), GL_UNSIGNED_BYTE, file->ReadBytes());
         }
 
         void BindToImage(GLuint unit, GLenum access = GL_READ_ONLY) const

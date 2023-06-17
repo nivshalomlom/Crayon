@@ -1,4 +1,4 @@
-#include "./Headers/Textures/texrenderer.h"
+#include "./Headers/Textures/texture_buffer.h"
 #include "./Headers/Graphics/window.h"
 #include "./Headers/Scene/scene_renderer.h"
 #include "./Headers/PostProccessing/bloom.h"
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     scene.Add(Plane(vec3(0, -2, 20), vec3(7.0), Material(vec3(1.0))), PLANE_TYPE);
 
     SceneRenderer* sceneRenderer = new SceneRenderer(scene, camera, 1280, 720);
-    TextureRenderer* textureRenderer = new TextureRenderer();
+    TextureBuffer* textureRenderer = new TextureBlitBuffer();
 
     Texture2D renderTexture = sceneRenderer->RenderTexture();
     textureRenderer->AddPostProcessing(new BloomProgram(0.8, 0.8));
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     window.Show([sceneRenderer, textureRenderer, renderTexture](Window* window, float dt) 
     {
         sceneRenderer->Render();
-        textureRenderer->RenderToScreen(renderTexture, ivec2(0), ivec2(1280, 720));
+        textureRenderer->RenderToBuffer(renderTexture, ivec2(0), ivec2(1280, 720));
     });
 
     window.Dispose();

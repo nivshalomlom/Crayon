@@ -76,6 +76,9 @@ class PostProcesingProgram : public ShaderProgram
 
         GLuint frameBuffer;
 
+    protected:
+        virtual void LoadSourceTexture(const Texture2D source) = 0;
+
     public:
         PostProcesingProgram(std::string fragmentShaderPath) : ShaderProgram(fragmentShaderPath, "./Shaders/Vertex/fullscreen.vert") 
         {
@@ -105,8 +108,6 @@ class PostProcesingProgram : public ShaderProgram
             Program::Dispose(); 
             glDeleteFramebuffers(1, &this->frameBuffer);
         }
-
-        virtual void LoadSourceTexture(const Texture2D source) = 0;
 };
 
 #endif

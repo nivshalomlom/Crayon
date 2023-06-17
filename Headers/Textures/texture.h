@@ -30,7 +30,7 @@ class Texture2D : public Disposable
         }
 
     public:
-        Texture2D(int width = 0, int height = 0, GLenum renderFormat = GL_RGBA32F)
+        Texture2D(int width = 0, int height = 0, GLenum renderFormat = GL_RGBA16F)
         {
             InitiallizeTexture(width, height, renderFormat);
         }

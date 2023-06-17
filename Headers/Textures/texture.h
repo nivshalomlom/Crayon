@@ -31,15 +31,15 @@ class Texture2D : public Disposable
             glTextureStorage2D(this->texture, 1, renderFormat, width, height);
         }
 
-        Texture2D(TextureFile file, GLenum renderFormat = GL_RGBA32F)
+        Texture2D(TextureFile* file, GLenum renderFormat = GL_RGBA32F)
         {
             glCreateTextures(GL_TEXTURE_2D, 1, &this->texture);
             this->renderFormat = renderFormat;
-            this->size = file.Dimensions();
+            this->size = file->Dimensions();
 
             this->Bind();
             SetTextureParameters(this->texture);
-            glTexImage2D(GL_TEXTURE_2D, 0, renderFormat, size.x, size.x, 0, file.Format(), GL_UNSIGNED_BYTE, file.GetBytes());
+            glTexImage2D(GL_TEXTURE_2D, 0, renderFormat, size.x, size.x, 0, file->Format(), GL_UNSIGNED_BYTE, file->GetBytes());
         }
 
         void BindToImage(GLuint unit, GLenum access = GL_READ_ONLY) const

@@ -12,6 +12,7 @@ class BloomProgram : public PostProcesingProgram
     public:
         BloomProgram(float bloomThreshold = 0.8, float bloomIntensity = 0.8) : PostProcesingProgram("./Shaders/Fragment/bloom.frag")
         {
+            this->Mount();
             this->textureSizeLocation = glGetUniformLocation(this->Id(), "textureSize");
             this->textureLocation = glGetUniformLocation(this->Id(), "textureSampler");
 

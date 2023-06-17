@@ -11,7 +11,9 @@ class ToneMappingProgram : public PostProcesingProgram
     public:
         ToneMappingProgram(float exposure = 1.0, float gamma = 2.2) : PostProcesingProgram("./Shaders/Fragment/tone.frag")
         {
+            this->Mount();
             this->textureLocation = glGetUniformLocation(this->Id(), "textureSampler");
+            
             glUniform1f(glGetUniformLocation(this->Id(), "exposure"), exposure);
             glUniform1f(glGetUniformLocation(this->Id(), "gamma"), gamma);
         }

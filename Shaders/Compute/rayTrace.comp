@@ -3,7 +3,7 @@
 #include "./Rays/ray_intersections.comp"
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
-layout(rgba16F, binding = 0) uniform image2D renderTarget;
+layout(rgba32F, binding = 0) uniform image2D renderTarget;
 
 uniform uint frameCounter;
 
@@ -73,9 +73,5 @@ void main()
         AddToReservoir(reservoir, rayColor, dot(rayColor, rayColor), state);
     }
 
-    vec4 color = GetReservoirValue(reservoir);
-    if (gamma != 1.0)
-        color.rgb = pow(color.rgb, vec3(1.0 / gamma));
-
-    UpdateImage(coords, color);
+    UpdateImage(coords, GetReservoirValue(reservoir));
 }

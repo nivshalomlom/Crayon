@@ -20,7 +20,7 @@ class TextureFile
 
         virtual std::byte* ReadBytes() = 0;
 
-        virtual TextureFile* WriteBytes(Texture2D texture) = 0;
+        virtual TextureFile* WriteBytes(std::byte* bytes) = 0;
 };
 
 #endif

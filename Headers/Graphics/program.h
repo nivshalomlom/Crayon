@@ -85,7 +85,7 @@ class PostProcesingProgram : public ShaderProgram
             glGenFramebuffers(1, &this->frameBuffer);
         }
 
-        void Draw() 
+        virtual void Draw() 
         { 
             glBindFramebuffer(GL_FRAMEBUFFER, this->frameBuffer);
             glDrawArrays(GL_TRIANGLES, 0, 3); 

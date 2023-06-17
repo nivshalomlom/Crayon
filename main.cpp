@@ -1,6 +1,7 @@
 #include "./Headers/Textures/texrenderer.h"
 #include "./Headers/Graphics/window.h"
 #include "./Headers/Scene/scene_renderer.h"
+#include "./Headers/PostProccessing/bloom.h"
 #include "./Headers/PostProccessing/tone_mapping.h"
 
 using namespace std;
@@ -21,6 +22,7 @@ int main(int argc, char **argv)
     TextureRenderer* textureRenderer = new TextureRenderer();
 
     Texture2D renderTexture = sceneRenderer->RenderTexture();
+    textureRenderer->AddPostProcessing(new BloomProgram(0.8, 0.8));
     textureRenderer->AddPostProcessing(new ToneMappingProgram(0.1, 2.2));
 
     window.ToggleFpsCounter();

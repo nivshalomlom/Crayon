@@ -14,7 +14,7 @@ class TextureCopyProgram : public PostProcesingProgram
             this->textureLocation = glGetUniformLocation(this->Id(), "textureSampler");
         }
 
-        void LoadSourceTexture(const Texture2D source)
+        void LoadSourceTexture(const Texture2D source, int currentPass)
         {
             this->Mount();
             source.Bind();

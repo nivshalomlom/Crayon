@@ -77,7 +77,7 @@ class PostProcesingProgram : public ShaderProgram
         GLuint frameBuffer;
 
     protected:
-        virtual void LoadSourceTexture(const Texture2D source) = 0;
+        virtual void LoadSourceTexture(const Texture2D source, int currentPass) = 0;
 
     public:
         PostProcesingProgram(std::string fragmentShaderPath) : ShaderProgram(fragmentShaderPath, "./Shaders/Vertex/fullscreen.vert") 
@@ -92,10 +92,10 @@ class PostProcesingProgram : public ShaderProgram
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
-        void LoadTextures(Texture2D source, Texture2D target)
+        void LoadTextures(Texture2D source, Texture2D target, int currentPass = 1)
         {
             this->Mount();
-            this->LoadSourceTexture(source);
+            this->LoadSourceTexture(source, currentPass);
 
             glBindFramebuffer(GL_FRAMEBUFFER, this->frameBuffer);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target.Id(), 0);

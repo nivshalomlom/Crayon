@@ -14,10 +14,10 @@ class TextureBuffer : public Disposable
     protected:
         GLuint frameBuffer;
 
-        static void ApplyPostProcessing(PostProcesingProgram* program, Texture2D* source, Texture2D* target)
+        static void ApplyPostProcessing(PostProcesingProgram* program, Texture2D* source, Texture2D* target, int currentPass)
         {
             program->Mount();
-            program->LoadTextures(*source, *target);
+            program->LoadTextures(*source, *target, currentPass);
             program->Draw();
         }
 
@@ -48,13 +48,13 @@ class TextureBuffer : public Disposable
                 {
                     int numPasses = this->postPasses[i];
 
-                    for (int j = 0; j < numPasses; j++)
+                    for (int pass = 0; pass < numPasses; pass++)
                     {
                         buffer = source;
                         source = target;
                         target = buffer;
 
-                        ApplyPostProcessing(this->postProcesing[i], i == 0 ? &texture : source, target);
+                        ApplyPostProcessing(this->postProcesing[i], i == 0 ? &texture : source, target, pass);
                     }
                 }
 

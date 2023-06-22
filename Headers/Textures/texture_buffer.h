@@ -13,6 +13,13 @@ class TextureBuffer : public Disposable
     protected:
         GLuint frameBuffer;
 
+        static void ApplyPostProcessing(PostProcesingProgram* program, Texture2D* source, Texture2D* target)
+        {
+            program->Mount();
+            program->LoadTextures(*source, *target);
+            program->Draw();
+        }
+
         virtual void RenderTexture(Texture2D texture, glm::ivec2 min, glm::ivec2 max) = 0;
 
     public:
@@ -28,21 +35,28 @@ class TextureBuffer : public Disposable
                 this->RenderTexture(texture, min, max);
             else
             {
-                Array<Texture2D> textures = Array<Texture2D>(this->postProcesing.Count());
                 glm::vec2 textureSize = texture.Size();
+                Texture2D* buffer = nullptr;
 
-                for (int i = 0; i < textures.Count(); i++)
+                Texture2D* source = new Texture2D(textureSize.x, textureSize.y, texture.RenderFormat());
+                Texture2D* target = new Texture2D(textureSize.x, textureSize.y, texture.RenderFormat());
+
+                PostProcesingProgram* program = this->postProcesing[0];
+                ApplyPostProcessing(program, &texture, target);
+
+                for (int i = 1; i < this->postProcesing.Count(); i++)
                 {
-                    PostProcesingProgram* program = this->postProcesing[i];
-                    Texture2D source = i > 0 ? textures[i - 1] : texture;
+                    buffer = source;
+                    source = target;
+                    target = buffer;
 
-                    program->Mount();
-                    program->LoadTextures(source, textures[i] = Texture2D(textureSize.x, textureSize.y, texture.RenderFormat()));
-                    program->Draw();
+                    program = this->postProcesing[i];
+                    ApplyPostProcessing(program, source, target);
                 }
 
-                this->RenderTexture(textures[textures.Count() - 1], min, max);
-                Enumerable<PostProcesingProgram*>::DisposeEnumerable(&textures);
+                this->RenderTexture(*target, min, max);
+                Disposable::DisposePointer(source);
+                Disposable::DisposePointer(target);
             }
         }
 

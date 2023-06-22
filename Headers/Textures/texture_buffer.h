@@ -9,6 +9,7 @@ class TextureBuffer : public Disposable
 {
     private:
         List<PostProcesingProgram*> postProcesing;
+        List<int> postPasses;
 
     protected:
         GLuint frameBuffer;
@@ -26,6 +27,8 @@ class TextureBuffer : public Disposable
         TextureBuffer()
         {
             this->postProcesing = List<PostProcesingProgram*>();
+            this->postPasses = List<int>();
+
             glGenFramebuffers(1, &this->frameBuffer);
         }
 
@@ -41,17 +44,18 @@ class TextureBuffer : public Disposable
                 Texture2D* source = new Texture2D(textureSize.x, textureSize.y, texture.RenderFormat());
                 Texture2D* target = new Texture2D(textureSize.x, textureSize.y, texture.RenderFormat());
 
-                PostProcesingProgram* program = this->postProcesing[0];
-                ApplyPostProcessing(program, &texture, target);
-
-                for (int i = 1; i < this->postProcesing.Count(); i++)
+                for (int i = 0; i < this->postProcesing.Count(); i++)
                 {
-                    buffer = source;
-                    source = target;
-                    target = buffer;
+                    int numPasses = this->postPasses[i];
 
-                    program = this->postProcesing[i];
-                    ApplyPostProcessing(program, source, target);
+                    for (int j = 0; j < numPasses; j++)
+                    {
+                        buffer = source;
+                        source = target;
+                        target = buffer;
+
+                        ApplyPostProcessing(this->postProcesing[i], i == 0 ? &texture : source, target);
+                    }
                 }
 
                 this->RenderTexture(*target, min, max);
@@ -66,7 +70,11 @@ class TextureBuffer : public Disposable
             Enumerable<PostProcesingProgram*>::DisposeEnumerable(&this->postProcesing);
         }
 
-        void AddPostProcessing(PostProcesingProgram* program) { this->postProcesing.Add(program); }
+        void AddPostProcessing(PostProcesingProgram* program, int numPasses = 1) 
+        { 
+            this->postProcesing.Add(program); 
+            this->postPasses.Add(numPasses); 
+        }
 };
 
 class TextureBlitBuffer : public TextureBuffer

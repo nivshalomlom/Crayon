@@ -9,13 +9,27 @@ class StorageBuffer : public Disposable
     private:
         GLuint storageBuffer;
 
+        static void InitializeBuffer(GLuint* storageBuffer, void* data, size_t size)
+        {
+            glGenBuffers(1, storageBuffer);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, *storageBuffer);
+            glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_COPY);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        }
+
     public:
         StorageBuffer(void* data, size_t size)
         {
-            glGenBuffers(1, &this->storageBuffer);
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->storageBuffer);
-            glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_COPY);
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+            InitializeBuffer(&this->storageBuffer, data, size);
+        }
+
+        StorageBuffer(size_t numBytes)
+        {
+            char* bytes = new char[numBytes];
+            
+            InitializeBuffer(&this->storageBuffer, bytes, numBytes * sizeof(char));
+
+            delete [] bytes;
         }
 
         void UpdateData(void* data, size_t size, size_t offset)

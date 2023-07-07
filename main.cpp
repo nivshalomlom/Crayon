@@ -1,11 +1,10 @@
 #include "./Headers/Textures/texture_buffer.h"
 #include "./Headers/Graphics/window.h"
 #include "./Headers/Scene/scene_renderer.h"
-#include "./Headers/PostProcessing/bloom.h"
 #include "./Headers/PostProcessing/tone_mapping.h"
 
-#define WIDTH 1920
-#define HEIGHT 1080
+#define WIDTH 1280
+#define HEIGHT 720
 
 using namespace std;
 using namespace glm;
@@ -25,7 +24,6 @@ int main(int argc, char **argv)
     TextureBuffer* textureRenderer = new TextureBlitBuffer();
 
     Texture2D renderTexture = sceneRenderer->RenderTexture();
-    textureRenderer->AddPostProcessing(new BloomProgram(0.8, 0.8));
     textureRenderer->AddPostProcessing(new ToneMappingProgram(0.1, 2.2));
 
     window.ToggleFpsCounter();

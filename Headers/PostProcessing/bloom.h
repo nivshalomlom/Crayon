@@ -20,7 +20,7 @@ class BloomProgram : public PostProcesingProgram
             glUniform1f(glGetUniformLocation(this->Id(), "bloomIntensity"), bloomIntensity);
         }
 
-        void LoadSourceTexture(const Texture2D source)
+        void LoadSourceTexture(const Texture2D source, int currentPass)
         {
             this->Mount();
             source.Bind();

@@ -1,9 +1,9 @@
 #version 430
 
 vec3 bloomKernal[3] = {
-    vec3(1.0, 2.0, 1.0),
-    vec3(2.0, 4.0, 2.0),
-    vec3(1.0, 2.0, 1.0)
+    vec3(0.0625, 0.125, 0.0625),
+    vec3(0.125, 0.25, 0.125),
+    vec3(0.0625, 0.125, 0.0625)
 };
 
 uniform sampler2D textureSampler;
@@ -28,10 +28,7 @@ bool isInBounds(vec2 point, vec2 bounds)
 
 void main()
 {
-    vec3 color = texture2D(textureSampler, texCoords).rgb;
     vec2 texelSize = 1.0 / textureSize;
-
-    vec3 bloomColor = color * step(bloomThreshold, color);
     vec3 blurredColor = vec3(0.0);
 
     for (int i = -1; i <= 1; i++)
@@ -42,5 +39,6 @@ void main()
                 blurredColor += texture2D(textureSampler, samplePoint).rgb * bloomKernal[i + 1][j + 1];
         }
 
-    fragColor = vec4(color + blurredColor * bloomIntensity + bloomColor, 1.0);
+    vec3 color = texture2D(textureSampler, texCoords).rgb;
+    fragColor = vec4(color + blurredColor * bloomIntensity, 1.0);
 }

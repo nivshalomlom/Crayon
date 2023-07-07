@@ -2,6 +2,7 @@
 #define _TEXTURE_H
 
 #include "../Utility/disposable.h"
+#include "./texture_file.h"
 #include "../common.h"
 
 class Texture2D : public Disposable
@@ -19,7 +20,8 @@ class Texture2D : public Disposable
             glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
 
-        void InitiallizeTexture(int width, int height, GLenum renderFormat)
+    public:
+        Texture2D(int width = 0, int height = 0, GLenum renderFormat = GL_RGBA32F)
         {
             glCreateTextures(GL_TEXTURE_2D, 1, &this->texture);
             this->renderFormat = renderFormat;
@@ -29,21 +31,20 @@ class Texture2D : public Disposable
             glTextureStorage2D(this->texture, 1, renderFormat, width, height);
         }
 
-    public:
-        Texture2D(int width = 0, int height = 0, GLenum renderFormat = GL_RGBA32F)
+        Texture2D(TextureFile* file, GLenum renderFormat = GL_RGBA32F)
         {
-            InitiallizeTexture(width, height, renderFormat);
+            glCreateTextures(GL_TEXTURE_2D, 1, &this->texture);
+            this->renderFormat = renderFormat;
+            this->size = file->Dimensions();
+
+            this->Bind();
+            SetTextureParameters(this->texture);
+            glTexImage2D(GL_TEXTURE_2D, 0, renderFormat, size.x, size.x, 0, file->Format(), GL_UNSIGNED_BYTE, file->ReadBytes());
         }
 
         void BindToImage(GLuint unit, GLenum access = GL_READ_ONLY) const
         {
             glBindImageTexture(unit, this->texture, 0, GL_FALSE, 0, access, this->renderFormat);
-        }
-
-        void Resize(int width, int height)
-        {
-            glDeleteTextures(1, &this->texture);
-            InitiallizeTexture(width, height, this->renderFormat);
         }
 
         GLenum RenderFormat() const { return this->renderFormat; }

@@ -7,7 +7,7 @@ const vec3 sunlightDirection = vec3(-0.5, -1.0, 0.0);
 const float sunItensity = 5;
 const float sunFocus = 10;
 
-const uint raysPerPixel = 16;
+const uint raysPerPixel = 8;
 const uint rayBounces = 10;
 
 vec3 EnvironmentLight(vec3 direction)

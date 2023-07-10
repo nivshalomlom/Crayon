@@ -46,7 +46,7 @@ class GeometryBuffer : public Disposable
 
         void Dispose() { this->geometryBuffers->Dispose(); }
 
-        ArrayBuffer<Geometry> operator [](GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
+        const ArrayBuffer<Geometry> GetGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
 };
 
 #endif

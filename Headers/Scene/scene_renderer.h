@@ -29,14 +29,6 @@ class SceneRenderer : public Disposable
 
         void SetScene(Scene scene);
 
-        // void ModifyGeometry(GEOMETRY_TYPE type, int index, std::function<Geometry(Geometry)> modification)
-        // {
-        //     Geometry geometry = this->geometryBuffers[type].Get(index);
-        //     geometry = modification(geometry);
-
-        //     this->geometryBuffers[type].Set(geometry, index);
-        // }
-
         void ModifyCamera(std::function<Camera(Camera)> modification) 
         {
             Camera camera = modification(this->cameraBuffer.GetValue());
@@ -65,7 +57,7 @@ class SceneRenderer : public Disposable
 
         const Camera SceneCamera() const { return this->cameraBuffer.GetValue(); }
 
-        // const ArrayBuffer<Geometry> GetAllGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
+        const ArrayBuffer<Geometry> GetGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffer.GetGeometry(type); }
 };
 
 #endif

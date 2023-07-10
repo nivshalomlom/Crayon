@@ -1,7 +1,7 @@
 #include "../Rays/ray_hit.comp"
 #include "../Random/random.comp"
 
-const uint ReservoirSize = 8;
+const uint ReservoirSize = 4;
 
 struct Reservoir
 {

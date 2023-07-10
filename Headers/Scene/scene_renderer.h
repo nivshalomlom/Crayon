@@ -1,44 +1,19 @@
 #ifndef _SCENE_RENDERER_H
 #define _SCENE_RENDERER_H
 
-#include "../Buffers/array_bufffer.h"
 #include "../Buffers/object_buffer.h"
 #include "../Graphics/program.h"
 #include "../Graphics/camera.h"
 #include "../Textures/texture.h"
 #include "../Utility/disposable.h"
+#include "./Utility/geometry_buffer.h"
 #include "./scene.h"
-
-struct BufferInfo
-{
-    private:
-        const char* name;
-        size_t itemSize;
-        int binding;
-
-    public:
-        BufferInfo(const char* name, size_t itemSize, int binding)
-        {
-            this->name = name;
-            this->itemSize = itemSize;
-            this->binding = binding;
-        }
-
-        const char* Name() const { return this->name; }
-
-        const size_t ItemSize() const { return this->itemSize; }
-        
-        const int Binding() const { return this->binding; }
-};
 
 class SceneRenderer : public Disposable
 {
     private:
-        static const int NUM_BUFFERS = PLANE_TYPE + 1;
-        static BufferInfo* BUFFERS_INFO;
-
-        ArrayBuffer<Geometry>* geometryBuffers;
         ObjectBuffer<Camera> cameraBuffer;
+        GeometryBuffer geometryBuffer;
 
         ComputeProgram renderShader;
         Texture2D renderTexture;
@@ -53,14 +28,6 @@ class SceneRenderer : public Disposable
         SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex = 0);
 
         void SetScene(Scene scene);
-
-        void ModifyGeometry(GEOMETRY_TYPE type, int index, std::function<Geometry(Geometry)> modification)
-        {
-            Geometry geometry = this->geometryBuffers[type].Get(index);
-            geometry = modification(geometry);
-
-            this->geometryBuffers[type].Set(geometry, index);
-        }
 
         void ModifyCamera(std::function<Camera(Camera)> modification) 
         {
@@ -81,7 +48,7 @@ class SceneRenderer : public Disposable
 
         void Dispose()
         {
-            delete [] this->geometryBuffers;
+            this->geometryBuffer.Dispose();
             this->renderShader.Dispose();
             this->renderTexture.Dispose();
         }
@@ -90,7 +57,7 @@ class SceneRenderer : public Disposable
 
         const Camera SceneCamera() const { return this->cameraBuffer.GetValue(); }
 
-        const ArrayBuffer<Geometry> GetAllGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
+        const ArrayBuffer<Geometry> GetGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffer.GetGeometry(type); }
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "../Headers/Scene/scene_renderer.h"
 
-const static GLuint RESERVOIR_BUCKET_SIZE = 4;
+#define RESERVOIR_BUCKET_SIZE 4
+
 const static size_t RESERVOIR_BYTE_SIZE = RESERVOIR_BUCKET_SIZE * (sizeof(glm::vec4) + sizeof(GLfloat)) + sizeof(GLfloat) + sizeof(GLuint);
 const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(glm::vec4) - RESERVOIR_BYTE_SIZE % sizeof(glm::vec4);
 

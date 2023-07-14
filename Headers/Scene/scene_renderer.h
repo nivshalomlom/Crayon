@@ -14,6 +14,7 @@ class SceneRenderer : public Disposable
     private:
         ObjectBuffer<Camera> cameraBuffer;
         GeometryBuffer geometryBuffer;
+        StorageBuffer reservoirBuffer;
 
         ComputeProgram renderShader;
         Texture2D renderTexture;
@@ -51,6 +52,7 @@ class SceneRenderer : public Disposable
             this->geometryBuffer.Dispose();
             this->renderShader.Dispose();
             this->renderTexture.Dispose();
+            this->reservoirBuffer.Dispose();
         }
 
         const Texture2D RenderTexture() const { return this->renderTexture; }

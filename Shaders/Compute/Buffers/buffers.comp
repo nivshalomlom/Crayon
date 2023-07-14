@@ -4,4 +4,5 @@
 
 #include "../Buffers/geometry.comp"
 #include "../Buffers/camera.comp"
+#include "../Buffers/reservoir.comp"
 #include "../Buffers/render_settings.comp"

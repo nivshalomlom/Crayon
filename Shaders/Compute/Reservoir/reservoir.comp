@@ -1,11 +1,11 @@
 #include "../Random/random.comp"
 
-const uint ReservoirSize = 4;
+const uint RESERVOIR_BUCKET_SIZE = 4;
 
 struct Reservoir
 {
-    vec4 colors[ReservoirSize];
-    float weights[ReservoirSize];
+    vec4 colors[RESERVOIR_BUCKET_SIZE];
+    float weights[RESERVOIR_BUCKET_SIZE];
     float totalWeight;
     uint numItems;
 };
@@ -24,7 +24,7 @@ void AddToReservoir(inout Reservoir reservoir, vec4 color, float weight, inout u
     reservoir.numItems++;
 
     float ratio = weight / max(reservoir.totalWeight, EPS);
-    for (int i = 0; i < ReservoirSize; i++)
+    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
     {
         float rand = RandomValue(state);
         if (reservoir.numItems == 1 || rand <= ratio)
@@ -37,7 +37,7 @@ void AddToReservoir(inout Reservoir reservoir, vec4 color, float weight, inout u
 
 void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
 {
-    for (int i = 0; i < ReservoirSize; i++)
+    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
         AddToReservoir(source, target.colors[i], target.weights[i], state);
 }
 
@@ -46,11 +46,11 @@ vec4 GetReservoirValue(Reservoir reservoir)
     float avarageWeight = reservoir.totalWeight / reservoir.numItems;
     vec4 avarageSample = vec4(0.0);
     
-    for (int i = 0; i < ReservoirSize; i++)
+    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
     {
         float correction = avarageWeight / reservoir.weights[i];
         avarageSample += reservoir.colors[i] * correction;
     }
 
-    return avarageSample / ReservoirSize;
+    return avarageSample / RESERVOIR_BUCKET_SIZE;
 }

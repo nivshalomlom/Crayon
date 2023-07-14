@@ -1,5 +1,8 @@
 #include "../Headers/Scene/scene_renderer.h"
 
+const static GLuint RESERVOIR_BUCKET_SIZE = 4;
+const static size_t RESERVOIR_BYTE_SIZE = RESERVOIR_BUCKET_SIZE * (sizeof(glm::vec4) + sizeof(float)) + sizeof(float) + sizeof(GLuint);
+
 SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex)
 {
     this->renderShader = ComputeProgram("./Shaders/Compute/rayTrace.comp");
@@ -20,4 +23,7 @@ SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int t
 
     this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
     this->cameraBuffer.BindToStorageBlock(this->renderShader.Id(), 2, "CameraBuffer");
+
+    this->reservoirBuffer = StorageBuffer(RESERVOIR_BYTE_SIZE * textureWidth * textureHeight);
+    this->reservoirBuffer.BindToStorageBlock(this->renderShader.Id(), 3, "ReservoirBuffer");
 }

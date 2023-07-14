@@ -1,5 +1,6 @@
 #include "../Geometry/geometry.comp"
 #include "../Rays/ray.comp"
+#include "../Reservoir/reservoir.comp"
 
 #include "../Buffers/geometry.comp"
 #include "../Buffers/camera.comp"

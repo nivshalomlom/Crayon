@@ -1,7 +1,8 @@
 #include "../Headers/Scene/scene_renderer.h"
 
 const static GLuint RESERVOIR_BUCKET_SIZE = 4;
-const static size_t RESERVOIR_BYTE_SIZE = RESERVOIR_BUCKET_SIZE * (sizeof(glm::vec4) + sizeof(float)) + sizeof(float) + sizeof(GLuint);
+const static size_t RESERVOIR_BYTE_SIZE = RESERVOIR_BUCKET_SIZE * (sizeof(glm::vec4) + sizeof(GLfloat)) + sizeof(GLfloat) + sizeof(GLuint);
+const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(glm::vec4) - RESERVOIR_BYTE_SIZE % sizeof(glm::vec4);
 
 SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex)
 {
@@ -13,7 +14,7 @@ SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int t
 
     this->renderTexture.BindToImage(imageIndex);
     this->dispatchGroups = glm::ivec3(
-        ceilf(textureWidth / 32.0f), 
+        ceilf(textureWidth / 32.0f),
         ceilf(textureHeight / 32.0f),
         1
     );
@@ -24,6 +25,6 @@ SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int t
     this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
     this->cameraBuffer.BindToStorageBlock(this->renderShader.Id(), 2, "CameraBuffer");
 
-    this->reservoirBuffer = StorageBuffer(RESERVOIR_BYTE_SIZE * textureWidth * textureHeight);
+    this->reservoirBuffer = StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * textureWidth * textureHeight);
     this->reservoirBuffer.BindToStorageBlock(this->renderShader.Id(), 3, "ReservoirBuffer");
 }

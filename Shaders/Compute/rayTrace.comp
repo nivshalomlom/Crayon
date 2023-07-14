@@ -61,8 +61,9 @@ void main()
     if (coords.x >= dimensions.x || coords.y >= dimensions.y)
         return;
 
-    uint state = coords.x + coords.y * dimensions.x + frameCounter * 6647369;
-    Reservoir reservoir = CreateReservoir();
+    uint kernal_ID = coords.x + coords.y * dimensions.x;
+    uint state = kernal_ID + frameCounter * 6647369;
+    reservoirs[kernal_ID] = CreateReservoir();
 
     for (int i = 0; i < raysPerPixel; i++)
     {
@@ -70,8 +71,8 @@ void main()
         Ray ray = CreateCameraRayFromUV(uv);
         
         vec4 rayColor = Trace(ray, rayBounces, state);
-        AddToReservoir(reservoir, rayColor, dot(rayColor, rayColor), state);
+        AddToReservoir(reservoirs[kernal_ID], rayColor, dot(rayColor, rayColor), state);
     }
 
-    UpdateImage(coords, GetReservoirValue(reservoir));
+    UpdateImage(coords, GetReservoirValue(reservoirs[kernal_ID]));
 }

@@ -6,19 +6,19 @@
 #include "../Graphics/camera.h"
 #include "../Textures/texture.h"
 #include "../Utility/disposable.h"
-#include "./Utility/geometry_buffer.h"
+#include "./Utility/scene_loader.h"
 #include "./scene.h"
 
 class SceneRenderer : public Disposable
 {
     private:
         ObjectBuffer<Camera> cameraBuffer;
-        GeometryBuffer geometryBuffer;
+        SceneLoader sceneLoader;
         StorageBuffer reservoirBuffer;
 
         ComputeProgram renderShader;
         ComputeProgram spatialReuse;
-        
+
         glm::ivec3 dispatchGroups;
         Texture2D renderTexture;
 
@@ -30,7 +30,7 @@ class SceneRenderer : public Disposable
     public:
         SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex = 0);
 
-        void SetScene(Scene scene);
+        void LoadScene(Scene scene) { this->sceneLoader.LoadScene(scene, this->renderShader.Id()); }
 
         void ModifyCamera(std::function<Camera(Camera)> modification) 
         {
@@ -51,7 +51,7 @@ class SceneRenderer : public Disposable
 
         void Dispose()
         {
-            this->geometryBuffer.Dispose();
+            this->sceneLoader.Dispose();
             this->renderShader.Dispose();
             this->renderTexture.Dispose();
             this->reservoirBuffer.Dispose();
@@ -61,7 +61,7 @@ class SceneRenderer : public Disposable
 
         const Camera SceneCamera() const { return this->cameraBuffer.GetValue(); }
 
-        const ArrayBuffer<Geometry> GetGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffer.GetGeometry(type); }
+        const ArrayBuffer<Geometry> GetGeometry(GEOMETRY_TYPE type) const { return this->sceneLoader.GetGeometry(type); }
 };
 
 #endif

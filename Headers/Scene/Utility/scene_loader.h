@@ -1,5 +1,5 @@
-#ifndef _GEOMETRY_BUFFER
-#define _GEOMETRY_BUFFER
+#ifndef _SCENE_LOADER_H
+#define _SCENE_LOADER_H
 
 #include "../../Buffers/array_bufffer.h"
 #include "../../Geometry/geometry.h"
@@ -28,7 +28,7 @@ struct BufferInfo
         const int Binding() const { return this->binding; }
 };
 
-class GeometryBuffer : public Disposable
+class SceneLoader : public Disposable
 {
     private:
         static const int NUM_BUFFERS = PLANE_TYPE + 1;
@@ -37,12 +37,12 @@ class GeometryBuffer : public Disposable
         ArrayBuffer<Geometry>* geometryBuffers;
 
     public:
-        GeometryBuffer() 
+        SceneLoader() 
         {
             this->geometryBuffers = NULL;
         }
 
-        void SetScene(Scene scene, GLuint progID);
+        void LoadScene(Scene scene, GLuint progID);
 
         void Dispose() { this->geometryBuffers->Dispose(); }
 

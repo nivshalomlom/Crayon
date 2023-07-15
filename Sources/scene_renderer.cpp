@@ -21,8 +21,8 @@ SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int t
         1
     );
 
-    this->geometryBuffer = GeometryBuffer();
-    this->geometryBuffer.SetScene(scene, this->renderShader.Id());
+    this->sceneLoader = SceneLoader();
+    this->sceneLoader.LoadScene(scene, this->renderShader.Id());
 
     this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
     this->cameraBuffer.BindToStorageBlock(this->renderShader.Id(), 2, "CameraBuffer");

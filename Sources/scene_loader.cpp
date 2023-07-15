@@ -1,11 +1,11 @@
-#include "../Headers/Scene/Utility/geometry_buffer.h"
+#include "../Headers/Scene/Utility/scene_loader.h"
 
-BufferInfo* GeometryBuffer::BUFFERS_INFO = new BufferInfo[GeometryBuffer::NUM_BUFFERS] {
+BufferInfo* SceneLoader::BUFFERS_INFO = new BufferInfo[SceneLoader::NUM_BUFFERS] {
     BufferInfo("SphereBuffer", sizeof(Sphere), 0),
     BufferInfo("PlaneBuffer", sizeof(Plane), 1)
 };
 
-void GeometryBuffer::SetScene(Scene scene, GLuint progID)
+void SceneLoader::LoadScene(Scene scene, GLuint progID)
 {
     if (this->geometryBuffers != NULL)
     {

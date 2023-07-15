@@ -26,8 +26,7 @@ void AddToReservoir(inout Reservoir reservoir, vec4 color, float weight, inout u
     float ratio = weight / max(reservoir.totalWeight, EPS);
     for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
     {
-        float rand = RandomValue(state);
-        if (reservoir.numItems == 1 || rand <= ratio)
+        if (reservoir.numItems == 1 || RandomValue(state) <= ratio)
         {
             reservoir.colors[i] = color;
             reservoir.weights[i] = weight;
@@ -37,8 +36,17 @@ void AddToReservoir(inout Reservoir reservoir, vec4 color, float weight, inout u
 
 void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
 {
-    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
-        AddToReservoir(source, target.colors[i], target.weights[i], state);
+    float totalWeight = source.totalWeight + target.totalWeight;
+    float ratio = target.totalWeight / totalWeight;
+
+    if (RandomValue(state) <= ratio)
+    {
+        source.colors = target.colors;
+        source.weights = target.weights;
+    }
+
+    source.totalWeight = totalWeight;
+    source.numItems += target.numItems;
 }
 
 vec4 GetReservoirValue(Reservoir reservoir)

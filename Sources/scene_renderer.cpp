@@ -8,6 +8,7 @@ const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(gl
 SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex)
 {
     this->renderShader = ComputeProgram("./Shaders/Compute/rayTrace.comp");
+    this->spatialReuse = ComputeProgram("./Shaders/Compute/spatialReuse.comp");
     this->renderTexture = Texture2D(textureWidth, textureHeight);
     
     this->frameCounterLocation = glGetUniformLocation(this->renderShader.Id(), "frameCounter");

@@ -17,8 +17,10 @@ class SceneRenderer : public Disposable
         StorageBuffer reservoirBuffer;
 
         ComputeProgram renderShader;
-        Texture2D renderTexture;
+        ComputeProgram spatialReuse;
+        
         glm::ivec3 dispatchGroups;
+        Texture2D renderTexture;
 
         GLint frameCounterLocation; 
         GLuint frameCounter;

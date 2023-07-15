@@ -1,3 +1,5 @@
+#include "../Reservoir/reservoir.comp"
+
 layout(std430, binding = 3) buffer ReservoirBuffer
 {
     Reservoir reservoirs[];

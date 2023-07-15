@@ -28,7 +28,7 @@ class SceneRenderer : public Disposable
         void IncrementFrameCounter() { glUniform1ui(this->frameCounterLocation, ++this->frameCounter); }
 
     public:
-        SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight, GLint imageIndex = 0);
+        SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight);
 
         void LoadScene(Scene scene) { this->sceneLoader.LoadScene(scene, this->renderShader.Id()); }
 

@@ -1,6 +1,7 @@
 #ifndef _SCENE_RENDERER_H
 #define _SCENE_RENDERER_H
 
+#include "../Graphics/RayTracing/ray_tracer.h"
 #include "../Buffers/object_buffer.h"
 #include "../Graphics/program.h"
 #include "../Graphics/camera.h"
@@ -12,12 +13,8 @@
 class SceneRenderer : public Disposable
 {
     private:
-        ObjectBuffer<Camera> cameraBuffer;
         SceneLoader sceneLoader;
-        StorageBuffer reservoirBuffer;
-
-        ComputeProgram renderShader;
-        ComputeProgram spatialReuse;
+        RayTracer rayTracer;
 
         glm::ivec3 dispatchGroups;
         Texture2D renderTexture;
@@ -30,18 +27,12 @@ class SceneRenderer : public Disposable
     public:
         SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight);
 
-        void LoadScene(Scene scene) { this->sceneLoader.LoadScene(scene, this->renderShader.Id()); }
-
-        void ModifyCamera(std::function<Camera(Camera)> modification) 
-        {
-            Camera camera = modification(this->cameraBuffer.GetValue());
-            this->cameraBuffer.SetValue(camera);
-        }
+        void LoadScene(Scene scene) { this->sceneLoader.LoadScene(scene, this->rayTracer); }
 
         void Render()
         {
-            this->renderShader.Mount();
-            this->renderShader.Dispatch(
+            this->rayTracer.Mount();
+            this->rayTracer.Dispatch(
                 this->dispatchGroups,
                 GL_SHADER_IMAGE_ACCESS_BARRIER_BIT
             );
@@ -52,14 +43,11 @@ class SceneRenderer : public Disposable
         void Dispose()
         {
             this->sceneLoader.Dispose();
-            this->renderShader.Dispose();
+            this->rayTracer.Dispose();
             this->renderTexture.Dispose();
-            this->reservoirBuffer.Dispose();
         }
 
         const Texture2D RenderTexture() const { return this->renderTexture; }
-
-        const Camera SceneCamera() const { return this->cameraBuffer.GetValue(); }
 
         const ArrayBuffer<Geometry> GetGeometry(GEOMETRY_TYPE type) const { return this->sceneLoader.GetGeometry(type); }
 };

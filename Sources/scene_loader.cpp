@@ -5,7 +5,7 @@ BufferInfo* SceneLoader::BUFFERS_INFO = new BufferInfo[SceneLoader::NUM_BUFFERS]
     BufferInfo("PlaneBuffer", sizeof(Plane), 1)
 };
 
-void SceneLoader::LoadScene(Scene scene, GLuint progID)
+void SceneLoader::LoadScene(Scene scene, RayTracer rayTracer)
 {
     if (this->geometryBuffers != NULL)
     {
@@ -22,6 +22,6 @@ void SceneLoader::LoadScene(Scene scene, GLuint progID)
         BufferInfo info = BUFFERS_INFO[i];
 
         this->geometryBuffers[i] = ArrayBuffer<Geometry>(geometry.ToArray(), geometry.Count(), info.ItemSize());
-        this->geometryBuffers[i].BindToStorageBlock(progID, info.Binding(), info.Name());
+        this->geometryBuffers[i].BindToStorageBlock(rayTracer.Id(), info.Binding(), info.Name());
     }
 }

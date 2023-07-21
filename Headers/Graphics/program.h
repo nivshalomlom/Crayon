@@ -62,7 +62,7 @@ class ComputeProgram : public Program
 
         ComputeProgram() : Program() {}
 
-        void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS) const 
+        virtual void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS) const 
         { 
             glDispatchCompute(groups.x, groups.y, groups.z);
             glMemoryBarrier(barrierMask);

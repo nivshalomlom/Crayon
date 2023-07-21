@@ -1,6 +1,7 @@
 #ifndef _SCENE_LOADER_H
 #define _SCENE_LOADER_H
 
+#include "../../Graphics/RayTracing/ray_tracer.h"
 #include "../../Buffers/array_bufffer.h"
 #include "../../Geometry/geometry.h"
 #include "../../Utility/enumerable.h"
@@ -42,7 +43,7 @@ class SceneLoader : public Disposable
             this->geometryBuffers = NULL;
         }
 
-        void LoadScene(Scene scene, GLuint progID);
+        void LoadScene(Scene scene, RayTracer rayTracer);
 
         void Dispose() { this->geometryBuffers->Dispose(); }
 

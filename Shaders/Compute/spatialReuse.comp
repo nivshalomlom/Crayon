@@ -3,8 +3,7 @@
 #include "./Utility/constants.comp"
 #include "./Buffers/reservoir.comp"
 
-layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
-layout(rgba32F, binding = 0) uniform image2D renderTarget;
+#define SAMPLING_DISTNACE 3
 
 const ivec2 offsets[8] = {
     ivec2( 1,  0),
@@ -17,29 +16,27 @@ const ivec2 offsets[8] = {
     ivec2( 1,  1)
 };
 
+uniform ivec2 dimensions;
 uniform int iteration;
 
 void main()
 {
-    ivec2 dimensions = imageSize(renderTarget);
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
 
     if (coords.x >= dimensions.x || coords.y >= dimensions.y)
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    Reservoir reservoir = reservoirs[kernal_ID];
-
+    Reservoir reservoir = CreateReservoir(reservoirs[kernal_ID]);
+    
     uint state = kernal_ID + uint(reservoir.totalWeight) * 6647369;
     for (int i = 0; i < 8; i++)
     {
-        ivec2 offset = 3 * iteration * offsets[i];
-        ivec2 neighbor = coords + offset;
-
+        ivec2 neighbor = coords + SAMPLING_DISTNACE * iteration * offsets[i];
         uint neighbor_ID = neighbor.x + neighbor.y * dimensions.x;
+        
         MergeReservoirs(reservoir, reservoirs[neighbor_ID], state);
     }
 
     reservoirs[kernal_ID] = reservoir;
-    imageStore(renderTarget, coords, GetReservoirValue(reservoirs[kernal_ID]));
 }

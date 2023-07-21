@@ -18,6 +18,16 @@ Reservoir CreateReservoir()
     return reservoir;
 }
 
+Reservoir CreateReservoir(Reservoir source)
+{
+    Reservoir reservoir;
+    reservoir.colors = source.colors;
+    reservoir.weights = source.weights;
+    reservoir.totalWeight = source.totalWeight;
+    reservoir.numItems = source.numItems;
+    return reservoir;
+}
+
 void AddToReservoir(inout Reservoir reservoir, vec4 color, float weight, inout uint state)
 {
     reservoir.totalWeight += weight;

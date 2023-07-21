@@ -1,7 +1,7 @@
 #ifndef _TONE_MAPPING_H
 #define _TONE_MAPPING_H
 
-#include "../Graphics/program.h"
+#include "../../Graphics/program.h"
 
 class ToneMappingProgram : public PostProcesingProgram
 {

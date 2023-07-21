@@ -1,7 +1,7 @@
 #ifndef _TEXTURE_COPY_H
 #define _TEXTURE_COPY_H
 
-#include "../Graphics/program.h"
+#include "../../Graphics/program.h"
 
 class TextureCopyProgram : public PostProcesingProgram
 {

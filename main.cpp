@@ -1,7 +1,7 @@
 #include "./Headers/Textures/texture_buffer.h"
 #include "./Headers/Graphics/window.h"
 #include "./Headers/Scene/scene_renderer.h"
-#include "./Headers/PostProcessing/tone_mapping.h"
+#include "./Headers/Graphics/PostProcessing/tone_mapping.h"
 
 #define WIDTH 1280
 #define HEIGHT 720

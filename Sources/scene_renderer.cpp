@@ -4,9 +4,6 @@ SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int t
 {
     this->renderTexture = Texture2D(textureWidth, textureHeight);
     this->rayTracer = RayTracer(camera, this->renderTexture);
-    
-    this->frameCounterLocation = glGetUniformLocation(this->rayTracer.Id(), "frameCounter");
-    this->frameCounter = 0;
 
     this->dispatchGroups = glm::ivec3(
         ceilf(textureWidth / 32.0f),

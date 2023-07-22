@@ -33,7 +33,7 @@ class RayTracer : public ComputeProgram
             this->spatialReuse = ComputeProgram("./Shaders/Compute/spatialReuse.comp");
             this->imageLoader = ComputeProgram("./Shaders/Compute/reservoirsToImage.comp");
             
-            renderTexture.BindToImage(RENDER_IMAGE_INDEX);
+            renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
             glm::ivec2 texSize = renderTexture.Size();
 
             this->reservoirBuffer = StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);

@@ -29,7 +29,7 @@ class SceneRenderer : public Disposable
             this->rayTracer.Mount();
             this->rayTracer.Dispatch(
                 this->dispatchGroups,
-                GL_SHADER_IMAGE_ACCESS_BARRIER_BIT
+                GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT
             );
         }
 

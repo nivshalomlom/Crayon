@@ -53,9 +53,11 @@ void main()
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    uint state = kernal_ID + uint(reservoirs[kernal_ID].totalWeight) * 6647369;
+    float reservoirValue = length(GetReservoirValue(reservoirs[kernal_ID]));
 
+    uint state = kernal_ID + uint(reservoirValue) * 6647369;
     reservoirs[kernal_ID] = CreateReservoir();
+
     for (int i = 0; i < raysPerPixel; i++)
     {
         vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;

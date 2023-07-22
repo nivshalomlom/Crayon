@@ -24,6 +24,8 @@ class RayTracer : public ComputeProgram
         StorageBuffer reservoirBuffer;
         
         ComputeProgram spatialReuse;
+        GLuint samplingDistanceLocation;
+
         // ComputeProgram temporalReuse;
         ComputeProgram imageLoader;
 
@@ -32,6 +34,7 @@ class RayTracer : public ComputeProgram
         {
             this->spatialReuse = ComputeProgram("./Shaders/Compute/spatialReuse.comp");
             this->imageLoader = ComputeProgram("./Shaders/Compute/reservoirsToImage.comp");
+            this->samplingDistanceLocation = glGetUniformLocation(this->spatialReuse.Id(), "samplingDistance");
             
             renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
             glm::ivec2 texSize = renderTexture.Size();
@@ -53,6 +56,15 @@ class RayTracer : public ComputeProgram
         {
             this->reservoirBuffer.BindToStorageBlock(this->Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
             ComputeProgram::Dispatch(groups, barrierMask);
+
+            this->reservoirBuffer.BindToStorageBlock(this->spatialReuse.Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
+            this->spatialReuse.Mount();
+
+            for (int i = 0, dst = 1; i < 1; i++, dst *= 3)
+            {
+                glUniform1i(this->samplingDistanceLocation, dst);
+                this->spatialReuse.Dispatch(groups, barrierMask);
+            }
 
             this->imageLoader.Mount();
             this->reservoirBuffer.BindToStorageBlock(this->imageLoader.Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);

@@ -51,7 +51,7 @@ class Texture2D : public Disposable
 
         GLuint Id() const { return this->texture; }
 
-        glm::vec2 Size() const { return this->size; }
+        glm::ivec2 Size() const { return this->size; }
 
         void Bind() const { glBindTexture(GL_TEXTURE_2D, this->texture); }
 

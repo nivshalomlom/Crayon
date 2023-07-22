@@ -41,7 +41,7 @@ class StorageBuffer : public Disposable
             this->Unbind();
         }
 
-        void BindToStorageBlock(GLuint program, GLuint binding, const char* blockName)
+        void BindToStorageBlock(GLuint program, GLuint binding, const char* blockName) const
         {
             this->Bind();
             
@@ -55,9 +55,9 @@ class StorageBuffer : public Disposable
             this->Unbind();
         }
 
-        void Bind() { glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->storageBuffer); }
+        void Bind() const { glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->storageBuffer); }
 
-        void Unbind() { glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); }
+        void Unbind() const { glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); }
 
         virtual void Dispose() { glDeleteBuffers(1, &this->storageBuffer); }
 };

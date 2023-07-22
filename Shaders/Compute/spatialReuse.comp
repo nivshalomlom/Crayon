@@ -38,5 +38,6 @@ void main()
         MergeReservoirs(reservoir, reservoirs[neighbor_ID], state);
     }
 
+    barrier();
     reservoirs[kernal_ID] = reservoir;
 }

@@ -2,6 +2,8 @@
 
 #include "./Rays/ray_intersections.comp"
 
+layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+
 uniform ivec2 dimensions;
 
 vec4 Trace(Ray ray, uint bounceLimit, inout uint state)

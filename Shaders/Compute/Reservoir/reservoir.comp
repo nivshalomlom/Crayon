@@ -61,12 +61,12 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
 
 vec4 GetReservoirValue(Reservoir reservoir)
 {
-    float avarageWeight = reservoir.totalWeight / reservoir.numItems;
+    float averageWeight = reservoir.totalWeight / reservoir.numItems;
     vec4 avarageSample = vec4(0.0);
     
     for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
     {
-        float correction = avarageWeight / reservoir.weights[i];
+        float correction = averageWeight / reservoir.weights[i];
         avarageSample += reservoir.colors[i] * correction;
     }
 

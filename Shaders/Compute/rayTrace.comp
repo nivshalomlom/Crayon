@@ -55,7 +55,7 @@ void main()
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     float reservoirValue = length(GetReservoirValue(reservoirs[kernal_ID]));
 
-    uint state = kernal_ID + uint(reservoirValue) * 6647369;
+    uint state = kernal_ID + uint(reservoirValue * 6647369);
     reservoirs[kernal_ID] = CreateReservoir();
 
     for (int i = 0; i < raysPerPixel; i++)

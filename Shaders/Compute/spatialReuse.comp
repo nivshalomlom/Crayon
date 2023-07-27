@@ -30,7 +30,7 @@ void main()
     Reservoir reservoir = CreateReservoir(reservoirs[kernal_ID]);
     
     float reservoirValue = length(GetReservoirValue(reservoir));
-    uint state = kernal_ID + uint(reservoirValue) * 6647369;
+    uint state = kernal_ID + uint(reservoirValue * 6647369);
     
     for (int i = 0; i < offsets.length(); i++)
     {

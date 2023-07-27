@@ -49,10 +49,13 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
     float totalWeight = source.totalWeight + target.totalWeight;
     float ratio = target.totalWeight / totalWeight;
 
-    if (RandomValue(state) <= ratio)
+    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
     {
-        source.colors = target.colors;
-        source.weights = target.weights;
+        if (RandomValue(state) <= ratio)
+        {
+            source.colors[i] = target.colors[i];
+            source.weights[i] = target.weights[i];
+        }
     }
 
     source.totalWeight = totalWeight;

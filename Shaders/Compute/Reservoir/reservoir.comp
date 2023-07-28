@@ -6,8 +6,12 @@ struct Reservoir
 {
     vec4 colors[RESERVOIR_BUCKET_SIZE];
     float weights[RESERVOIR_BUCKET_SIZE];
+
     float totalWeight;
     uint numItems;
+
+    float depth;
+    vec3 normal;
 };
 
 Reservoir CreateReservoir()
@@ -25,6 +29,8 @@ Reservoir CreateReservoir(Reservoir source)
     reservoir.weights = source.weights;
     reservoir.totalWeight = source.totalWeight;
     reservoir.numItems = source.numItems;
+    reservoir.depth = source.depth;
+    reservoir.normal = source.normal;
     return reservoir;
 }
 

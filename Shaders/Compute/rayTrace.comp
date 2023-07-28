@@ -45,6 +45,38 @@ vec3 Trace(Ray ray, uint bounceLimit, inout uint state)
     return incomingLight;
 }
 
+void HandleRayMiss(inout Reservoir reservoir, vec3 rayDirection, inout uint state)
+{
+    vec4 incomingLight = vec4(EnvironmentLight(rayDirection), 1.0);
+    float weight = dot(incomingLight, incomingLight);
+
+    reservoir.normalDst = vec4(0, 0, 0, -1);
+    AddToReservoir(reservoir, incomingLight, weight, state);
+}
+
+void HandleRayHit(inout Reservoir reservoir, vec3 rayDirection, RayHit rayHit, inout uint state)
+{
+    Material material = rayHit.material;
+    vec3 normal = rayHit.impact.normal;
+    vec3 emission = Emission(material);
+
+    BRDFPoint point = CreateBRDFPoint(-rayDirection, vec3(0), normal);
+    Ray reflected = CreateRay(rayHit.impact.point, vec3(0));
+
+    for (int i = 0; i < raysPerPixel; i++)
+    {
+        point.lightDirection = normalize(rayHit.impact.normal + RandomDirection(state));
+        reflected.direction = point.lightDirection + normal * 0.0001;
+
+        vec3 incomingLight = Trace(reflected, rayBounces, state);
+        vec3 outgoingLight = incomingLight * BRDF(point, material) + emission;
+
+        AddToReservoir(reservoir, vec4(outgoingLight, 1.0), dot(outgoingLight, outgoingLight), state);
+    }
+
+    reservoir.normalDst = vec4(normal, dot(rayHit.impact.point, rayHit.impact.point));
+}
+
 void main()
 {
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
@@ -56,47 +88,16 @@ void main()
     float reservoirValue = length(GetReservoirValue(reservoirs[kernal_ID]));
 
     uint state = kernal_ID + uint(reservoirValue * 6647369);
-    reservoirs[kernal_ID] = CreateReservoir();
+    Reservoir reservoir = CreateReservoir();
 
     vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
     Ray ray = CreateCameraRayFromUV(uv);
 
     RayHit rayHit;
-    if (!FireRay(ray, rayHit))
-    {
-        vec4 incomingLight = vec4(EnvironmentLight(ray.direction), 1.0);
-        float weight = dot(incomingLight, incomingLight);
+    if (FireRay(ray, rayHit))
+        HandleRayHit(reservoir, ray.direction, rayHit, state);
+    else
+        HandleRayMiss(reservoir, ray.direction, state);
 
-        reservoirs[kernal_ID].normalDst = vec4(0, 0, 0, -1);
-        for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
-        {
-            reservoirs[kernal_ID].colors[i] = incomingLight;
-            reservoirs[kernal_ID].weights[i] = weight;
-        }
-
-        reservoirs[kernal_ID].numItems += raysPerPixel;
-        reservoirs[kernal_ID].totalWeight += weight * raysPerPixel;
-
-        return;
-    }
-
-    Material material = rayHit.material;
-    vec3 normal = rayHit.impact.normal;
-    vec3 emission = Emission(material);
-
-    BRDFPoint point = CreateBRDFPoint(-ray.direction, vec3(0), normal);
-    Ray reflected = CreateRay(rayHit.impact.point, vec3(0));
-
-    for (int i = 0; i < raysPerPixel; i++)
-    {
-        point.lightDirection = normalize(rayHit.impact.normal + RandomDirection(state));
-        reflected.direction = point.lightDirection + normal * 0.0001;
-
-        vec3 incomingLight = Trace(ray, rayBounces, state);
-        vec3 outgoingLight = incomingLight * BRDF(point, material) + emission;
-
-        AddToReservoir(reservoirs[kernal_ID], vec4(outgoingLight, 1.0), dot(outgoingLight, outgoingLight), state);
-    }
-
-    reservoirs[kernal_ID].normalDst = vec4(normal, dot(rayHit.impact.point, rayHit.impact.point));
+    reservoirs[kernal_ID] = reservoir;
 }

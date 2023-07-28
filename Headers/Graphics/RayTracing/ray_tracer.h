@@ -40,8 +40,10 @@ class RayTracer : public ComputeProgram
             glm::ivec2 texSize = renderTexture.Size();
 
             this->reservoirBuffer = StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
+            this->reservoirBuffer.BindToStorageBlock(RESERVOIR_BUFFER_BINDING);
+
             this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
-            this->cameraBuffer.BindToStorageBlock(this->Id(), CAMERA_BUFFER_BINDING, CAMERA_BUFFER_NAME);
+            this->cameraBuffer.BindToStorageBlock(CAMERA_BUFFER_BINDING);
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
@@ -54,12 +56,9 @@ class RayTracer : public ComputeProgram
 
         void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS) const
         {
-            this->reservoirBuffer.BindToStorageBlock(this->Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
             ComputeProgram::Dispatch(groups, barrierMask);
 
-            this->reservoirBuffer.BindToStorageBlock(this->spatialReuse.Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
             this->spatialReuse.Mount();
-
             for (int i = 0, dst = 1; i < 1; i++, dst *= 3)
             {
                 glUniform1i(this->samplingDistanceLocation, dst);
@@ -67,7 +66,6 @@ class RayTracer : public ComputeProgram
             }
 
             this->imageLoader.Mount();
-            this->reservoirBuffer.BindToStorageBlock(this->imageLoader.Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
             this->imageLoader.Dispatch(groups, barrierMask);
         }
 

@@ -57,6 +57,13 @@ class StorageBuffer : public Disposable
             this->Unbind();
         }
 
+        void BindToStorageBlock(GLuint binding) const
+        {
+            this->Bind();
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, this->storageBuffer);
+            this->Unbind();
+        }
+
         void Bind() const { glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->storageBuffer); }
 
         void Unbind() const { glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); }

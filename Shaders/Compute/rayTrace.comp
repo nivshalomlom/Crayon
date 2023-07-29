@@ -45,22 +45,22 @@ vec3 Trace(Ray ray, uint bounceLimit, inout uint state)
     return incomingLight;
 }
 
-void HandleRayMiss(inout Reservoir reservoir, vec3 rayDirection, inout uint state)
+void HandleRayMiss(inout Reservoir reservoir, Ray ray, inout uint state)
 {
-    vec4 incomingLight = vec4(EnvironmentLight(rayDirection), 1.0);
+    vec4 incomingLight = vec4(EnvironmentLight(ray.direction), 1.0);
     float weight = dot(incomingLight, incomingLight);
 
-    reservoir.normalDst = vec4(0, 0, 0, -1);
+    reservoir.normalDepth = vec4(0, 0, 0, -1);
     AddToReservoir(reservoir, incomingLight, weight, state);
 }
 
-void HandleRayHit(inout Reservoir reservoir, vec3 rayDirection, RayHit rayHit, inout uint state)
+void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint state)
 {
     Material material = rayHit.material;
     vec3 normal = rayHit.impact.normal;
     vec3 emission = Emission(material);
 
-    BRDFPoint point = CreateBRDFPoint(-rayDirection, vec3(0), normal);
+    BRDFPoint point = CreateBRDFPoint(-ray.direction, vec3(0), normal);
     Ray reflected = CreateRay(rayHit.impact.point, vec3(0));
 
     for (int i = 0; i < raysPerPixel; i++)
@@ -70,11 +70,10 @@ void HandleRayHit(inout Reservoir reservoir, vec3 rayDirection, RayHit rayHit, i
 
         vec3 incomingLight = Trace(reflected, rayBounces, state);
         vec3 outgoingLight = incomingLight * BRDF(point, material) + emission;
-
-        AddToReservoir(reservoir, vec4(outgoingLight, 1.0), dot(outgoingLight, outgoingLight), state);
+        AddToReservoir(reservoir, vec4(outgoingLight, 1.0), length(outgoingLight), state);
     }
 
-    reservoir.normalDst = vec4(normal, dot(rayHit.impact.point, rayHit.impact.point));
+    reservoir.normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));
 }
 
 void main()
@@ -95,9 +94,9 @@ void main()
 
     RayHit rayHit;
     if (FireRay(ray, rayHit))
-        HandleRayHit(reservoir, ray.direction, rayHit, state);
+        HandleRayHit(reservoir, ray, rayHit, state);
     else
-        HandleRayMiss(reservoir, ray.direction, state);
+        HandleRayMiss(reservoir, ray, state);
 
     reservoirs[kernal_ID] = reservoir;
 }

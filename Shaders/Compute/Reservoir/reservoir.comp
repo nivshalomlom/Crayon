@@ -10,7 +10,7 @@ struct Reservoir
     float totalWeight;
     uint numItems;
 
-    vec4 normalDst;
+    vec4 normalDepth;
 };
 
 Reservoir CreateReservoir()
@@ -28,7 +28,7 @@ Reservoir CreateReservoir(Reservoir source)
     reservoir.weights = source.weights;
     reservoir.totalWeight = source.totalWeight;
     reservoir.numItems = source.numItems;
-    reservoir.normalDst = source.normalDst;
+    reservoir.normalDepth = source.normalDepth;
     return reservoir;
 }
 

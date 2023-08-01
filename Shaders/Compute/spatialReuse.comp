@@ -1,7 +1,10 @@
 #version 430 core
 
 #include "./Utility/constants.comp"
+#include "./Geometry/transform.comp"
+#include "./Rays/ray.comp"
 #include "./Buffers/reservoir.comp"
+#include "./Buffers/camera.comp"
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
@@ -30,7 +33,7 @@ void main()
     Reservoir reservoir = CreateReservoir(reservoirs[kernal_ID]);
     
     float reservoirValue = length(GetReservoirValue(reservoir));
-    uint state = kernal_ID + uint(reservoirValue * 6647369);
+    uint state = kernal_ID + Camera.frameCounter * 6647369;
 
     vec3 normal = reservoirs[kernal_ID].normalDepth.xyz;
     float depth = reservoirs[kernal_ID].normalDepth.w;

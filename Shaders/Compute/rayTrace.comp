@@ -86,7 +86,7 @@ void main()
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     float reservoirValue = length(GetReservoirValue(reservoirs[kernal_ID]));
 
-    uint state = kernal_ID + uint(reservoirValue * 6647369);
+    uint state = kernal_ID + Camera.frameCounter * 6647369;
     Reservoir reservoir = CreateReservoir();
 
     vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;

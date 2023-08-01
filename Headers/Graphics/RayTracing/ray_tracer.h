@@ -54,7 +54,7 @@ class RayTracer : public ComputeProgram
 
         RayTracer() {}
 
-        void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS) const
+        void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS)
         {
             ComputeProgram::Dispatch(groups, barrierMask);
 
@@ -67,6 +67,11 @@ class RayTracer : public ComputeProgram
 
             this->imageLoader.Mount();
             this->imageLoader.Dispatch(groups, barrierMask);
+
+            Camera camera = this->cameraBuffer.GetValue();
+            camera.frameCounter++;
+
+            this->cameraBuffer.SetValue(camera);
         }
 
         void Dispose()

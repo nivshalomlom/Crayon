@@ -84,8 +84,6 @@ void main()
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    float reservoirValue = length(GetReservoirValue(reservoirs[kernal_ID]));
-
     uint state = kernal_ID + Camera.frameCounter * 6647369;
     Reservoir reservoir = CreateReservoir();
 

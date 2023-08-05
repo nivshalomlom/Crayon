@@ -1,16 +1,14 @@
 #include "../Random/random.comp"
 
-const uint RESERVOIR_BUCKET_SIZE = 4;
-
 struct Reservoir
 {
-    vec4 colors[RESERVOIR_BUCKET_SIZE];
-    float weights[RESERVOIR_BUCKET_SIZE];
-
-    float totalWeight;
-    uint numItems;
-
+    vec4 item;
     vec4 normalDepth;
+
+    float itemWeight;
+    float totalWeight;
+
+    uint numItems;
 };
 
 Reservoir CreateReservoir()
@@ -21,30 +19,16 @@ Reservoir CreateReservoir()
     return reservoir;
 }
 
-Reservoir CreateReservoir(Reservoir source)
+void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inout uint state)
 {
-    Reservoir reservoir;
-    reservoir.colors = source.colors;
-    reservoir.weights = source.weights;
-    reservoir.totalWeight = source.totalWeight;
-    reservoir.numItems = source.numItems;
-    reservoir.normalDepth = source.normalDepth;
-    return reservoir;
-}
-
-void AddToReservoir(inout Reservoir reservoir, vec4 color, float weight, inout uint state)
-{
-    reservoir.totalWeight += weight;
+    reservoir.totalWeight += itemWeight;
     reservoir.numItems++;
 
-    float ratio = weight / max(reservoir.totalWeight, EPS);
-    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
+    float ratio = itemWeight / max(reservoir.totalWeight, EPS);
+    if (reservoir.numItems == 1 || RandomValue(state) <= ratio)
     {
-        if (reservoir.numItems == 1 || RandomValue(state) <= ratio)
-        {
-            reservoir.colors[i] = color;
-            reservoir.weights[i] = weight;
-        }
+        reservoir.item = item;
+        reservoir.itemWeight = itemWeight;
     }
 }
 
@@ -53,13 +37,10 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
     float totalWeight = source.totalWeight + target.totalWeight;
     float ratio = target.totalWeight / totalWeight;
 
-    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
+    if (source.numItems == 0 || RandomValue(state) <= ratio)
     {
-        if (RandomValue(state) <= ratio)
-        {
-            source.colors[i] = target.colors[i];
-            source.weights[i] = target.weights[i];
-        }
+        source.item = target.item;
+        source.itemWeight = target.itemWeight;
     }
 
     source.totalWeight = totalWeight;
@@ -69,13 +50,6 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
 vec4 GetReservoirValue(Reservoir reservoir)
 {
     float averageWeight = reservoir.totalWeight / reservoir.numItems;
-    vec4 avarageSample = vec4(0.0);
-    
-    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
-    {
-        float correction = averageWeight / reservoir.weights[i];
-        avarageSample += reservoir.colors[i] * correction;
-    }
-
-    return avarageSample / RESERVOIR_BUCKET_SIZE;
+    float correction = averageWeight / reservoir.itemWeight;
+    return reservoir.item * correction;
 }

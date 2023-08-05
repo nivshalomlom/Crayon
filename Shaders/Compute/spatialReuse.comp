@@ -31,7 +31,7 @@ void main()
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     uint state = kernal_ID + Camera.frameCounter * 6647369;
-    Reservoir reservoir = CreateReservoir(reservoirs[kernal_ID]);
+    Reservoir reservoir = reservoirs[kernal_ID];
 
     vec3 normal = reservoir.normalDepth.xyz;
     float depth = reservoir.normalDepth.w;

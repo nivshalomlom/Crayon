@@ -7,14 +7,6 @@ struct RayHit
     Impact impact;
 };
 
-Impact CreateImpact(vec3 point, vec3 normal)
-{
-    Impact impact;
-    impact.point = point;
-    impact.normal = normal;
-    return impact;
-}
-
 RayHit CreateRayHit(Transform transform, Material material, vec3 point, vec3 normal)
 {
     RayHit rayHit;

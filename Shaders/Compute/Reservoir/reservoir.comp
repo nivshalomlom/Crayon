@@ -41,22 +41,28 @@ void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, Impa
 
 void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
 {
-    // float totalWeight = source.point_s_totalWeight.w + target.point_s_totalWeight.w;
-    // float ratio = target.point_s_totalWeight.w / totalWeight;
+    float totalWeight = source.point_s_totalWeight.w + target.point_s_totalWeight.w;
+    float ratio = target.point_s_totalWeight.w / totalWeight;
 
-    // if (source.normal_v_numItems.w == 0 || RandomValue(state) <= ratio)
-    // {
-    //     source.item = target.item;
-    //     source.point_v_itemWeight.w = target.point_v_itemWeight.w;
-    //     source.point_s_totalWeight.xyz = target.point_s_totalWeight.xyz;
-    //     source.normal_s_depth.xyz = target.normal_s_depth.xyz;
-    // }
+    if (source.normal_v_numItems.w == 0 || RandomValue(state) <= ratio)
+    {
+        source.item = target.item;
+        source.point_v_itemWeight.w = target.point_v_itemWeight.w;
+        source.point_s_totalWeight.xyz = target.point_s_totalWeight.xyz;
+        source.normal_s_depth.xyz = target.normal_s_depth.xyz;
+    }
 
-    // source.point_s_totalWeight.w = totalWeight;
-    // source.normal_v_numItems.w += target.normal_v_numItems.w;
+    source.point_s_totalWeight.w = totalWeight;
+    source.normal_v_numItems.w += target.normal_v_numItems.w;
+}
 
+void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, inout uint state)
+{
+    float mergeWeight = ReservoirCorrectionWeight(target) * target.normal_v_numItems.w * weight;
     Impact impact = CreateImpact(target.point_s_totalWeight.xyz, target.normal_s_depth.xyz);
-    AddToReservoir(source, target.item, target.point_v_itemWeight.w, impact, state);
+
+    source.normal_v_numItems.w += target.normal_v_numItems.w - 1;
+    AddToReservoir(source, target.item, mergeWeight, impact, state);
 }
 
 vec4 GetReservoirValue(Reservoir reservoir)

@@ -56,7 +56,10 @@ void main()
         if (dot(normal, reservoirs[neighbor_ID].normal_v_numItems.xyz) < 0.906)
             continue;
 
-        MergeReservoirs(reservoir, reservoirs[neighbor_ID], state);
+        float weight = reservoirs[neighbor_ID].point_v_itemWeight.w;
+        float jacobian = ComputeJacobian(reservoirs[neighbor_ID], reservoir);
+
+        MergeReservoirs(reservoir, reservoirs[neighbor_ID], weight / jacobian, state);
     }
 
     barrier();

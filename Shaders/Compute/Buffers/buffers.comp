@@ -1,4 +1,5 @@
 #include "../Utility/constants.comp"
+#include "../Utility/models.comp"
 
 #include "../Buffers/geometry.comp"
 #include "../Buffers/camera.comp"

@@ -1,12 +1,6 @@
 #include "../Rays/ray.comp"
 #include "../Buffers/buffers.comp"
 
-struct Impact
-{
-    vec3 point;
-    vec3 normal;
-};
-
 struct RayHit
 {
     GEOMETRY_BASE

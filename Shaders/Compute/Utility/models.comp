@@ -1,0 +1,5 @@
+struct Impact
+{
+    vec3 point;
+    vec3 normal;
+};

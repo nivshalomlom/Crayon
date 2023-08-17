@@ -3,53 +3,53 @@
 struct Reservoir
 {
     vec4 item;
-    vec4 normalDepth;
 
-    float itemWeight;
-    float totalWeight;
+    vec4 point_v_itemWeight;
+    vec4 point_s_totalWeight;
 
-    uint numItems;
+    vec4 normal_v_numItems;
+    vec4 normal_s_depth;
 };
 
 Reservoir CreateReservoir()
 {
     Reservoir reservoir;
-    reservoir.totalWeight = 0.0;
-    reservoir.numItems = 0;
+    reservoir.point_s_totalWeight.w = 0.0;
+    reservoir.normal_v_numItems.w = 0;
     return reservoir;
 }
 
 void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inout uint state)
 {
-    reservoir.totalWeight += itemWeight;
-    reservoir.numItems++;
+    reservoir.point_s_totalWeight.w += itemWeight;
+    reservoir.normal_v_numItems.w++;
 
-    float ratio = itemWeight / max(reservoir.totalWeight, EPS);
-    if (reservoir.numItems == 1 || RandomValue(state) <= ratio)
+    float ratio = itemWeight / max(reservoir.point_s_totalWeight.w, EPS);
+    if (reservoir.normal_v_numItems.w == 1 || RandomValue(state) <= ratio)
     {
         reservoir.item = item;
-        reservoir.itemWeight = itemWeight;
+        reservoir.point_v_itemWeight.w = itemWeight;
     }
 }
 
 void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
 {
-    float totalWeight = source.totalWeight + target.totalWeight;
-    float ratio = target.totalWeight / totalWeight;
+    float totalWeight = source.point_s_totalWeight.w + target.point_s_totalWeight.w;
+    float ratio = target.point_s_totalWeight.w / totalWeight;
 
-    if (source.numItems == 0 || RandomValue(state) <= ratio)
+    if (source.normal_v_numItems.w == 0 || RandomValue(state) <= ratio)
     {
         source.item = target.item;
-        source.itemWeight = target.itemWeight;
+        source.point_v_itemWeight.w = target.point_v_itemWeight.w;
     }
 
-    source.totalWeight = totalWeight;
-    source.numItems += target.numItems;
+    source.point_s_totalWeight.w = totalWeight;
+    source.normal_v_numItems.w += target.normal_v_numItems.w;
 }
 
 vec4 GetReservoirValue(Reservoir reservoir)
 {
-    float averageWeight = reservoir.totalWeight / reservoir.numItems;
-    float correction = averageWeight / reservoir.itemWeight;
+    float averageWeight = reservoir.point_s_totalWeight.w / reservoir.normal_v_numItems.w;
+    float correction = averageWeight / reservoir.point_v_itemWeight.w;
     return reservoir.item * correction;
 }

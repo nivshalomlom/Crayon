@@ -33,8 +33,8 @@ void main()
     uint state = kernal_ID + Camera.frameCounter * 6647369;
     Reservoir reservoir = reservoirs[kernal_ID];
 
-    vec3 normal = reservoir.normalDepth.xyz;
-    float depth = reservoir.normalDepth.w;
+    vec3 normal = reservoir.normal_v_numItems.xyz;
+    float depth = reservoir.normal_s_depth.w;
 
     for (int i = 0; i < offsets.length(); i++)
     {
@@ -47,11 +47,11 @@ void main()
         if (neighbor_ID >= reservoirs.length())
             continue;
 
-        float neighborDepth = reservoirs[neighbor_ID].normalDepth.w;
+        float neighborDepth = reservoirs[neighbor_ID].normal_s_depth.w;
         if (neighborDepth < 0 || abs(depth - neighborDepth) > 0.1 * depth)
             continue;
 
-        if (dot(normal, reservoirs[neighbor_ID].normalDepth.xyz) < 0.906)
+        if (dot(normal, reservoirs[neighbor_ID].normal_v_numItems.xyz) < 0.906)
             continue;
 
         MergeReservoirs(reservoir, reservoirs[neighbor_ID], state);

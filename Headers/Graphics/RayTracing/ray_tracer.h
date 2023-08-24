@@ -58,7 +58,7 @@ class RayTracer : public ComputeProgram
             ComputeProgram::Dispatch(groups, barrierMask);
 
             this->spatialReuse.Mount();
-            for (int i = 0, dst = 1; i < 3; i++, dst *= 3)
+            for (int i = 0, dst = 1; i < 5; i++, dst *= 3)
             {
                 glUniform1i(this->samplingDistanceLocation, dst);
                 this->spatialReuse.Dispatch(groups, barrierMask);

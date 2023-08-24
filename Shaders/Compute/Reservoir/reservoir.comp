@@ -63,7 +63,11 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, ino
     Impact impact = CreateImpact(target.point_s_totalWeight.xyz, target.normal_s_depth.xyz);
     float mergeWeight = target.correction * target.normal_v_numItems.w * weight;
 
-    source.normal_v_numItems.w += target.normal_v_numItems.w - 1;
+    if (weight > 0)
+        source.normal_v_numItems.w += target.normal_v_numItems.w - 1;
+    else
+        source.normal_v_numItems.w -= 1;
+        
     AddToReservoir(source, target.item, mergeWeight, impact, state);
 }
 

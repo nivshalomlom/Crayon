@@ -59,7 +59,7 @@ void main()
         float weight = reservoirs[neighbor_ID].point_v_itemWeight.w;
         float jacobian = ComputeJacobian(reservoirs[neighbor_ID], reservoir);
 
-        MergeReservoirs(reservoir, reservoirs[neighbor_ID], weight / jacobian, state);
+        MergeReservoirs(reservoir, reservoirs[neighbor_ID], weight / max(jacobian, EPS), state);
     }
 
     barrier();

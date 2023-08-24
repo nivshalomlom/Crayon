@@ -47,6 +47,9 @@ void main()
         if (neighbor_ID >= reservoirs.length())
             continue;
 
+        if (reservoirs[neighbor_ID].normal_v_numItems.xyz == vec3(0.0))
+            continue;
+
         float neighborDepth = reservoirs[neighbor_ID].normal_s_depth.w;
         if (neighborDepth < 0 || abs(depth - neighborDepth) > 0.1 * depth)
             continue;

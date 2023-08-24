@@ -78,6 +78,7 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
         AddToReservoir(reservoir, vec4(outgoingLight, 1.0), length(outgoingLight), impact, state);
     }
 
+    UpdateReservoirCorrection(reservoir);
     reservoir.normal_v_numItems.xyz = normal;
     reservoir.point_v_itemWeight.xyz = rayHit.impact.point;
     reservoir.normal_s_depth.w = distance(ray.origin, rayHit.impact.point);
@@ -103,5 +104,6 @@ void main()
     else
         HandleRayMiss(reservoir, ray, state);
 
+    UpdateReservoirCorrection(reservoirs[kernal_ID]);
     MergeReservoirs(reservoirs[kernal_ID], reservoir, state);
 }

@@ -9,6 +9,8 @@ struct Reservoir
 
     vec4 normal_v_numItems;
     vec4 normal_s_depth;
+
+    float correction;
 };
 
 Reservoir CreateReservoir()
@@ -19,9 +21,9 @@ Reservoir CreateReservoir()
     return reservoir;
 }
 
-float ReservoirCorrectionWeight(Reservoir reservoir)
+void UpdateReservoirCorrection(inout Reservoir reservoir)
 {
-    return reservoir.point_s_totalWeight.w / (reservoir.point_v_itemWeight.w * reservoir.normal_v_numItems.w);
+    reservoir.correction = reservoir.point_s_totalWeight.w / (reservoir.point_v_itemWeight.w * reservoir.normal_v_numItems.w);
 }
 
 void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, Impact impact, inout uint state)
@@ -58,8 +60,8 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
 
 void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, inout uint state)
 {
-    float mergeWeight = ReservoirCorrectionWeight(target) * target.normal_v_numItems.w * weight;
     Impact impact = CreateImpact(target.point_s_totalWeight.xyz, target.normal_s_depth.xyz);
+    float mergeWeight = target.correction * target.normal_v_numItems.w * weight;
 
     source.normal_v_numItems.w += target.normal_v_numItems.w - 1;
     AddToReservoir(source, target.item, mergeWeight, impact, state);
@@ -67,7 +69,7 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, ino
 
 vec4 GetReservoirValue(Reservoir reservoir)
 {
-    return reservoir.item * ReservoirCorrectionWeight(reservoir);
+    return reservoir.item * reservoir.correction;
 }
 
 float ComputeJacobian(Reservoir current, Reservoir sampled)

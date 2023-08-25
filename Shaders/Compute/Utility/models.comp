@@ -11,11 +11,3 @@ Impact CreateImpact(vec3 point, vec3 normal)
     impact.normal = normal;
     return impact;
 }
-
-Impact ReservoirImpact(Reservoir reservoir)
-{
-    return CreateImpact(
-        reservoir.point_s_totalWeight.xyz,
-        reservoir.normal_s_depth.xyz
-    );
-}

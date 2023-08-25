@@ -1,5 +1,5 @@
-#include "../Buffers/buffers.comp"
 #include "../Rays/ray.comp"
+#include "../Buffers/buffers.comp"
 
 struct RayHit
 {

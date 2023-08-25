@@ -35,7 +35,7 @@ class ArrayBuffer : public StorageBuffer
             this->UpdateData(this->array.items + startIndex, length * this->itemSize, startIndex * this->itemSize);
         }
 
-        T Get(int index) { return this->array[index]; }
+        const T Get(int index) { return this->array[index]; }
 
         int Length() { return this->array.Length(); }
 

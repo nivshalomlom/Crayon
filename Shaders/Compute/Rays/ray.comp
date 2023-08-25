@@ -11,3 +11,11 @@ Ray CreateRay(vec3 origin, vec3 direction)
     ray.direction = direction;
     return ray;
 }
+
+Ray ReservoirRay(Reservoir reservoir)
+{
+    return CreateRay(
+        reservoir.point_v_itemWeight.xyz,
+        normalize(reservoir.point_s_totalWeight.xyz - reservoir.point_v_itemWeight.xyz);
+    );
+}

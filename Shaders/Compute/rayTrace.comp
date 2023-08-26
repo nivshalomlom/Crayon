@@ -80,8 +80,6 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
     SetReservoirVisibleImpact(reservoir, rayHit.impact, distance(ray.origin, rayHit.impact.point));
 }
 
-}
-
 void main()
 {
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy);

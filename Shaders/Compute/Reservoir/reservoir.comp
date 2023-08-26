@@ -21,6 +21,13 @@ Reservoir CreateReservoir()
     return reservoir;
 }
 
+void SetReservoirVisibleImpact(inout Reservoir reservoir, Impact impact, float depth)
+{
+    reservoir.point_v_itemWeight.xyz = impact.point;
+    reservoir.normal_v_numItems.xyz = impact.normal;
+    reservoir.normal_s_depth.w = depth;
+}
+
 void UpdateReservoirCorrection(inout Reservoir reservoir)
 {
     reservoir.correction = reservoir.point_s_totalWeight.w / (reservoir.point_v_itemWeight.w * reservoir.normal_v_numItems.w);

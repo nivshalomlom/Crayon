@@ -2,6 +2,8 @@
 
 #include "./Utility/constants.comp"
 #include "./Utility/models.comp"
+
+#include "./Rays/ray.comp"
 #include "./Buffers/reservoir.comp"
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;

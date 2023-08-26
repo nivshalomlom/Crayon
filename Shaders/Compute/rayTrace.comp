@@ -52,9 +52,7 @@ void HandleRayMiss(inout Reservoir reservoir, Ray ray, inout uint state)
     vec4 incomingLight = vec4(EnvironmentLight(ray.direction), 1.0);
     float weight = dot(incomingLight, incomingLight);
 
-    reservoir.normal_v_numItems.xyz = vec3(0);
-    reservoir.normal_s_depth.w = -1;
-    
+    SetReservoirVisibleImpact(reservoir, CreateImpact(vec3(0), vec3(0)), -1);
     AddToReservoir(reservoir, incomingLight, weight, CreateImpact(vec3(0), vec3(0)), state);
 }
 
@@ -79,9 +77,9 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
     }
 
     UpdateReservoirCorrection(reservoir);
-    reservoir.normal_v_numItems.xyz = normal;
-    reservoir.point_v_itemWeight.xyz = rayHit.impact.point;
-    reservoir.normal_s_depth.w = distance(ray.origin, rayHit.impact.point);
+    SetReservoirVisibleImpact(reservoir, rayHit.impact, distance(ray.origin, rayHit.impact.point));
+}
+
 }
 
 void main()

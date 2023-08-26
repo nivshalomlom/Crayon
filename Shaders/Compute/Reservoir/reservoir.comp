@@ -28,6 +28,15 @@ void SetReservoirVisibleImpact(inout Reservoir reservoir, Impact impact, float d
     reservoir.normal_s_depth.w = depth;
 }
 
+Ray GetReservoirViewRay(Reservoir reservoir, vec3 viewOrigin)
+{
+    vec3 point_v = reservoir.point_v_itemWeight.xyz;
+    return CreateRay(
+        viewOrigin,
+        normalize(point_v - viewOrigin)
+    );
+}
+
 void UpdateReservoirCorrection(inout Reservoir reservoir)
 {
     reservoir.correction = reservoir.point_s_totalWeight.w / (reservoir.point_v_itemWeight.w * reservoir.normal_v_numItems.w);

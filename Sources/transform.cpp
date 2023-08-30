@@ -12,10 +12,16 @@ vec4 GetMatrixCol(mat4 matrix, int col)
     );
 }
 
+vec3 GetTransformAxis(mat4 transform, int axis)
+{
+    vec4 column = GetMatrixCol(transform, axis);
+    return glm::normalize(column.xyz());
+}
+
 vec3 Transform::Position() { return GetMatrixCol(this->localToWorld, 3).xyz(); }
 
-vec3 Transform::Forward() { return GetMatrixCol(this->localToWorld, 2).xyz(); }
+vec3 Transform::Forward() { return GetTransformAxis(this->localToWorld, 2).xyz(); }
 
-vec3 Transform::Up() { return GetMatrixCol(this->localToWorld, 1).xyz(); }
+vec3 Transform::Up() { return GetTransformAxis(this->localToWorld, 1).xyz(); }
 
-vec3 Transform::Right() { return GetMatrixCol(this->localToWorld, 0).xyz(); }
+vec3 Transform::Right() { return GetTransformAxis(this->localToWorld, 0).xyz(); }

@@ -66,5 +66,11 @@ void main()
     uint state = kernal_ID + Camera.frameCounter * 6647369;
 
     Reservoir reservoir = SampleLight(coords, state);
-    MergeReservoirs(reservoirs[kernal_ID], reservoir, state);
+    if (reservoirs[kernal_ID].numItems > 0)
+    {
+        Reservoir resample = SampleLight(coords, reservoirs[kernal_ID].state);
+        AddToReservoir(reservoir, reservoirs[kernal_ID].item, resample.itemWeight, state);
+    }
+
+    reservoirs[kernal_ID] = reservoir;
 }

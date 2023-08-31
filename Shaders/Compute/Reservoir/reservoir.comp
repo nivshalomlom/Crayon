@@ -9,15 +9,15 @@ struct Reservoir
     float totalWeight;
 
     uint numItems;
-    uint seed;
+    uint state;
 };
 
-Reservoir CreateReservoir(uint seed)
+Reservoir CreateReservoir(uint state)
 {
     Reservoir reservoir;
     reservoir.totalWeight = 0.0;
     reservoir.numItems = 0;
-    reservoir.seed = seed;
+    reservoir.state = state;
     return reservoir;
 }
 
@@ -57,7 +57,7 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
     {
         source.item = target.item;
         source.itemWeight = target.itemWeight;
-        source.seed = target.seed;
+        source.state = target.state;
     }
 
     source.totalWeight = totalWeight;
@@ -71,7 +71,7 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, ino
         return;
 
     if (AddToReservoir(source, target.item, mergeWeight, state))
-        source.seed = target.seed;
-        
+        source.state = target.state;
+
     source.numItems += target.numItems - 1;
 }

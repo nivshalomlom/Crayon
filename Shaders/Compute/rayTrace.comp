@@ -41,7 +41,7 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
 
 Reservoir SampleLight(ivec2 coords, inout uint state)
 {
-    Reservoir reservoir = CreateReservoir();
+    Reservoir reservoir = CreateReservoir(state);
 
     vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
     Ray ray = CreateCameraRayFromUV(uv);

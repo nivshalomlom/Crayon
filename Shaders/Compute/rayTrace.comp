@@ -70,7 +70,9 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
 
         vec3 incomingLight = Trace(reflected, rayBounces, state);
         vec3 outgoingLight = incomingLight * BRDF(point, material) + emission;
-        AddToReservoir(reservoir, vec4(outgoingLight, 1.0), length(outgoingLight), state);
+
+        float weight = length(outgoingLight) / RandomDirectionPDF(reflected.direction, normal);
+        AddToReservoir(reservoir, vec4(outgoingLight, 1.0), weight, state);
     }
 
     reservoir.normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));

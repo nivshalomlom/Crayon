@@ -1,49 +1,10 @@
 #version 430 core
 
-#include "./Rays/ray_intersections.comp"
+#include "./Rays/ray_trace.comp"
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
 uniform ivec2 dimensions;
-
-vec3 Trace(Ray ray, uint bounceLimit, inout uint state)
-{
-    vec3 incomingLight = vec3(0.0);
-    vec3 rayColor = vec3(1.0);
-
-    RayHit rayHit;
-    for (uint i = 0; i < bounceLimit; i++)
-    {
-        if (Vec3Max(rayColor) <= EPS)
-            break;
-
-        if (FireRay(ray, rayHit))
-        {
-            Material material = rayHit.material;
-            vec3 normal = rayHit.impact.normal;
-            vec3 emission = Emission(material);
-
-            BRDFPoint point = CreateBRDFPoint(
-                -ray.direction,
-                normalize(rayHit.impact.normal + RandomDirection(state)),
-                normal
-            );
-
-            ray.origin = rayHit.impact.point + normal * 0.0001;
-            ray.direction = point.lightDirection;
-
-            incomingLight += emission * rayColor;
-            rayColor *= BRDF(point, material);
-        }
-        else
-        {
-            incomingLight += EnvironmentLight(ray.direction) * rayColor;
-            break;
-        }
-    }
-
-    return incomingLight;
-}
 
 void HandleRayMiss(inout Reservoir reservoir, Ray ray, inout uint state)
 {
@@ -78,15 +39,8 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
     reservoir.normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));
 }
 
-void main()
+Reservoir SampleLight(ivec2 coords, inout uint state)
 {
-    ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
-
-    if (coords.x >= dimensions.x || coords.y >= dimensions.y)
-        return;
-
-    uint kernal_ID = coords.x + coords.y * dimensions.x;
-    uint state = kernal_ID + Camera.frameCounter * 6647369;
     Reservoir reservoir = CreateReservoir();
 
     vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
@@ -98,5 +52,19 @@ void main()
     else
         HandleRayMiss(reservoir, ray, state);
 
+    return reservoir;
+}
+
+void main()
+{
+    ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
+
+    if (coords.x >= dimensions.x || coords.y >= dimensions.y)
+        return;
+
+    uint kernal_ID = coords.x + coords.y * dimensions.x;
+    uint state = kernal_ID + Camera.frameCounter * 6647369;
+
+    Reservoir reservoir = SampleLight(coords, state);
     MergeReservoirs(reservoirs[kernal_ID], reservoir, state);
 }

@@ -23,10 +23,8 @@ class RayTracer : public ComputeProgram
         StorageBuffer reservoirBuffer;
         
         ComputeProgram spatialReuse;
-        GLuint samplingDistanceLocation;
-
-        // ComputeProgram temporalReuse;
         ComputeProgram imageLoader;
+        GLuint samplingDistanceLocation;
 
     public:
         RayTracer(const Camera& camera, const Texture2D& renderTexture) : ComputeProgram("./Shaders/Compute/rayTrace.comp")

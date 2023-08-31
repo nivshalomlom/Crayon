@@ -13,7 +13,7 @@
 
 #define RENDER_IMAGE_INDEX 0
 
-const static size_t RESERVOIR_BYTE_SIZE =  2 * sizeof(glm::vec4) + 2 * sizeof(GLfloat) + 2 * sizeof(GLuint);
+const static size_t RESERVOIR_BYTE_SIZE =  2 * sizeof(glm::vec4) + 2 * sizeof(GLfloat) + sizeof(GLuint);
 const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(glm::vec4) - RESERVOIR_BYTE_SIZE % sizeof(glm::vec4);
 
 class RayTracer : public ComputeProgram

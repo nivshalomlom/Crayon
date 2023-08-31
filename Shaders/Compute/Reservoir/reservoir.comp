@@ -9,7 +9,6 @@ struct Reservoir
     float totalWeight;
 
     uint numItems;
-    uint itemSeed;
 };
 
 Reservoir CreateReservoir()
@@ -30,7 +29,6 @@ void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inou
     {
         reservoir.item = item;
         reservoir.itemWeight = itemWeight;
-        reservoir.itemSeed = state;
     }
 }
 

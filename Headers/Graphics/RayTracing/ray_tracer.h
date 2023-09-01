@@ -19,8 +19,8 @@ const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(gl
 class RayTracer : public ComputeProgram
 {
     private:
-        ObjectBuffer<Camera> cameraBuffer;
-        StorageBuffer reservoirBuffer;
+        ObjectBuffer<Camera>* cameraBuffer;
+        StorageBuffer* reservoirBuffer;
         
         ComputeProgram spatialReuse;
         ComputeProgram imageLoader;
@@ -36,11 +36,11 @@ class RayTracer : public ComputeProgram
             renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
             glm::ivec2 texSize = renderTexture.Size();
 
-            this->reservoirBuffer = StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
-            this->reservoirBuffer.BindToStorageBlock(RESERVOIR_BUFFER_BINDING);
+            this->reservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
+            this->reservoirBuffer->BindToStorageBlock(RESERVOIR_BUFFER_BINDING);
 
-            this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
-            this->cameraBuffer.BindToStorageBlock(CAMERA_BUFFER_BINDING);
+            this->cameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
+            this->cameraBuffer->BindToStorageBlock(CAMERA_BUFFER_BINDING);
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
@@ -65,10 +65,10 @@ class RayTracer : public ComputeProgram
             this->imageLoader.Mount();
             this->imageLoader.Dispatch(groups, barrierMask);
 
-            Camera camera = this->cameraBuffer.GetValue();
+            Camera camera = this->cameraBuffer->GetValue();
             camera.frameCounter++;
 
-            this->cameraBuffer.SetValue(camera);
+            this->cameraBuffer->SetValue(camera);
         }
 
         void Dispose()
@@ -77,10 +77,13 @@ class RayTracer : public ComputeProgram
 
             this->spatialReuse.Dispose();
             this->imageLoader.Dispose();
-            this->reservoirBuffer.Dispose();
+            this->reservoirBuffer->Dispose();
+
+            delete this->cameraBuffer;
+            delete this->reservoirBuffer;
         }
 
-        ObjectBuffer<Camera> ViewCamera() { return this->cameraBuffer; }
+        ObjectBuffer<Camera>* ViewCamera() { return this->cameraBuffer; }
 };
 
 #endif

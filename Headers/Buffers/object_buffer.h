@@ -18,12 +18,6 @@ class ObjectBuffer : public StorageBuffer
             this->size = size;
         }
 
-        ObjectBuffer() : StorageBuffer(nullptr, 0)
-        {
-            this->value = T{};
-            this->size = 0;
-        }
-
         void SetValue(T data)
         {
             this->value = data;

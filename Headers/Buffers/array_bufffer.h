@@ -15,7 +15,7 @@ class ArrayBuffer : public StorageBuffer
         size_t itemSize;
 
     public:
-        ArrayBuffer(T* items = nullptr, int count = 0, size_t itemSize = 0) : StorageBuffer(items, count * itemSize)
+        ArrayBuffer(T* items, int count, size_t itemSize) : StorageBuffer(items, count * itemSize)
         {
             this->array = Array<T>(items, count);
             this->itemSize = itemSize;

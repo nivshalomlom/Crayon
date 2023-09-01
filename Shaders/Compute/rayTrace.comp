@@ -39,12 +39,12 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
     reservoir.normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));
 }
 
-Reservoir SampleLight(ivec2 coords, inout uint state)
+Reservoir SampleLight(ivec2 coords, out Ray ray, inout uint state)
 {
     Reservoir reservoir = CreateReservoir(state);
 
     vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
-    Ray ray = CreateCameraRayFromUV(uv);
+    ray = CreateCameraRayFromUV(uv);
 
     RayHit rayHit;
     if (FireRay(ray, rayHit))
@@ -64,12 +64,17 @@ void main()
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     uint state = kernal_ID + Camera.frameCounter * 6647369;
+    Ray ray;
 
-    Reservoir reservoir = SampleLight(coords, state);
-    if (reservoirs[kernal_ID].numItems > 0)
+    Reservoir reservoir = SampleLight(coords, ray, state);
+
+    ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
+    uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
+
+    if (reservoirs[prev_ID].numItems > 0)
     {
-        Reservoir resample = SampleLight(coords, reservoirs[kernal_ID].state);
-        AddToReservoir(reservoir, reservoirs[kernal_ID].item, resample.itemWeight, state);
+        Reservoir resample = SampleLight(prevCoords, ray, reservoirs[prev_ID].state);
+        AddToReservoir(reservoir, reservoirs[prev_ID].item, resample.itemWeight, state);
     }
 
     reservoirs[kernal_ID] = reservoir;

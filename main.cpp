@@ -9,8 +9,9 @@
 using namespace std;
 using namespace glm;
 
-static void Animate(ArrayBuffer<Sphere>* spheres, Time time)
+static void Animate(SceneRenderer* renderer, Time time)
 {
+    ArrayBuffer<Sphere>* spheres = (ArrayBuffer<Sphere>*) renderer->GetGeometry(SPHERE_TYPE);
     for (int i = 0; i < spheres->Length(); i++)
     {
         Sphere sphere = spheres->Get(i);
@@ -19,6 +20,11 @@ static void Animate(ArrayBuffer<Sphere>* spheres, Time time)
         sphere.transform.Translate(translation * time.deltaTime);
         spheres->Set(sphere, i);
     }
+
+    Camera camera = renderer->GetCamera();
+    camera.transform.Translate(-camera.transform.Forward() * time.deltaTime * 2.0f);
+    camera.transform.Rotate(camera.transform.Forward(), 20 * time.deltaTime);
+    renderer->SetCamera(camera);
 }
 
 int main(int argc, char **argv)
@@ -43,7 +49,8 @@ int main(int argc, char **argv)
     {
         sceneRenderer->Render();
         textureRenderer->RenderToBuffer(renderTexture, ivec2(0), ivec2(WIDTH, HEIGHT));
-        Animate((ArrayBuffer<Sphere>*) sceneRenderer->GetGeometry(SPHERE_TYPE), time);
+
+        Animate(sceneRenderer, time);
     });
 
     window.Dispose();

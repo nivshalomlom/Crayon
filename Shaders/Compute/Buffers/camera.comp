@@ -5,6 +5,13 @@ layout(std430, binding = 2) buffer CameraBuffer
     uint frameCounter;
 } Camera;
 
+layout(std430, binding = 3) buffer PrevCameraBuffer
+{
+    Transform transform;
+    vec3 viewParams;
+    uint frameCounter;
+} PrevCamera;
+
 Ray CreateCameraRayFromUV(vec2 uv)
 {
     vec3 localPoint = vec3(uv - 0.5, 1) * Camera.viewParams;

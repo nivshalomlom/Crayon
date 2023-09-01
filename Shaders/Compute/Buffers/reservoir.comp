@@ -1,6 +1,6 @@
 #include "../Reservoir/reservoir.comp"
 
-layout(std430, binding = 3) buffer ReservoirBuffer
+layout(std430, binding = 4) buffer ReservoirBuffer
 {
     Reservoir reservoirs[];
 };

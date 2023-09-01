@@ -43,9 +43,7 @@ int main(int argc, char **argv)
     {
         sceneRenderer->Render();
         textureRenderer->RenderToBuffer(renderTexture, ivec2(0), ivec2(WIDTH, HEIGHT));
-
-        ArrayBuffer<Geometry>* list = sceneRenderer->GetGeometry(SPHERE_TYPE);
-        Animate((ArrayBuffer<Sphere>*) list, time);
+        Animate((ArrayBuffer<Sphere>*) sceneRenderer->GetGeometry(SPHERE_TYPE), time);
     });
 
     window.Dispose();

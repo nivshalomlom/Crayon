@@ -9,6 +9,24 @@
 using namespace std;
 using namespace glm;
 
+static void Animate(SceneRenderer* renderer, Time time)
+{
+    ArrayBuffer<Sphere>* spheres = (ArrayBuffer<Sphere>*) renderer->GetGeometry(SPHERE_TYPE);
+    for (int i = 0; i < spheres->Length(); i++)
+    {
+        Sphere sphere = spheres->Get(i);
+        vec3 translation = sphere.transform.Up() * sin(time.elapsedTime + i);
+
+        sphere.transform.Translate(translation * time.deltaTime);
+        spheres->Set(sphere, i);
+    }
+
+    Camera camera = renderer->GetCamera();
+    camera.transform.Translate(-camera.transform.Forward() * time.deltaTime * 2.0f);
+    camera.transform.Rotate(camera.transform.Forward(), 20 * time.deltaTime);
+    renderer->SetCamera(camera);
+}
+
 int main(int argc, char **argv)
 {
     Window window = Window(WIDTH, HEIGHT, "Ray Tracing Demo", 60);
@@ -17,7 +35,7 @@ int main(int argc, char **argv)
     Scene scene = Scene();
     scene.Add(Sphere(vec3(-5, -1, 20), 1, Material(vec3(0.0), vec3(100, 50, 0), 1.0)), SPHERE_TYPE);
     scene.Add(Sphere(vec3(-1, 0, 20), 2, Material(vec3(0.0, 0.5, 0.0))), SPHERE_TYPE);
-    scene.Add(Sphere(vec3(4.5, 1, 20), 3, Material(vec3(0.0), vec3(0, 50, 100), 1.0)), SPHERE_TYPE);
+    scene.Add(Sphere(vec3(4.5f, 1, 20), 3, Material(vec3(0.0), vec3(0, 50, 100), 1.0)), SPHERE_TYPE);
     scene.Add(Plane(vec3(0, -2, 20), vec3(7.0), Material(vec3(1.0))), PLANE_TYPE);
 
     SceneRenderer* sceneRenderer = new SceneRenderer(scene, camera, WIDTH, HEIGHT);
@@ -27,10 +45,12 @@ int main(int argc, char **argv)
     textureRenderer->AddPostProcessing(new ToneMappingProgram(0.1, 2.2));
 
     window.ToggleFpsCounter();
-    window.Show([sceneRenderer, textureRenderer, renderTexture](Window* window, float dt) 
+    window.Show([sceneRenderer, textureRenderer, renderTexture](Window* window, Time time) 
     {
         sceneRenderer->Render();
         textureRenderer->RenderToBuffer(renderTexture, ivec2(0), ivec2(WIDTH, HEIGHT));
+
+        Animate(sceneRenderer, time);
     });
 
     window.Dispose();

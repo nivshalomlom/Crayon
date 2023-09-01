@@ -9,17 +9,29 @@ struct Reservoir
     float totalWeight;
 
     uint numItems;
+    uint state;
 };
 
-Reservoir CreateReservoir()
+Reservoir CreateReservoir(uint state)
 {
     Reservoir reservoir;
     reservoir.totalWeight = 0.0;
     reservoir.numItems = 0;
+    reservoir.state = state;
     return reservoir;
 }
 
-void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inout uint state)
+float ReservoirCorrection(Reservoir reservoir)
+{
+    return reservoir.totalWeight / (reservoir.numItems * reservoir.itemWeight);
+}
+
+vec4 GetReservoirValue(Reservoir reservoir)
+{
+    return reservoir.item * ReservoirCorrection(reservoir);
+}
+
+bool AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inout uint state)
 {
     reservoir.totalWeight += itemWeight;
     reservoir.numItems++;
@@ -29,7 +41,11 @@ void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inou
     {
         reservoir.item = item;
         reservoir.itemWeight = itemWeight;
+
+        return true;
     }
+
+    return false;
 }
 
 void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
@@ -41,15 +57,21 @@ void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
     {
         source.item = target.item;
         source.itemWeight = target.itemWeight;
+        source.state = target.state;
     }
 
     source.totalWeight = totalWeight;
     source.numItems += target.numItems;
 }
 
-vec4 GetReservoirValue(Reservoir reservoir)
+void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, inout uint state)
 {
-    float averageWeight = reservoir.totalWeight / reservoir.numItems;
-    float correction = averageWeight / reservoir.itemWeight;
-    return reservoir.item * correction;
+    float mergeWeight = weight * target.numItems * ReservoirCorrection(target);
+    if (mergeWeight <= 0)
+        return;
+
+    if (AddToReservoir(source, target.item, mergeWeight, state))
+        source.state = target.state;
+
+    source.numItems += target.numItems - 1;
 }

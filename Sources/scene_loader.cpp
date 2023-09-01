@@ -10,18 +10,18 @@ void SceneLoader::LoadScene(Scene scene, RayTracer rayTracer)
     if (this->geometryBuffers != NULL)
     {
         for (int i = 0; i < NUM_BUFFERS; i++)
-            this->geometryBuffers[i].Dispose();
+            this->geometryBuffers[i]->Dispose();
 
         delete [] this->geometryBuffers;
     }
 
-    this->geometryBuffers = new ArrayBuffer<Geometry>[NUM_BUFFERS];
+    this->geometryBuffers = new ArrayBuffer<Geometry>*[NUM_BUFFERS];
     for (int i = 0; i < NUM_BUFFERS; i++)
     {
         List<Geometry> geometry = scene.GetAllGeometry((GEOMETRY_TYPE) i);
         BufferInfo info = BUFFERS_INFO[i];
 
-        this->geometryBuffers[i] = ArrayBuffer<Geometry>(geometry.ToArray(), geometry.Count(), info.ItemSize());
-        this->geometryBuffers[i].BindToStorageBlock(info.Binding());
+        this->geometryBuffers[i] = new ArrayBuffer<Geometry>(geometry.ToArray(), geometry.Count(), info.ItemSize());
+        this->geometryBuffers[i]->BindToStorageBlock(info.Binding());
     }
 }

@@ -46,19 +46,23 @@ Window::Window(int width, int height, const char* title, int fpsCap)
     glfwSetWindowSizeCallback(this->window, this->onResize);
 }
 
-void Window::Show(std::function<void(Window*, float)> mainLoop)
+void Window::Show(std::function<void(Window*, Time)> mainLoop)
 {
     char titleBuffer[100];
+    Time time = Time();
+
     while (!glfwWindowShouldClose(this->window))
     {
         float dt = glfwGetTime();
         if (dt >= this->frameFrequency)
         {
             DisplayFPSCounter(this, titleBuffer, this->title.c_str(), dt, this->showFps);
+            time.deltaTime = dt;
 
             glfwSetTime(0);
-            mainLoop(this, dt);
+            mainLoop(this, time);
 
+            time.elapsedTime += dt;
             glfwSwapBuffers(this->window);
         }
 

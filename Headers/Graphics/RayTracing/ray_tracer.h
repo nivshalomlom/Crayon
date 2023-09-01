@@ -6,27 +6,24 @@
 #include "../camera.h"
 
 #define CAMERA_BUFFER_BINDING 2
-#define CAMERA_BUFFER_NAME "CameraBuffer"
-
-#define RESERVOIR_BUFFER_BINDING 3
-#define RESERVOIR_BUFFER_NAME "ReservoirBuffer"
+#define PREV_CAMERA_BUFFER_BINDING 3
+#define RESERVOIR_BUFFER_BINDING 4
 
 #define RENDER_IMAGE_INDEX 0
 
-const static size_t RESERVOIR_BYTE_SIZE =  2 * sizeof(glm::vec4) + 2 * sizeof(GLfloat) + sizeof(GLuint);
+const static size_t RESERVOIR_BYTE_SIZE =  2 * sizeof(glm::vec4) + 2 * sizeof(GLfloat) + 2 * sizeof(GLuint);
 const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(glm::vec4) - RESERVOIR_BYTE_SIZE % sizeof(glm::vec4);
 
 class RayTracer : public ComputeProgram
 {
     private:
-        ObjectBuffer<Camera> cameraBuffer;
-        StorageBuffer reservoirBuffer;
+        ObjectBuffer<Camera>* cameraBuffer;
+        ObjectBuffer<Camera>* prevCameraBuffer;
+        StorageBuffer* reservoirBuffer;
         
         ComputeProgram spatialReuse;
-        GLuint samplingDistanceLocation;
-
-        // ComputeProgram temporalReuse;
         ComputeProgram imageLoader;
+        GLuint samplingDistanceLocation;
 
     public:
         RayTracer(const Camera& camera, const Texture2D& renderTexture) : ComputeProgram("./Shaders/Compute/rayTrace.comp")
@@ -38,11 +35,14 @@ class RayTracer : public ComputeProgram
             renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
             glm::ivec2 texSize = renderTexture.Size();
 
-            this->reservoirBuffer = StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
-            this->reservoirBuffer.BindToStorageBlock(RESERVOIR_BUFFER_BINDING);
+            this->cameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
+            this->cameraBuffer->BindToStorageBlock(CAMERA_BUFFER_BINDING);
 
-            this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
-            this->cameraBuffer.BindToStorageBlock(CAMERA_BUFFER_BINDING);
+            this->prevCameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
+            this->prevCameraBuffer->BindToStorageBlock(PREV_CAMERA_BUFFER_BINDING);
+
+            this->reservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
+            this->reservoirBuffer->BindToStorageBlock(RESERVOIR_BUFFER_BINDING);
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
@@ -67,10 +67,11 @@ class RayTracer : public ComputeProgram
             this->imageLoader.Mount();
             this->imageLoader.Dispatch(groups, barrierMask);
 
-            Camera camera = this->cameraBuffer.GetValue();
-            camera.frameCounter++;
+            Camera camera = this->cameraBuffer->GetValue();
+            this->prevCameraBuffer->SetValue(camera);
 
-            this->cameraBuffer.SetValue(camera);
+            camera.frameCounter++;
+            this->cameraBuffer->SetValue(camera);
         }
 
         void Dispose()
@@ -79,10 +80,18 @@ class RayTracer : public ComputeProgram
 
             this->spatialReuse.Dispose();
             this->imageLoader.Dispose();
-            this->reservoirBuffer.Dispose();
+            this->cameraBuffer->Dispose();
+            this->prevCameraBuffer->Dispose();
+            this->reservoirBuffer->Dispose();
+
+            delete this->cameraBuffer;
+            delete this->prevCameraBuffer;
+            delete this->reservoirBuffer;
         }
 
-        ObjectBuffer<Camera> ViewCamera() { return this->cameraBuffer; }
+        Camera GetCamera() { return this->cameraBuffer->GetValue(); }
+
+        void SetCamera(Camera camera) { this->cameraBuffer->SetValue(camera); }
 };
 
 #endif

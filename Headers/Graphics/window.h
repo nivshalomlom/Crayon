@@ -5,6 +5,15 @@
 #include "../Events/event_manager.h"
 #include "../common.h"
 
+struct Time
+{
+    public:
+        float deltaTime;
+        float elapsedTime;
+
+        Time() : deltaTime(0), elapsedTime(0) {}
+};
+
 class Window : public Disposable
 {
     private:
@@ -21,7 +30,7 @@ class Window : public Disposable
 
         void Dispose();
 
-        void Show(std::function<void(Window*, float)> mainLoop);
+        void Show(std::function<void(Window*, Time)> mainLoop);
 
         void SetTitle(const char* title) { glfwSetWindowTitle(this->window, title); }
 

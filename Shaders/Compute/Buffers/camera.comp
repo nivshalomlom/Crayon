@@ -5,6 +5,13 @@ layout(std430, binding = 2) buffer CameraBuffer
     uint frameCounter;
 } Camera;
 
+layout(std430, binding = 3) buffer PrevCameraBuffer
+{
+    Transform transform;
+    vec3 viewParams;
+    uint frameCounter;
+} PrevCamera;
+
 Ray CreateCameraRayFromUV(vec2 uv)
 {
     vec3 localPoint = vec3(uv - 0.5, 1) * Camera.viewParams;
@@ -15,4 +22,15 @@ Ray CreateCameraRayFromUV(vec2 uv)
         Position(Camera.transform.localToWorld), 
         normalize(viewPoint - origin)
     );
+}
+
+vec2 RayToPrevUV(Ray ray)
+{
+    vec3 lookDirection = Forward(PrevCamera.transform.localToWorld);
+    float dst = PrevCamera.viewParams.z / dot(ray.direction, lookDirection);
+
+    vec4 worldPoint = vec4(ray.origin + dst * ray.direction, 1);
+    vec4 localPoint = PrevCamera.transform.worldToLocal * worldPoint;
+    
+    return (localPoint.xyz / PrevCamera.viewParams).xy + 0.5;
 }

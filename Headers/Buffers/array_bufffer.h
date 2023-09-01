@@ -37,7 +37,7 @@ class ArrayBuffer : public StorageBuffer
 
         T Get(int index) { return this->array[index]; }
 
-        int Length() { return this->array.Length(); }
+        int Length() { return this->array.Count(); }
 
         void Dispose()
         {

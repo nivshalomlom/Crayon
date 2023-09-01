@@ -42,7 +42,7 @@ class SceneRenderer : public Disposable
 
         const Texture2D RenderTexture() const { return this->renderTexture; }
 
-        const ArrayBuffer<Geometry>* GetGeometry(GEOMETRY_TYPE type) const { return this->sceneLoader.GetGeometry(type); }
+        ArrayBuffer<Geometry>* GetGeometry(GEOMETRY_TYPE type) const { return this->sceneLoader.GetGeometry(type); }
 };
 
 #endif

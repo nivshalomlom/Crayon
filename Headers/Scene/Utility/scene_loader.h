@@ -56,7 +56,7 @@ class SceneLoader : public Disposable
             delete this->geometryBuffers;
         }
 
-        const ArrayBuffer<Geometry>* GetGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
+        ArrayBuffer<Geometry>* GetGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
 };
 
 #endif

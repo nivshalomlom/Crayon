@@ -6,13 +6,8 @@
 #include "../camera.h"
 
 #define CAMERA_BUFFER_BINDING 2
-#define CAMERA_BUFFER_NAME "CameraBuffer"
-
 #define PREV_CAMERA_BUFFER_BINDING 3
-#define PREV_CAMERA_BUFFER_NAME "PrevCameraBuffer"
-
 #define RESERVOIR_BUFFER_BINDING 4
-#define RESERVOIR_BUFFER_NAME "ReservoirBuffer"
 
 #define RENDER_IMAGE_INDEX 0
 
@@ -23,6 +18,7 @@ class RayTracer : public ComputeProgram
 {
     private:
         ObjectBuffer<Camera>* cameraBuffer;
+        ObjectBuffer<Camera>* prevCameraBuffer;
         StorageBuffer* reservoirBuffer;
         
         ComputeProgram spatialReuse;
@@ -39,11 +35,14 @@ class RayTracer : public ComputeProgram
             renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
             glm::ivec2 texSize = renderTexture.Size();
 
-            this->reservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
-            this->reservoirBuffer->BindToStorageBlock(RESERVOIR_BUFFER_BINDING);
-
             this->cameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
             this->cameraBuffer->BindToStorageBlock(CAMERA_BUFFER_BINDING);
+
+            this->prevCameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
+            this->prevCameraBuffer->BindToStorageBlock(PREV_CAMERA_BUFFER_BINDING);
+
+            this->reservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
+            this->reservoirBuffer->BindToStorageBlock(RESERVOIR_BUFFER_BINDING);
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
@@ -58,19 +57,20 @@ class RayTracer : public ComputeProgram
         {
             ComputeProgram::Dispatch(groups, barrierMask);
 
-            this->spatialReuse.Mount();
-            for (int i = 0, dst = 1; i < 3; i++, dst *= 3)
-            {
-                glUniform1i(this->samplingDistanceLocation, dst);
-                this->spatialReuse.Dispatch(groups, barrierMask);
-            }
+            // this->spatialReuse.Mount();
+            // for (int i = 0, dst = 1; i < 3; i++, dst *= 3)
+            // {
+            //     glUniform1i(this->samplingDistanceLocation, dst);
+            //     this->spatialReuse.Dispatch(groups, barrierMask);
+            // }
 
             this->imageLoader.Mount();
             this->imageLoader.Dispatch(groups, barrierMask);
 
             Camera camera = this->cameraBuffer->GetValue();
-            camera.frameCounter++;
+            this->prevCameraBuffer->SetValue(camera);
 
+            camera.frameCounter++;
             this->cameraBuffer->SetValue(camera);
         }
 
@@ -80,13 +80,18 @@ class RayTracer : public ComputeProgram
 
             this->spatialReuse.Dispose();
             this->imageLoader.Dispose();
+            this->cameraBuffer->Dispose();
+            this->prevCameraBuffer->Dispose();
             this->reservoirBuffer->Dispose();
 
             delete this->cameraBuffer;
+            delete this->prevCameraBuffer;
             delete this->reservoirBuffer;
         }
 
-        ObjectBuffer<Camera>* ViewCamera() { return this->cameraBuffer; }
+        Camera GetCamera() { return this->cameraBuffer->GetValue(); }
+
+        void SetCamera(Camera camera) { this->cameraBuffer->SetValue(camera); }
 };
 
 #endif

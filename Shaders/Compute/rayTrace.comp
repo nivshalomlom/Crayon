@@ -71,7 +71,7 @@ void main()
     ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
     uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
 
-    if (reservoirs[prev_ID].numItems > 0)
+    if (reservoirs[prev_ID].numItems > 0 && reservoir.normalDepth.w > 0)
     {
         Reservoir resample = SampleLight(prevCoords, ray, reservoirs[prev_ID].state);
         AddToReservoir(reservoir, reservoirs[prev_ID].item, resample.itemWeight, state);

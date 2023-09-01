@@ -55,6 +55,18 @@ Reservoir SampleLight(ivec2 coords, out Ray ray, inout uint state)
     return reservoir;
 }
 
+void TemporalReuse(inout Reservoir reservoir, Ray ray, inout uint state)
+{
+    ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
+    uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
+
+    if (reservoirs[prev_ID].numItems > 0)
+    {
+        Reservoir resample = SampleLight(prevCoords, ray, reservoirs[prev_ID].state);
+        AddToReservoir(reservoir, reservoirs[prev_ID].item, resample.itemWeight, state);
+    }
+}
+
 void main()
 {
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
@@ -67,15 +79,8 @@ void main()
     Ray ray;
 
     Reservoir reservoir = SampleLight(coords, ray, state);
-
-    ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
-    uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
-
-    if (reservoirs[prev_ID].numItems > 0 && reservoir.normalDepth.w > 0)
-    {
-        Reservoir resample = SampleLight(prevCoords, ray, reservoirs[prev_ID].state);
-        AddToReservoir(reservoir, reservoirs[prev_ID].item, resample.itemWeight, state);
-    }
+    if (reservoir.normalDepth.w > 0)
+        TemporalReuse(reservoir, ray, state);
 
     reservoirs[kernal_ID] = reservoir;
 }

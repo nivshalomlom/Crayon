@@ -43,6 +43,10 @@ class SceneRenderer : public Disposable
         const Texture2D RenderTexture() const { return this->renderTexture; }
 
         ArrayBuffer<Geometry>* GetGeometry(GEOMETRY_TYPE type) const { return this->sceneLoader.GetGeometry(type); }
+        
+        Camera GetCamera() { return this->rayTracer.GetCamera(); }
+
+        void SetCamera(Camera camera) { this->rayTracer.SetCamera(camera); }
 };
 
 #endif

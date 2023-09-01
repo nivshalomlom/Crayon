@@ -4,20 +4,26 @@ struct Transform
     mat4 worldToLocal;
 };
 
-vec4 getMatrixCol(mat4 matrix, int col)
+vec4 getMatrixColumn(mat4 matrix, int column)
 {
     return vec4(
-        matrix[col][0],
-        matrix[col][1],
-        matrix[col][2],
-        matrix[col][3]
+        matrix[column][0],
+        matrix[column][1],
+        matrix[column][2],
+        matrix[column][3]
     );
 }
 
-vec3 Position(mat4 transform) { return getMatrixCol(transform, 3).xyz; }
+vec3 getMatrixAxis(mat4 matrix, int axis)
+{
+    vec4 column = getMatrixColumn(matrix, axis);
+    return normalize(column.xyz);
+}
 
-vec3 Forward(mat4 transform) { return getMatrixCol(transform, 2).xyz; }
+vec3 Position(mat4 transform) { return getMatrixColumn(transform, 3).xyz; }
 
-vec3 Up(mat4 transform) { return getMatrixCol(transform, 1).xyz; }
+vec3 Forward(mat4 transform) { return getMatrixAxis(transform, 2); }
 
-vec3 Right(mat4 transform) { return getMatrixCol(transform, 0).xyz; }
+vec3 Up(mat4 transform) { return getMatrixAxis(transform, 1); }
+
+vec3 Right(mat4 transform) { return getMatrixAxis(transform, 0); }

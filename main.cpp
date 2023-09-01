@@ -14,9 +14,9 @@ static void Animate(ArrayBuffer<Sphere>* spheres, Time time)
     for (int i = 0; i < spheres->Length(); i++)
     {
         Sphere sphere = spheres->Get(i);
-        vec3 traslation = sphere.transform.Up() * sin(time.elapsedTime + i);
+        vec3 translation = sphere.transform.Up() * sin(time.elapsedTime + i);
 
-        sphere.transform.Translate(traslation * time.deltaTime);
+        sphere.transform.Translate(translation * time.deltaTime);
         spheres->Set(sphere, i);
     }
 }
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     scene.Add(Sphere(vec3(-5, -1, 20), 1, Material(vec3(0.0), vec3(100, 50, 0), 1.0)), SPHERE_TYPE);
     scene.Add(Sphere(vec3(-1, 0, 20), 2, Material(vec3(0.0, 0.5, 0.0))), SPHERE_TYPE);
     scene.Add(Sphere(vec3(4.5f, 1, 20), 3, Material(vec3(0.0), vec3(0, 50, 100), 1.0)), SPHERE_TYPE);
-    scene.Add(Plane(vec3(0, -2.5f, 20), vec3(7.0), Material(vec3(1.0))), PLANE_TYPE);
+    scene.Add(Plane(vec3(0, -2, 20), vec3(7.0), Material(vec3(1.0))), PLANE_TYPE);
 
     SceneRenderer* sceneRenderer = new SceneRenderer(scene, camera, WIDTH, HEIGHT);
     TextureBuffer* textureRenderer = new TextureBlitBuffer();

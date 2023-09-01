@@ -23,3 +23,14 @@ Ray CreateCameraRayFromUV(vec2 uv)
         normalize(viewPoint - origin)
     );
 }
+
+vec2 RayToPrevUV(Ray ray)
+{
+    vec3 lookDirection = Forward(PrevCamera.transform.localToWorld);
+    float dst = PrevCamera.viewParams.z / dot(ray.direction, lookDirection);
+
+    vec4 worldPoint = vec4(ray.origin + dst * ray.direction, 1);
+    vec4 localPoint = PrevCamera.transform.worldToLocal * worldPoint;
+    
+    return (localPoint.xyz / PrevCamera.viewParams).xy + 0.5;
+}

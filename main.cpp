@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     textureRenderer->AddPostProcessing(new ToneMappingProgram(0.1, 2.2));
 
     window.ToggleFpsCounter();
-    window.Show([sceneRenderer, textureRenderer, renderTexture](Window* window, float dt) 
+    window.Show([sceneRenderer, textureRenderer, renderTexture](Window* window, Time time) 
     {
         sceneRenderer->Render();
         textureRenderer->RenderToBuffer(renderTexture, ivec2(0), ivec2(WIDTH, HEIGHT));

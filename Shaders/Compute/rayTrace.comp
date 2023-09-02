@@ -55,6 +55,35 @@ Reservoir SampleLight(ivec2 coords, out Ray ray, inout uint state)
     return reservoir;
 }
 
+void CheapTemporalReuse(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint state)
+{
+    ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
+    uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
+
+    if (reservoirs[prev_ID].numItems <= 0)
+        return;
+
+    uint prevState = reservoirs[prev_ID].state;
+    vec3 normal = rayHit.impact.normal;
+
+    Ray reflected = CreateRay(
+        rayHit.impact.point,
+        normalize(normal + RandomDirection(prevState))
+    );
+
+    BRDFPoint point = CreateBRDFPoint(
+        -ray.direction,
+        reflected.direction,
+        normal
+    );
+
+    vec3 incomingLight = Trace(reflected, rayBounces, prevState);
+    vec3 outgoingLight = incomingLight * BRDF(point, rayHit.material) + Emission(rayHit.material);
+
+    float weight = length(outgoingLight) / RandomDirectionPDF(reflected.direction, normal);
+    AddToReservoir(reservoir, reservoirs[prev_ID].item, weight, state);
+}
+
 void TemporalReuse(inout Reservoir reservoir, Ray ray, inout uint state)
 {
     ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);

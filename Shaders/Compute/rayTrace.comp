@@ -12,7 +12,7 @@ void HandleRayMiss(inout Reservoir reservoir, Ray ray, inout uint state)
     float weight = dot(incomingLight, incomingLight);
 
     reservoir.normalDepth = vec4(0, 0, 0, -1);
-    AddToReservoir(reservoir, incomingLight, weight, state);
+    AddToReservoir(reservoir, incomingLight, weight, -1, state);
 }
 
 void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint state)
@@ -26,6 +26,8 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
 
     for (int i = 0; i < raysPerPixel; i++)
     {
+        uint seedState = state;
+
         point.lightDirection = normalize(rayHit.impact.normal + RandomDirection(state));
         reflected.direction = point.lightDirection + normal * 0.0001;
 
@@ -33,34 +35,18 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
         vec3 outgoingLight = incomingLight * BRDF(point, material) + emission;
 
         float weight = length(outgoingLight) / RandomDirectionPDF(reflected.direction, normal);
-        AddToReservoir(reservoir, vec4(outgoingLight, 1.0), weight, state);
+        AddToReservoir(reservoir, vec4(outgoingLight, 1.0), weight, seedState, state);
     }
 
     reservoir.normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));
 }
 
-Reservoir SampleLight(ivec2 coords, out Ray ray, inout uint state)
-{
-    Reservoir reservoir = CreateReservoir(state);
-
-    vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
-    ray = CreateCameraRayFromUV(uv);
-
-    RayHit rayHit;
-    if (FireRay(ray, rayHit))
-        HandleRayHit(reservoir, ray, rayHit, state);
-    else
-        HandleRayMiss(reservoir, ray, state);
-
-    return reservoir;
-}
-
-void CheapTemporalReuse(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint state)
+void TemporalReuse(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint state)
 {
     ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
     uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
 
-    if (reservoirs[prev_ID].numItems <= 0)
+    if (prev_ID >= reservoirs.length() || reservoirs[prev_ID].numItems <= 0)
         return;
 
     uint prevState = reservoirs[prev_ID].state;
@@ -81,19 +67,26 @@ void CheapTemporalReuse(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout
     vec3 outgoingLight = incomingLight * BRDF(point, rayHit.material) + Emission(rayHit.material);
 
     float weight = length(outgoingLight) / RandomDirectionPDF(reflected.direction, normal);
-    AddToReservoir(reservoir, reservoirs[prev_ID].item, weight, state);
+    AddToReservoir(reservoir, reservoirs[prev_ID].item, weight, reservoirs[prev_ID].state, state);
 }
 
-void TemporalReuse(inout Reservoir reservoir, Ray ray, inout uint state)
+Reservoir SampleLight(ivec2 coords, inout uint state)
 {
-    ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
-    uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
+    Reservoir reservoir = CreateReservoir();
 
-    if (reservoirs[prev_ID].numItems > 0)
+    vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
+    Ray ray = CreateCameraRayFromUV(uv);
+
+    RayHit rayHit;
+    if (FireRay(ray, rayHit))
     {
-        Reservoir resample = SampleLight(prevCoords, ray, reservoirs[prev_ID].state);
-        AddToReservoir(reservoir, reservoirs[prev_ID].item, resample.itemWeight, state);
+        HandleRayHit(reservoir, ray, rayHit, state);
+        TemporalReuse(reservoir, ray, rayHit, state);
     }
+    else
+        HandleRayMiss(reservoir, ray, state);
+    
+    return reservoir;
 }
 
 void main()
@@ -105,11 +98,6 @@ void main()
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     uint state = kernal_ID + Camera.frameCounter * 6647369;
-    Ray ray;
 
-    Reservoir reservoir = SampleLight(coords, ray, state);
-    if (reservoir.normalDepth.w > 0)
-        TemporalReuse(reservoir, ray, state);
-
-    reservoirs[kernal_ID] = reservoir;
+    reservoirs[kernal_ID] = SampleLight(coords, state);
 }

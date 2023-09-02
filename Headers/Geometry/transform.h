@@ -37,8 +37,6 @@ class Transform
 
         void Scale(glm::vec3 scale) { this->UpdateTransform(glm::scale(this->localToWorld, scale)); }
 
-        void LookAt(glm::vec3 position) { this->UpdateTransform(this->localToWorld * glm::lookAt(this->Position(), position, this->Up())); }
-
         void Rotate(glm::vec3 axis, float angle) { this->UpdateTransform(glm::rotate(this->localToWorld, glm::radians(angle), axis)); };
 
         void Translate(glm::vec3 translation) { this->UpdateTransform(glm::translate(this->localToWorld, translation)); }

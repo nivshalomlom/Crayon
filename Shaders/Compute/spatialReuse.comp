@@ -48,7 +48,7 @@ void main()
             continue;
 
         float neighborDepth = reservoirs[neighbor_ID].normalDepth.w;
-        if (neighborDepth < 0 || abs(depth - neighborDepth) > 0.1 * depth)
+        if (neighborDepth < 0 || abs(depth - neighborDepth) > 0.05)
             continue;
 
         if (dot(normal, reservoirs[neighbor_ID].normalDepth.xyz) < 0.906)

@@ -59,13 +59,16 @@ void main()
     uint state = kernal_ID + Camera.frameCounter * 6647369;
 
     ReservoirHitInfo hitInfo = reservoirsHitInfo[kernal_ID];
-    Reservoir reservoir = spatialReservoirs[kernal_ID];
+    Reservoir reservoir;
 
     float depth = hitInfo.normalDepth.w;
     if (depth < 0)
         reservoir = temporalReservoirs[kernal_ID];
     else
+    {
+        reservoir = CreateReservoir();
         SpatialReuse(reservoir, coords, hitInfo, state);    
+    }
 
     barrier();
     spatialReservoirs[kernal_ID] = reservoir;

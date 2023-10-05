@@ -8,18 +8,23 @@
 #define CAMERA_BUFFER_BINDING 2
 #define PREV_CAMERA_BUFFER_BINDING 3
 #define RESERVOIR_BUFFER_BINDING 4
+#define RESERVOIR_HIT_INFO_BINDING 6
 
 #define RENDER_IMAGE_INDEX 0
 
-const static size_t RESERVOIR_BYTE_SIZE =  2 * sizeof(glm::vec4) + 2 * sizeof(GLfloat) + 2 * sizeof(GLuint);
+const static size_t RESERVOIR_BYTE_SIZE =  sizeof(glm::vec4) + 2 * sizeof(GLfloat) + 2 * sizeof(GLuint);
 const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(glm::vec4) - RESERVOIR_BYTE_SIZE % sizeof(glm::vec4);
+
+const static size_t RESERVOIR_HIT_INFO_BYTE_SIZED = sizeof(glm::vec4);
 
 class RayTracer : public ComputeProgram
 {
     private:
         ObjectBuffer<Camera>* cameraBuffer;
         ObjectBuffer<Camera>* prevCameraBuffer;
+
         StorageBuffer* reservoirBuffer;
+        StorageBuffer* reservoirHitInfoBuffer;
         
         ComputeProgram spatialReuse;
         ComputeProgram imageLoader;
@@ -43,6 +48,9 @@ class RayTracer : public ComputeProgram
 
             this->reservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
             this->reservoirBuffer->BindToStorageBlock(RESERVOIR_BUFFER_BINDING);
+
+            this->reservoirHitInfoBuffer = new StorageBuffer(RESERVOIR_HIT_INFO_BYTE_SIZED * texSize.x * texSize.y);
+            this->reservoirHitInfoBuffer->BindToStorageBlock(RESERVOIR_HIT_INFO_BINDING);
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
@@ -83,10 +91,12 @@ class RayTracer : public ComputeProgram
             this->cameraBuffer->Dispose();
             this->prevCameraBuffer->Dispose();
             this->reservoirBuffer->Dispose();
+            this->reservoirHitInfoBuffer->Dispose();
 
             delete this->cameraBuffer;
             delete this->prevCameraBuffer;
             delete this->reservoirBuffer;
+            delete this->reservoirHitInfoBuffer;
         }
 
         Camera GetCamera() { return this->cameraBuffer->GetValue(); }

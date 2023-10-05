@@ -1,9 +1,13 @@
 #include "../Random/random.comp"
 
+struct ReservoirHitInfo
+{
+    vec4 normalDepth;
+};
+
 struct Reservoir
 {
     vec4 item;
-    vec4 normalDepth;
 
     float itemWeight;
     float totalWeight;

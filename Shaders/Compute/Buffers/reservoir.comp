@@ -1,6 +1,11 @@
 #include "../Reservoir/reservoir.comp"
 
-layout(std430, binding = 4) buffer ReservoirBuffer
+layout(std430, binding = 4) buffer TemporalReservoirBuffer
 {
     Reservoir reservoirs[];
+};
+
+layout(std430, binding = 6) buffer ReservoirHitInfoBuffer
+{
+    ReservoirHitInfo reservoirsHitInfo[];
 };

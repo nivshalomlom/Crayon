@@ -6,16 +6,16 @@ layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
 uniform ivec2 dimensions;
 
-void HandleRayMiss(inout Reservoir reservoir, Ray ray, inout uint state)
+void HandleRayMiss(inout Reservoir reservoir, uint kernal_ID, Ray ray, inout uint state)
 {
     vec4 incomingLight = vec4(EnvironmentLight(ray.direction), 1.0);
     float weight = dot(incomingLight, incomingLight);
 
-    reservoir.normalDepth = vec4(0, 0, 0, -1);
+    reservoirsHitInfo[kernal_ID].normalDepth = vec4(0, 0, 0, -1);
     AddToReservoir(reservoir, incomingLight, weight, -1, state);
 }
 
-void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint state)
+void HandleRayHit(inout Reservoir reservoir, uint kernal_ID, Ray ray, RayHit rayHit, inout uint state)
 {
     Material material = rayHit.material;
     vec3 normal = rayHit.impact.normal;
@@ -38,7 +38,7 @@ void HandleRayHit(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint 
         AddToReservoir(reservoir, vec4(outgoingLight, 1.0), weight, seedState, state);
     }
 
-    reservoir.normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));
+    reservoirsHitInfo[kernal_ID].normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));
 }
 
 void TemporalReuse(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint state)
@@ -70,7 +70,7 @@ void TemporalReuse(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint
     AddToReservoir(reservoir, reservoirs[prev_ID].item, weight, reservoirs[prev_ID].state, state);
 }
 
-Reservoir SampleLight(ivec2 coords, inout uint state)
+Reservoir SampleLight(ivec2 coords, uint kernal_ID, inout uint state)
 {
     Reservoir reservoir = CreateReservoir();
 
@@ -80,11 +80,11 @@ Reservoir SampleLight(ivec2 coords, inout uint state)
     RayHit rayHit;
     if (FireRay(ray, rayHit))
     {
-        HandleRayHit(reservoir, ray, rayHit, state);
+        HandleRayHit(reservoir, kernal_ID, ray, rayHit, state);
         TemporalReuse(reservoir, ray, rayHit, state);
     }
     else
-        HandleRayMiss(reservoir, ray, state);
+        HandleRayMiss(reservoir, kernal_ID, ray, state);
     
     return reservoir;
 }
@@ -99,5 +99,5 @@ void main()
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     uint state = kernal_ID + Camera.frameCounter * 6647369;
 
-    reservoirs[kernal_ID] = SampleLight(coords, state);
+    reservoirs[kernal_ID] = SampleLight(coords, kernal_ID, state);
 }

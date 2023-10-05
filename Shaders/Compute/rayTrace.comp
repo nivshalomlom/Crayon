@@ -67,7 +67,13 @@ void TemporalReuse(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint
     vec3 outgoingLight = incomingLight * BRDF(point, rayHit.material) + Emission(rayHit.material);
 
     float weight = length(outgoingLight) / RandomDirectionPDF(reflected.direction, normal);
-    AddToReservoir(reservoir, temporalReservoirs[prev_ID].item, weight, temporalReservoirs[prev_ID].state, state);
+    AddToReservoir(
+        reservoir, 
+        temporalReservoirs[prev_ID].item, 
+        weight * ReservoirCorrection(temporalReservoirs[prev_ID]), 
+        temporalReservoirs[prev_ID].state, 
+        state
+    );
 }
 
 Reservoir SampleLight(ivec2 coords, uint kernal_ID, inout uint state)

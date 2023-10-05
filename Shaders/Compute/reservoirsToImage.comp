@@ -15,5 +15,5 @@ void main()
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    imageStore(renderTarget, coords, GetReservoirValue(reservoirs[kernal_ID]));
+    imageStore(renderTarget, coords, GetReservoirValue(spatialReservoirs[kernal_ID]));
 }

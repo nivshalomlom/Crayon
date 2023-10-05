@@ -48,28 +48,16 @@ void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, uint
     }
 }
 
-void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
-{
-    float totalWeight = source.totalWeight + target.totalWeight;
-    float ratio = target.totalWeight / totalWeight;
-
-    if (source.numItems == 0 || RandomValue(state) <= ratio)
-    {
-        source.item = target.item;
-        source.itemWeight = target.itemWeight;
-        source.state = target.state;
-    }
-
-    source.totalWeight = totalWeight;
-    source.numItems += target.numItems;
-}
-
 void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, inout uint state)
 {
-    float mergeWeight = weight * target.numItems * ReservoirCorrection(target);
-    if (mergeWeight <= 0)
-        return;
+    uint numItems = source.numItems + target.numItems;
+    AddToReservoir(
+        source, 
+        target.item, 
+        weight * target.numItems * ReservoirCorrection(target), 
+        target.state,
+        state
+    );
 
-    AddToReservoir(source, target.item, mergeWeight, target.state, state);
-    source.numItems += target.numItems - 1;
+    source.numItems = numItems;
 }

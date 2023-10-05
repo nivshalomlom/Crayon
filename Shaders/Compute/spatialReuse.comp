@@ -33,7 +33,7 @@ void main()
     uint state = kernal_ID + Camera.frameCounter * 6647369;
 
     ReservoirHitInfo hitInfo = reservoirsHitInfo[kernal_ID];
-    Reservoir reservoir = reservoirs[kernal_ID];
+    Reservoir reservoir = temporalReservoirs[kernal_ID];
 
     vec3 normal = hitInfo.normalDepth.xyz;
     float depth = hitInfo.normalDepth.w;
@@ -46,7 +46,7 @@ void main()
         ivec2 neighbor = coords + samplingDistance * offsets[i];
         uint neighbor_ID = neighbor.x + neighbor.y * dimensions.x;
         
-        if (neighbor_ID >= reservoirs.length())
+        if (neighbor_ID >= temporalReservoirs.length())
             continue;
 
         float neighborDepth = reservoirsHitInfo[neighbor_ID].normalDepth.w;
@@ -56,9 +56,9 @@ void main()
         if (dot(normal, reservoirsHitInfo[neighbor_ID].normalDepth.xyz) < 0.906)
             continue;
 
-        MergeReservoirs(reservoir, reservoirs[neighbor_ID], state);
+        MergeReservoirs(reservoir, temporalReservoirs[neighbor_ID], state);
     }
 
     barrier();
-    reservoirs[kernal_ID] = reservoir;
+    temporalReservoirs[kernal_ID] = reservoir;
 }

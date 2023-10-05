@@ -23,6 +23,31 @@ const ivec2 offsets[9] = {
 uniform ivec2 dimensions;
 uniform int samplingDistance;
 
+void SpatialReuse(inout Reservoir reservoir, ivec2 coords, ReservoirHitInfo hitInfo, inout uint state)
+{
+    for (int i = 0; i < offsets.length(); i++)
+    {
+        if (RandomValue(state) < 0.5)
+            continue;
+
+        ivec2 neighbor = coords + samplingDistance * offsets[i];
+        uint neighbor_ID = neighbor.x + neighbor.y * dimensions.x;
+        
+        if (neighbor_ID >= temporalReservoirs.length())
+            continue;
+
+        float neighborDepth = reservoirsHitInfo[neighbor_ID].normalDepth.w;
+        if (neighborDepth < 0 || abs(hitInfo.normalDepth.w - neighborDepth) > 0.05)
+            continue;
+
+        if (dot(hitInfo.normalDepth.xyz, reservoirsHitInfo[neighbor_ID].normalDepth.xyz) < 0.906)
+            continue;
+
+        float weight = temporalReservoirs[neighbor_ID].itemWeight;
+        MergeReservoirs(reservoir, temporalReservoirs[neighbor_ID], weight, state);
+    }
+}
+
 void main()
 {
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
@@ -36,30 +61,11 @@ void main()
     ReservoirHitInfo hitInfo = reservoirsHitInfo[kernal_ID];
     Reservoir reservoir = spatialReservoirs[kernal_ID];
 
-    vec3 normal = hitInfo.normalDepth.xyz;
     float depth = hitInfo.normalDepth.w;
-
-    for (int i = 0; i < offsets.length(); i++)
-    {
-        if (RandomValue(state) < 0.5)
-            continue;
-
-        ivec2 neighbor = coords + samplingDistance * offsets[i];
-        uint neighbor_ID = neighbor.x + neighbor.y * dimensions.x;
-        
-        if (neighbor_ID >= temporalReservoirs.length())
-            continue;
-
-        float neighborDepth = reservoirsHitInfo[neighbor_ID].normalDepth.w;
-        if (neighborDepth < 0 || abs(depth - neighborDepth) > 0.05)
-            continue;
-
-        if (dot(normal, reservoirsHitInfo[neighbor_ID].normalDepth.xyz) < 0.906)
-            continue;
-
-        float weight = temporalReservoirs[neighbor_ID].itemWeight;
-        MergeReservoirs(reservoir, temporalReservoirs[neighbor_ID], weight, state);
-    }
+    if (depth < 0)
+        reservoir = temporalReservoirs[kernal_ID];
+    else
+        SpatialReuse(reservoir, coords, hitInfo, state);    
 
     barrier();
     spatialReservoirs[kernal_ID] = reservoir;

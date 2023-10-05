@@ -66,7 +66,7 @@ void main()
         reservoir = temporalReservoirs[kernal_ID];
     else
     {
-        reservoir = CreateReservoir();
+        reservoir = spatialReservoirs[kernal_ID];
         SpatialReuse(reservoir, coords, hitInfo, state);    
     }
 

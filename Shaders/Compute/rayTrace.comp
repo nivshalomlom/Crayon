@@ -41,41 +41,6 @@ void HandleRayHit(inout Reservoir reservoir, uint kernal_ID, Ray ray, RayHit ray
     reservoirsHitInfo[kernal_ID].normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));
 }
 
-void TemporalReuse(inout Reservoir reservoir, Ray ray, RayHit rayHit, inout uint state)
-{
-    ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
-    uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
-
-    if (prev_ID >= temporalReservoirs.length() || temporalReservoirs[prev_ID].numItems <= 0)
-        return;
-
-    uint prevState = temporalReservoirs[prev_ID].state;
-    vec3 normal = rayHit.impact.normal;
-
-    Ray reflected = CreateRay(
-        rayHit.impact.point,
-        normalize(normal + RandomDirection(prevState))
-    );
-
-    BRDFPoint point = CreateBRDFPoint(
-        -ray.direction,
-        reflected.direction,
-        normal
-    );
-
-    vec3 incomingLight = Trace(reflected, rayBounces, prevState);
-    vec3 outgoingLight = incomingLight * BRDF(point, rayHit.material) + Emission(rayHit.material);
-
-    float weight = length(outgoingLight) / RandomDirectionPDF(reflected.direction, normal);
-    AddToReservoir(
-        reservoir, 
-        temporalReservoirs[prev_ID].item, 
-        weight * ReservoirCorrection(temporalReservoirs[prev_ID]), 
-        temporalReservoirs[prev_ID].state, 
-        state
-    );
-}
-
 Reservoir SampleLight(ivec2 coords, uint kernal_ID, inout uint state)
 {
     Reservoir reservoir = CreateReservoir();
@@ -85,10 +50,7 @@ Reservoir SampleLight(ivec2 coords, uint kernal_ID, inout uint state)
 
     RayHit rayHit;
     if (FireRay(ray, rayHit))
-    {
         HandleRayHit(reservoir, kernal_ID, ray, rayHit, state);
-        TemporalReuse(reservoir, ray, rayHit, state);
-    }
     else
         HandleRayMiss(reservoir, kernal_ID, ray, state);
     
@@ -105,6 +67,11 @@ void main()
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     uint state = kernal_ID + Camera.frameCounter * 6647369;
 
+    Reservoir reservoir = SampleLight(coords, kernal_ID, state);
     spatialReservoirs[kernal_ID] = CreateReservoir();
-    temporalReservoirs[kernal_ID] = SampleLight(coords, kernal_ID, state);
+
+    if (abs(reservoir.itemWeight - temporalReservoirs[kernal_ID].itemWeight) >= EPS)
+        temporalReservoirs[kernal_ID] = SampleLight(coords, kernal_ID, state);
+    else
+        AddToReservoir(temporalReservoirs[kernal_ID], reservoir.item, reservoir.itemWeight, reservoir.state, state);
 }

@@ -8,7 +8,7 @@
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
-const ivec2 offsets[9] = {
+const ivec2 offsets[8] = {
     ivec2( 1,  0),
     ivec2(-1,  0),
     ivec2( 0,  1),
@@ -16,8 +16,7 @@ const ivec2 offsets[9] = {
     ivec2( 1, -1),
     ivec2(-1,  1),
     ivec2(-1, -1),
-    ivec2( 1,  1),
-    ivec2( 0,  0)
+    ivec2( 1,  1)
 };
 
 uniform ivec2 dimensions;
@@ -33,7 +32,7 @@ void SpatialReuse(inout Reservoir reservoir, ivec2 coords, ReservoirHitInfo hitI
         ivec2 neighbor = coords + samplingDistance * offsets[i];
         uint neighbor_ID = neighbor.x + neighbor.y * dimensions.x;
         
-        if (neighbor_ID >= temporalReservoirs.length())
+        if (neighbor_ID >= spatialReservoirs.length())
             continue;
 
         float neighborDepth = reservoirsHitInfo[neighbor_ID].normalDepth.w;
@@ -43,8 +42,8 @@ void SpatialReuse(inout Reservoir reservoir, ivec2 coords, ReservoirHitInfo hitI
         if (dot(hitInfo.normalDepth.xyz, reservoirsHitInfo[neighbor_ID].normalDepth.xyz) < 0.906)
             continue;
 
-        float weight = temporalReservoirs[neighbor_ID].itemWeight;
-        MergeReservoirs(reservoir, temporalReservoirs[neighbor_ID], weight, state);
+        float weight = spatialReservoirs[neighbor_ID].itemWeight;
+        MergeReservoirs(reservoir, spatialReservoirs[neighbor_ID], weight, state);
     }
 }
 
@@ -62,7 +61,11 @@ void main()
     float depth = hitInfo.normalDepth.w;
     
     if (depth < 0)
-        spatialReservoirs[kernal_ID] = temporalReservoirs[kernal_ID];
-    else
-        SpatialReuse(spatialReservoirs[kernal_ID], coords, hitInfo, state);    
+        return;
+    
+    Reservoir spatialReservoir = spatialReservoirs[kernal_ID];
+    SpatialReuse(spatialReservoir, coords, hitInfo, state);
+
+    barrier();
+    spatialReservoirs[kernal_ID] = spatialReservoir;
 }

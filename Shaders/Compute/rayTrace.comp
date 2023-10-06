@@ -105,6 +105,8 @@ void main()
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     uint state = kernal_ID + Camera.frameCounter * 6647369;
 
-    spatialReservoirs[kernal_ID] = CreateReservoir();
     temporalReservoirs[kernal_ID] = SampleLight(coords, kernal_ID, state);
+    spatialReservoirs[kernal_ID] = CreateReservoir();
+    
+    MergeReservoirs(spatialReservoirs[kernal_ID], temporalReservoirs[kernal_ID], temporalReservoirs[kernal_ID].itemWeight, state);
 }

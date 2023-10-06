@@ -20,11 +20,6 @@ static void Animate(SceneRenderer* renderer, Time time)
         sphere.transform.Translate(translation * time.deltaTime);
         spheres->Set(sphere, i);
     }
-
-    Camera camera = renderer->GetCamera();
-    camera.transform.Translate(-camera.transform.Forward() * time.deltaTime * 2.0f);
-    camera.transform.Rotate(camera.transform.Forward(), 20 * time.deltaTime);
-    renderer->SetCamera(camera);
 }
 
 int main(int argc, char **argv)

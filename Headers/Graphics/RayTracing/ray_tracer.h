@@ -16,7 +16,7 @@
 const static size_t RESERVOIR_BYTE_SIZE =  sizeof(glm::vec4) + 2 * sizeof(GLfloat) + 2 * sizeof(GLuint);
 const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(glm::vec4) - RESERVOIR_BYTE_SIZE % sizeof(glm::vec4);
 
-const static size_t RESERVOIR_HIT_INFO_BYTE_SIZED = sizeof(glm::vec4);
+const static size_t RESERVOIR_HIT_INFO_BYTE_SIZED = 3 * sizeof(glm::vec4);
 
 class RayTracer : public ComputeProgram
 {

@@ -1,35 +1,37 @@
 #include "./ray_intersections.comp"
 
-vec3 Trace(Ray ray, uint bounceLimit, inout uint state)
+vec3 Trace(Ray ray, uint bounceLimit, out Impact impact, inout uint state)
 {
     vec3 incomingLight = vec3(0.0);
     vec3 rayColor = vec3(1.0);
 
     RayHit rayHit;
+    if (!FireRay(ray, rayHit))
+        return EnvironmentLight(ray.direction);
+
+    impact = rayHit.impact;
     for (uint i = 0; i < bounceLimit; i++)
     {
+        Material material = rayHit.material;
+        vec3 normal = rayHit.impact.normal;
+        vec3 emission = Emission(material);
+
+        BRDFPoint point = CreateBRDFPoint(
+            -ray.direction,
+            normalize(rayHit.impact.normal + RandomDirection(state)),
+            normal
+        );
+
+        ray.origin = rayHit.impact.point + normal * 0.0001;
+        ray.direction = point.lightDirection;
+
+        incomingLight += emission * rayColor;
+        rayColor *= BRDF(point, material);
+
         if (Vec3Max(rayColor) <= EPS)
             break;
 
-        if (FireRay(ray, rayHit))
-        {
-            Material material = rayHit.material;
-            vec3 normal = rayHit.impact.normal;
-            vec3 emission = Emission(material);
-
-            BRDFPoint point = CreateBRDFPoint(
-                -ray.direction,
-                normalize(rayHit.impact.normal + RandomDirection(state)),
-                normal
-            );
-
-            ray.origin = rayHit.impact.point + normal * 0.0001;
-            ray.direction = point.lightDirection;
-
-            incomingLight += emission * rayColor;
-            rayColor *= BRDF(point, material);
-        }
-        else
+        if (!FireRay(ray, rayHit))
         {
             incomingLight += EnvironmentLight(ray.direction) * rayColor;
             break;

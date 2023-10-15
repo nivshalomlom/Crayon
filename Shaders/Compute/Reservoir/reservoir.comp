@@ -3,6 +3,8 @@
 struct ReservoirHitInfo
 {
     vec4 normalDepth;
+    vec4 impactPoint;
+    vec4 samplePoint;
 };
 
 struct Reservoir
@@ -34,18 +36,20 @@ vec4 GetReservoirValue(Reservoir reservoir)
     return reservoir.item * ReservoirCorrection(reservoir);
 }
 
-void AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, uint seedState, inout uint state)
+bool AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, uint seedState, inout uint state)
 {
     reservoir.totalWeight += itemWeight;
     reservoir.numItems++;
 
-    float ratio = itemWeight / max(reservoir.totalWeight, EPS);
-    if (reservoir.numItems == 1 || RandomValue(state) <= ratio)
+    bool accepted = RandomValue(state) <= itemWeight / max(reservoir.totalWeight, EPS);
+    if (reservoir.numItems == 1 || accepted)
     {
         reservoir.item = item;
         reservoir.itemWeight = itemWeight;
         reservoir.state = seedState;
     }
+
+    return accepted;
 }
 
 void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, inout uint state)

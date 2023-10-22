@@ -35,7 +35,7 @@ void SpatialReuse(inout Reservoir reservoir, uint kernal_ID, ivec2 coords, Reser
 {
     for (int i = 0; i < numSpatialNeighbors; i++)
     {
-        uint neighbor_ID = PickRandomNeighbor(coords, 10, state);
+        uint neighbor_ID = PickRandomNeighbor(coords, spatialNeighborRadius, state);
         float neighborDepth = reservoirsHitInfo[neighbor_ID].normalDepth.w;
         
         if (neighborDepth < 0 || abs(hitInfo.normalDepth.w - neighborDepth) > 0.05)

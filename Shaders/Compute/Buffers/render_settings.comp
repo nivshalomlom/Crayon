@@ -9,7 +9,7 @@ const float sunFocus = 10;
 
 const uint raysPerPixel = 8;
 const uint rayBounces = 10;
-const uint numNeighborsToPick = 5;
+const uint numSpatialNeighbors = 30;
 
 vec3 EnvironmentLight(vec3 direction)
 {

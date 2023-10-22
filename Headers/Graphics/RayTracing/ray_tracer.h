@@ -30,14 +30,12 @@ class RayTracer : public ComputeProgram
         
         ComputeProgram spatialReuse;
         ComputeProgram imageLoader;
-        GLuint samplingDistanceLocation;
 
     public:
         RayTracer(const Camera& camera, const Texture2D& renderTexture) : ComputeProgram("./Shaders/Compute/rayTrace.comp")
         {
             this->spatialReuse = ComputeProgram("./Shaders/Compute/spatialReuse.comp");
             this->imageLoader = ComputeProgram("./Shaders/Compute/reservoirsToImage.comp");
-            this->samplingDistanceLocation = glGetUniformLocation(this->spatialReuse.Id(), "samplingDistance");
             
             renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
             glm::ivec2 texSize = renderTexture.Size();
@@ -71,11 +69,7 @@ class RayTracer : public ComputeProgram
             ComputeProgram::Dispatch(groups, barrierMask);
 
             this->spatialReuse.Mount();
-            for (int i = 0, dst = 1; i < 3; i++, dst *= 3)
-            {
-                glUniform1i(this->samplingDistanceLocation, dst);
-                this->spatialReuse.Dispatch(groups, barrierMask);
-            }
+            this->spatialReuse.Dispatch(groups, barrierMask);
 
             this->imageLoader.Mount();
             this->imageLoader.Dispatch(groups, barrierMask);

@@ -10,9 +10,6 @@ const float sunFocus = 10;
 const uint raysPerPixel = 8;
 const uint rayBounces = 10;
 
-const uint numSpatialNeighbors = 30;
-const uint spatialNeighborRadius = 7;
-
 vec3 EnvironmentLight(vec3 direction)
 {
     float skyGradientT = pow(smoothstep(0.0, 0.4, direction.y), 0.35);

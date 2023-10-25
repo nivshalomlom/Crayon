@@ -55,12 +55,15 @@ bool AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inou
 void MergeReservoirs(inout Reservoir source, Reservoir target, float weight, inout uint state)
 {
     uint numItems = source.numItems + target.numItems;
-    AddToReservoir(
+    bool accepted = AddToReservoir(
         source, 
         target.item, 
         weight * target.numItems * ReservoirCorrection(target), 
         state
     );
+
+    if (accepted)
+        source.state = target.state;
 
     source.numItems = numItems;
 }

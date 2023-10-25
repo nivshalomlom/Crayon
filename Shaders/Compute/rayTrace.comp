@@ -1,13 +1,13 @@
 #version 430 core
 
 #include "./Rays/ray_trace.comp"
-#define MAX_TEMPORAL_ITEMS 20
+#define MAX_TEMPORAL_ITEMS 30
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
 uniform ivec2 dimensions;
 
-void HandleRayHit(uint kernal_ID, Ray ray, RayHit rayHit, inout uint state)
+void HandleRayHit(inout Reservoir reservoir, uint kernal_ID, Ray ray, RayHit rayHit, inout uint state)
 {
     Material material = rayHit.material;
     vec3 normal = rayHit.impact.normal;
@@ -28,7 +28,7 @@ void HandleRayHit(uint kernal_ID, Ray ray, RayHit rayHit, inout uint state)
         vec3 outgoingLight = incomingLight * BRDF(point, material) + emission;
 
         float weight = length(outgoingLight) / RandomDirectionPDF(reflected.direction, normal);
-        bool accepted = AddToReservoir(temporalReservoirs[kernal_ID], vec4(outgoingLight, 1.0), weight, seedState, state);
+        bool accepted = AddToReservoir(reservoir, vec4(outgoingLight, 1.0), weight, state);
 
         if (accepted)
             reservoirsHitInfo[kernal_ID].samplePoint = vec4(impact.point, 1.0);
@@ -37,54 +37,17 @@ void HandleRayHit(uint kernal_ID, Ray ray, RayHit rayHit, inout uint state)
     reservoirsHitInfo[kernal_ID].normalDepth = vec4(normal, distance(ray.origin, rayHit.impact.point));
 }
 
-void TemporalReuse(inout Reservoir reservoir, uint kernal_ID, Ray ray, RayHit rayHit, inout uint state)
+Reservoir SampleLight(ivec2 coords, uint kernal_ID, inout uint state)
 {
-    ivec2 prevCoords = ivec2(RayToPrevUV(ray) * dimensions);
-    uint prev_ID = prevCoords.x + prevCoords.y * dimensions.x;
+    Reservoir reservoir = CreateReservoir(state);
 
-    if (prev_ID >= temporalReservoirs.length() || temporalReservoirs[prev_ID].numItems <= 0)
-        return;
-
-    uint prevState = temporalReservoirs[prev_ID].state;
-    vec3 normal = rayHit.impact.normal;
-
-    Ray reflected = CreateRay(
-        rayHit.impact.point,
-        normalize(normal + RandomDirection(prevState))
-    );
-
-    BRDFPoint point = CreateBRDFPoint(
-        -ray.direction,
-        reflected.direction,
-        normal
-    );
-
-    Impact impact;
-    vec3 incomingLight = Trace(reflected, rayBounces, impact, prevState);
-    vec3 outgoingLight = incomingLight * BRDF(point, rayHit.material) + Emission(rayHit.material);
-
-    float weight = length(outgoingLight) / RandomDirectionPDF(reflected.direction, normal);
-    bool accepted = AddToReservoir(
-        reservoir, 
-        temporalReservoirs[prev_ID].item, 
-        weight * ReservoirCorrection(temporalReservoirs[prev_ID]), 
-        temporalReservoirs[prev_ID].state, 
-        state
-    );
-
-    if (accepted)
-        reservoirsHitInfo[kernal_ID].samplePoint = vec4(impact.point, 1.0);
-}
-
-void SampleLight(ivec2 coords, uint kernal_ID, inout uint state)
-{
     vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
     Ray ray = CreateCameraRayFromUV(uv);
 
     RayHit rayHit;
     if (FireRay(ray, rayHit))
     {
-        HandleRayHit(kernal_ID, ray, rayHit, state);
+        HandleRayHit(reservoir, kernal_ID, ray, rayHit, state);
         reservoirsHitInfo[kernal_ID].impactPoint = vec4(rayHit.impact.point, 1.0);
     }
     else
@@ -92,12 +55,39 @@ void SampleLight(ivec2 coords, uint kernal_ID, inout uint state)
         vec4 incomingLight = vec4(EnvironmentLight(ray.direction), 1.0);
         float weight = dot(incomingLight, incomingLight);
 
-        temporalReservoirs[kernal_ID] = CreateReservoir();
         reservoirsHitInfo[kernal_ID].normalDepth = vec4(0, 0, 0, -1);
-        AddToReservoir(temporalReservoirs[kernal_ID], incomingLight, weight, -1, state);
+        AddToReservoir(reservoir, incomingLight, weight, state);
     }
 
-    temporalReservoirs[kernal_ID].numItems = min(temporalReservoirs[kernal_ID].numItems, MAX_TEMPORAL_ITEMS);
+    return reservoir;
+}
+
+void HandleRetrace(ivec2 coords, uint kernal_ID, uint prevState)
+{
+    Reservoir reservoir = SampleLight(coords, kernal_ID, prevState);
+    vec4 diff = abs(temporalReservoirs[kernal_ID].item - reservoir.item);
+
+    if (diff.x >= 5 || diff.y >= 5 || diff.z >= 5)
+        temporalReservoirs[kernal_ID] = reservoir;
+}
+
+void HandleTemporalUpdate(ivec2 coords, uint kernal_ID, inout uint state)
+{
+    Reservoir reservoir = SampleLight(coords, kernal_ID, state);
+    if (reservoirsHitInfo[kernal_ID].normalDepth.w < 0)
+        temporalReservoirs[kernal_ID] = reservoir;
+    else
+    {
+        bool accepted = AddToReservoir(
+            temporalReservoirs[kernal_ID],
+            reservoir.item,
+            reservoir.itemWeight,
+            state
+        );
+
+        if (accepted)
+            temporalReservoirs[kernal_ID].state = reservoir.state;
+    }
 }
 
 void main()
@@ -110,5 +100,11 @@ void main()
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     uint state = kernal_ID + Camera.frameCounter * 6647369;
 
-    SampleLight(coords, kernal_ID, state);
+    if (Camera.frameCounter % 6 == 1)
+        HandleRetrace(coords, kernal_ID, temporalReservoirs[kernal_ID].state);
+    else
+        HandleTemporalUpdate(coords, kernal_ID, state);
+
+    temporalReservoirs[kernal_ID].numItems = min(temporalReservoirs[kernal_ID].numItems, MAX_TEMPORAL_ITEMS);
+    spatialReservoirs[kernal_ID] = temporalReservoirs[kernal_ID];
 }

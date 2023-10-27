@@ -37,7 +37,7 @@ vec4 GetReservoirValue(Reservoir reservoir)
     return reservoir.item * ReservoirCorrection(reservoir);
 }
 
-bool AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inout uint state, uint numItemsLimit = 0, uint seedState = 0)
+bool AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inout uint state)
 {
     reservoir.totalWeight += itemWeight;
     reservoir.numItems++;
@@ -45,15 +45,6 @@ bool AddToReservoir(inout Reservoir reservoir, vec4 item, float itemWeight, inou
     bool accepted = RandomValue(state) <= itemWeight / max(reservoir.totalWeight, EPS);
     if (reservoir.numItems == 1 || accepted)
     {
-        if (numItemsLimit > 0 && reservoir.numItems >= numItemsLimit)
-        {
-            reservoir.numItems = min(reservoir.numItems, numItemsLimit);
-            reservoir.totalWeight -= reservoir.itemWeight;
-        }
-
-        if (seedState > 0)
-            reservoir.state = seedState;
-
         reservoir.item = item;
         reservoir.itemWeight = itemWeight;
     }

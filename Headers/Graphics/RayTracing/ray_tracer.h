@@ -6,9 +6,10 @@
 #include "../camera.h"
 
 #define CAMERA_BUFFER_BINDING 2
-#define TEMPORAL_RESERVOIR_BUFFER_BINDING 3
-#define SPATIAL_RESERVOIR_BUFFER_BINDING 4
-#define RESERVOIR_HIT_INFO_BINDING 5
+#define PREV_CAMERA_BUFFER_BINDING 3
+#define TEMPORAL_RESERVOIR_BUFFER_BINDING 4
+#define SPATIAL_RESERVOIR_BUFFER_BINDING 5
+#define RESERVOIR_HIT_INFO_BINDING 6
 
 #define RENDER_IMAGE_INDEX 0
 
@@ -21,6 +22,7 @@ class RayTracer : public ComputeProgram
 {
     private:
         ObjectBuffer<Camera>* cameraBuffer;
+        ObjectBuffer<Camera>* prevCameraBuffer;
 
         StorageBuffer* temporalReservoirBuffer;
         StorageBuffer* spatialReservoirBuffer;
@@ -40,6 +42,9 @@ class RayTracer : public ComputeProgram
 
             this->cameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
             this->cameraBuffer->BindToStorageBlock(CAMERA_BUFFER_BINDING);
+
+            this->prevCameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
+            this->prevCameraBuffer->BindToStorageBlock(PREV_CAMERA_BUFFER_BINDING);
 
             this->temporalReservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
             this->temporalReservoirBuffer->BindToStorageBlock(SPATIAL_RESERVOIR_BUFFER_BINDING);
@@ -70,8 +75,9 @@ class RayTracer : public ComputeProgram
             this->imageLoader.Dispatch(groups, barrierMask);
 
             Camera camera = this->cameraBuffer->GetValue();
-            camera.frameCounter++;
+            this->prevCameraBuffer->SetValue(camera);
 
+            camera.frameCounter++;
             this->cameraBuffer->SetValue(camera);
         }
 
@@ -82,10 +88,12 @@ class RayTracer : public ComputeProgram
             this->spatialReuse.Dispose();
             this->imageLoader.Dispose();
             this->cameraBuffer->Dispose();
+            this->prevCameraBuffer->Dispose();
             this->temporalReservoirBuffer->Dispose();
             this->reservoirHitInfoBuffer->Dispose();
 
             delete this->cameraBuffer;
+            delete this->prevCameraBuffer;
             delete this->temporalReservoirBuffer;
             delete this->reservoirHitInfoBuffer;
         }

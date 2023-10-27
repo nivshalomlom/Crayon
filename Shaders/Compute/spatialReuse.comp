@@ -72,7 +72,7 @@ void main()
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    uint state = GenerateInitialFrameState(kernal_ID);
+    uint state = kernal_ID + Camera.frameCounter * 6647369;
 
     ReservoirHitInfo hitInfo = reservoirsHitInfo[kernal_ID];    
     if (hitInfo.normalDepth.w < 0)

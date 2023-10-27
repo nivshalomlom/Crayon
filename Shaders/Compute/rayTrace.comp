@@ -62,15 +62,13 @@ Reservoir SampleLight(ivec2 coords, uint kernal_ID, inout uint state)
     return reservoir;
 }
 
-void HandleRetrace(ivec2 coords, uint kernal_ID, uint prevState, inout uint state)
+void HandleRetrace(ivec2 coords, uint kernal_ID, uint prevState)
 {
     Reservoir reservoir = SampleLight(coords, kernal_ID, prevState);
     vec4 diff = abs(temporalReservoirs[kernal_ID].item - reservoir.item);
 
     if (diff.x >= 5 || diff.y >= 5 || diff.z >= 5)
         temporalReservoirs[kernal_ID] = reservoir;
-    else
-        AddToReservoir(temporalReservoirs[kernal_ID], reservoir.item, reservoir.itemWeight, state, MAX_TEMPORAL_ITEMS, reservoir.state);
 }
 
 void HandleTemporalUpdate(ivec2 coords, uint kernal_ID, inout uint state)
@@ -79,7 +77,17 @@ void HandleTemporalUpdate(ivec2 coords, uint kernal_ID, inout uint state)
     if (reservoirsHitInfo[kernal_ID].normalDepth.w < 0)
         temporalReservoirs[kernal_ID] = reservoir;
     else
-        AddToReservoir(temporalReservoirs[kernal_ID], reservoir.item, reservoir.itemWeight, state, MAX_TEMPORAL_ITEMS, reservoir.state);
+    {
+        bool accepted = AddToReservoir(
+            temporalReservoirs[kernal_ID],
+            reservoir.item,
+            reservoir.itemWeight,
+            state
+        );
+
+        if (accepted)
+            temporalReservoirs[kernal_ID].state = reservoir.state;
+    }
 }
 
 void main()
@@ -90,12 +98,13 @@ void main()
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    uint state = GenerateInitialFrameState(kernal_ID);
+    uint state = kernal_ID + Camera.frameCounter * 6647369;
 
     if (Camera.frameCounter % 6 == 1)
-        HandleRetrace(coords, kernal_ID, temporalReservoirs[kernal_ID].state, state);
+        HandleRetrace(coords, kernal_ID, temporalReservoirs[kernal_ID].state);
     else
         HandleTemporalUpdate(coords, kernal_ID, state);
 
+    temporalReservoirs[kernal_ID].numItems = min(temporalReservoirs[kernal_ID].numItems, MAX_TEMPORAL_ITEMS);
     spatialReservoirs[kernal_ID] = temporalReservoirs[kernal_ID];
 }

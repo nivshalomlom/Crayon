@@ -55,39 +55,46 @@ Reservoir SampleLight(ivec2 coords, uint kernal_ID, inout uint state)
         vec4 incomingLight = vec4(EnvironmentLight(ray.direction), 1.0);
         float weight = dot(incomingLight, incomingLight);
 
-        reservoirsHitInfo[kernal_ID].normalDepth = vec4(0, 0, 0, -1);
         AddToReservoir(reservoir, incomingLight, weight, state);
+        reservoirsHitInfo[kernal_ID].normalDepth = vec4(0, 0, 0, -1);
     }
 
     return reservoir;
 }
 
-void HandleRetrace(ivec2 coords, uint kernal_ID, uint prevState)
+void InsertIntitalSample(Reservoir initialSample, uint kernal_ID, inout uint state)
 {
-    Reservoir reservoir = SampleLight(coords, kernal_ID, prevState);
+    bool accepted = AddToReservoir(
+        temporalReservoirs[kernal_ID],
+        initialSample.item,
+        initialSample.itemWeight,
+        state
+    );
+
+    if (accepted)
+        temporalReservoirs[kernal_ID].state = initialSample.state;
+}
+
+void HandleRetrace(ivec2 coords, uint kernal_ID, inout uint state)
+{
+    Reservoir reservoir = SampleLight(coords, kernal_ID, temporalReservoirs[kernal_ID].state);
     vec4 diff = temporalReservoirs[kernal_ID].item - reservoir.item;
 
     if (dot(diff, diff) > 0.01)
         temporalReservoirs[kernal_ID] = reservoir;
+    else
+        InsertIntitalSample(reservoir, kernal_ID, state);
 }
 
 void HandleTemporalUpdate(ivec2 coords, uint kernal_ID, inout uint state)
 {
+    bool temporalSkyHit = reservoirsHitInfo[kernal_ID].normalDepth.w < 0;
     Reservoir reservoir = SampleLight(coords, kernal_ID, state);
-    if (reservoirsHitInfo[kernal_ID].normalDepth.w < 0)
+
+    if (temporalSkyHit || reservoirsHitInfo[kernal_ID].normalDepth.w < 0)
         temporalReservoirs[kernal_ID] = reservoir;
     else
-    {
-        bool accepted = AddToReservoir(
-            temporalReservoirs[kernal_ID],
-            reservoir.item,
-            reservoir.itemWeight,
-            state
-        );
-
-        if (accepted)
-            temporalReservoirs[kernal_ID].state = reservoir.state;
-    }
+        InsertIntitalSample(reservoir, kernal_ID, state);
 }
 
 void main()
@@ -100,8 +107,8 @@ void main()
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     uint state = GenerateInitialFrameState(kernal_ID);
 
-    if (Camera.frameCounter % 3 == 1)
-        HandleRetrace(coords, kernal_ID, temporalReservoirs[kernal_ID].state);
+    if (Camera.frameCounter % 6 == 1)
+        HandleRetrace(coords, kernal_ID, state);
     else
         HandleTemporalUpdate(coords, kernal_ID, state);
 

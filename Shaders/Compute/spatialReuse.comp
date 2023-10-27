@@ -76,9 +76,15 @@ void main()
 
     ReservoirHitInfo hitInfo = reservoirsHitInfo[kernal_ID];    
     if (hitInfo.normalDepth.w < 0)
+    {
         spatialReservoirs[kernal_ID] = temporalReservoirs[kernal_ID];
+        spatialReservoirs[kernal_ID].state = -1;
+    }
     else
     {
+        if (spatialReservoirs[kernal_ID].state == -1)
+            spatialReservoirs[kernal_ID] = CreateReservoir(state);
+
         ivec2 searchRadius = ivec2(dimensions * 0.1);
         while (SpatialReuse(kernal_ID, coords, searchRadius, state) == 0)
         {

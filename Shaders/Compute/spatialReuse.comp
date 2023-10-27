@@ -56,8 +56,10 @@ uint SpatialReuse(uint kernal_ID, ivec2 coords, ivec2 searchRadius, inout uint s
             continue;
 
         samplesAccepted++;
-        MergeReservoirs(spatialReservoirs[kernal_ID], temporalReservoirs[neighbor_ID], weight, state, MAX_SPATIAL_ITEMS);
+        MergeReservoirs(spatialReservoirs[kernal_ID], temporalReservoirs[neighbor_ID], weight, state);
     }
+
+    spatialReservoirs[kernal_ID].numItems = min(MAX_SPATIAL_ITEMS, spatialReservoirs[kernal_ID].numItems);
 
     return samplesAccepted;
 }

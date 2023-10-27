@@ -106,5 +106,4 @@ void main()
         HandleTemporalUpdate(coords, kernal_ID, state);
 
     temporalReservoirs[kernal_ID].numItems = min(temporalReservoirs[kernal_ID].numItems, MAX_TEMPORAL_ITEMS);
-    // spatialReservoirs[kernal_ID] = temporalReservoirs[kernal_ID];
 }

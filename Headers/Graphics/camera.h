@@ -18,6 +18,7 @@ class Camera
         Transform transform;
         glm::vec2 nearPlaneSize;
         float nearPlaneDistance;
+        GLuint frameCounter;
 
         Camera(glm::vec3 position = glm::vec3(0), float fov = 25.0f, float aspectRatio = 1.777, float near = 5, float far = 20)
         {

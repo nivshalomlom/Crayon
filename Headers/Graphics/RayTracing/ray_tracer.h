@@ -22,15 +22,11 @@ class RayTracer : public ComputeProgram
     private:
         ObjectBuffer<Camera> cameraBuffer;
         StorageBuffer reservoirBuffer;
-        
-        ComputeProgram spatialReuse;
-        // ComputeProgram temporalReuse;
         ComputeProgram imageLoader;
 
     public:
         RayTracer(const Camera& camera, const Texture2D& renderTexture) : ComputeProgram("./Shaders/Compute/rayTrace.comp")
         {
-            this->spatialReuse = ComputeProgram("./Shaders/Compute/spatialReuse.comp");
             this->imageLoader = ComputeProgram("./Shaders/Compute/reservoirsToImage.comp");
             
             renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
@@ -42,14 +38,11 @@ class RayTracer : public ComputeProgram
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
-
-            this->spatialReuse.Mount();
-            glUniform2i(glGetUniformLocation(this->spatialReuse.Id(), "dimensions"), texSize.x, texSize.y);
         }
 
         RayTracer() {}
 
-        void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS) const
+        void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS)
         {
             this->reservoirBuffer.BindToStorageBlock(this->Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
             ComputeProgram::Dispatch(groups, barrierMask);
@@ -57,13 +50,17 @@ class RayTracer : public ComputeProgram
             this->imageLoader.Mount();
             this->reservoirBuffer.BindToStorageBlock(this->imageLoader.Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
             this->imageLoader.Dispatch(groups, barrierMask);
+
+            Camera camera = this->cameraBuffer.GetValue();
+            camera.frameCounter++;
+
+            this->cameraBuffer.SetValue(camera);
         }
 
         void Dispose()
         {
             ComputeProgram::Dispose();
 
-            this->spatialReuse.Dispose();
             this->imageLoader.Dispose();
             this->reservoirBuffer.Dispose();
         }

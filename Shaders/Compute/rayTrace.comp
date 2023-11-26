@@ -6,7 +6,7 @@ layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
 uniform ivec2 dimensions;
 
-vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
+vec3 Trace(Ray ray, uint bounceLimit, inout uint state)
 {
     vec3 incomingLight = vec3(0.0);
     vec3 rayColor = vec3(1.0);
@@ -42,26 +42,48 @@ vec4 Trace(Ray ray, uint bounceLimit, inout uint state)
         }
     }
 
-    return vec4(incomingLight, 1.0);
+    return incomingLight;
 }
 
 void main()
 {
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
-
     if (coords.x >= dimensions.x || coords.y >= dimensions.y)
         return;
 
+    uint state = coords.x + coords.y * dimensions.x + Camera.frameCounter * 6647369;
+    vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
+
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    uint state = kernal_ID + Camera.frameCounter * 6647369;
+    Ray cameraRay = CreateCameraRayFromUV(uv);
 
     reservoirs[kernal_ID] = CreateReservoir();
-    for (int i = 0; i < raysPerPixel; i++)
+    RayHit rayHit;
+
+    if (FireRay(cameraRay, rayHit))
     {
-        vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
-        Ray ray = CreateCameraRayFromUV(uv);
-        
-        vec4 rayColor = Trace(ray, rayBounces, state);
-        AddToReservoir(reservoirs[kernal_ID], rayColor, dot(rayColor, rayColor), state);
+        Material material = rayHit.material;
+        vec3 normal = rayHit.impact.normal;
+        vec3 emission = Emission(material);
+
+        BRDFPoint point = CreateBRDFPoint(-cameraRay.direction, vec3(0.0), normal);
+        Ray ray = CreateRay(rayHit.impact.point, vec3(0.0));
+
+        for (int i = 0; i < raysPerPixel; i++)
+        {
+            point.lightDirection = normalize(normal + RandomDirection(state));
+            ray.direction = point.lightDirection + normal * 0.0001;
+
+            vec3 incomingLight = Trace(ray, rayBounces, state);
+            vec3 outgoingLight = emission + BRDF(point, material) * incomingLight;
+
+            float weight = length(outgoingLight) / RandomDirectionPDF(ray.direction, normal);
+            AddToReservoir(reservoirs[kernal_ID], vec4(outgoingLight, 1.0), weight, state);
+        }
+    }
+    else
+    {
+        vec3 outgoingLight = EnvironmentLight(cameraRay.direction);
+        AddToReservoir(reservoirs[kernal_ID], vec4(outgoingLight, 1.0), length(outgoingLight), state);
     }
 }

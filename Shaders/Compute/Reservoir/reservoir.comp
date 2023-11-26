@@ -1,11 +1,9 @@
 #include "../Random/random.comp"
 
-const uint RESERVOIR_BUCKET_SIZE = 4;
-
 struct Reservoir
 {
-    vec4 colors[RESERVOIR_BUCKET_SIZE];
-    float weights[RESERVOIR_BUCKET_SIZE];
+    vec4 item;
+    float itemWeight;
     float totalWeight;
     uint numItems;
 };
@@ -18,57 +16,20 @@ Reservoir CreateReservoir()
     return reservoir;
 }
 
-Reservoir CreateReservoir(Reservoir source)
-{
-    Reservoir reservoir;
-    reservoir.colors = source.colors;
-    reservoir.weights = source.weights;
-    reservoir.totalWeight = source.totalWeight;
-    reservoir.numItems = source.numItems;
-    return reservoir;
-}
-
-void AddToReservoir(inout Reservoir reservoir, vec4 color, float weight, inout uint state)
+void AddToReservoir(inout Reservoir reservoir, vec4 item, float weight, inout uint state)
 {
     reservoir.totalWeight += weight;
     reservoir.numItems++;
 
     float ratio = weight / max(reservoir.totalWeight, EPS);
-    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
+    if (reservoir.numItems == 1 || RandomValue(state) <= ratio)
     {
-        if (reservoir.numItems == 1 || RandomValue(state) <= ratio)
-        {
-            reservoir.colors[i] = color;
-            reservoir.weights[i] = weight;
-        }
+        reservoir.item = item;
+        reservoir.itemWeight = weight;
     }
-}
-
-void MergeReservoirs(inout Reservoir source, Reservoir target, inout uint state)
-{
-    float totalWeight = source.totalWeight + target.totalWeight;
-    float ratio = target.totalWeight / totalWeight;
-
-    if (RandomValue(state) <= ratio)
-    {
-        source.colors = target.colors;
-        source.weights = target.weights;
-    }
-
-    source.totalWeight = totalWeight;
-    source.numItems += target.numItems;
 }
 
 vec4 GetReservoirValue(Reservoir reservoir)
 {
-    float avarageWeight = reservoir.totalWeight / reservoir.numItems;
-    vec4 avarageSample = vec4(0.0);
-    
-    for (int i = 0; i < RESERVOIR_BUCKET_SIZE; i++)
-    {
-        float correction = avarageWeight / reservoir.weights[i];
-        avarageSample += reservoir.colors[i] * correction;
-    }
-
-    return avarageSample / RESERVOIR_BUCKET_SIZE;
+    return (reservoir.totalWeight * reservoir.item) / (reservoir.itemWeight * reservoir.numItems);
 }

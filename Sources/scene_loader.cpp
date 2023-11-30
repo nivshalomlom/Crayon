@@ -1,8 +1,8 @@
 #include "../Headers/Scene/Utility/scene_loader.h"
 
 BufferInfo* SceneLoader::BUFFERS_INFO = new BufferInfo[SceneLoader::NUM_BUFFERS] {
-    BufferInfo("SphereBuffer", sizeof(Sphere), 0),
-    BufferInfo("PlaneBuffer", sizeof(Plane), 1)
+    BufferInfo(sizeof(Sphere), 0),
+    BufferInfo(sizeof(Plane), 1)
 };
 
 void SceneLoader::LoadScene(Scene scene, RayTracer rayTracer)
@@ -22,6 +22,6 @@ void SceneLoader::LoadScene(Scene scene, RayTracer rayTracer)
         BufferInfo info = BUFFERS_INFO[i];
 
         this->geometryBuffers[i] = ArrayBuffer<Geometry>(geometry.ToArray(), geometry.Count(), info.ItemSize());
-        this->geometryBuffers[i].BindToStorageBlock(rayTracer.Id(), info.Binding(), info.Name());
+        this->geometryBuffers[i].BindToStorageBlock(rayTracer.Id(), info.Binding());
     }
 }

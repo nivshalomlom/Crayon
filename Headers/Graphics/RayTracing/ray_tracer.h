@@ -6,10 +6,7 @@
 #include "../camera.h"
 
 #define CAMERA_BUFFER_BINDING 2
-#define CAMERA_BUFFER_NAME "CameraBuffer"
-
 #define RESERVOIR_BUFFER_BINDING 3
-#define RESERVOIR_BUFFER_NAME "ReservoirBuffer"
 
 #define RENDER_IMAGE_INDEX 0
 
@@ -33,7 +30,7 @@ class RayTracer : public ComputeProgram
 
             this->reservoirBuffer = StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
             this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
-            this->cameraBuffer.BindToStorageBlock(this->Id(), CAMERA_BUFFER_BINDING, CAMERA_BUFFER_NAME);
+            this->cameraBuffer.BindToStorageBlock(this->Id(), CAMERA_BUFFER_BINDING);
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
@@ -43,11 +40,11 @@ class RayTracer : public ComputeProgram
 
         void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS)
         {
-            this->reservoirBuffer.BindToStorageBlock(this->Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
+            this->reservoirBuffer.BindToStorageBlock(this->Id(), RESERVOIR_BUFFER_BINDING);
             ComputeProgram::Dispatch(groups, barrierMask);
 
             this->imageLoader.Mount();
-            this->reservoirBuffer.BindToStorageBlock(this->imageLoader.Id(), RESERVOIR_BUFFER_BINDING, RESERVOIR_BUFFER_NAME);
+            this->reservoirBuffer.BindToStorageBlock(this->imageLoader.Id(), RESERVOIR_BUFFER_BINDING);
             this->imageLoader.Dispatch(groups, barrierMask);
 
             Camera camera = this->cameraBuffer.GetValue();

@@ -41,19 +41,10 @@ class StorageBuffer : public Disposable
             this->Unbind();
         }
 
-        void BindToStorageBlock(GLuint program, GLuint binding, const char* blockName) const
+        void BindToStorageBlock(GLuint program, GLuint binding) const
         {
             this->Bind();
-            
-            GLuint resourceIndex = glGetProgramResourceIndex(
-                program, 
-                GL_SHADER_STORAGE_BLOCK, 
-                blockName
-            );
-
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, this->storageBuffer);
-            glShaderStorageBlockBinding(program, resourceIndex, binding);
-
             this->Unbind();
         }
 

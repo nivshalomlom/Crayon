@@ -10,19 +10,15 @@
 struct BufferInfo
 {
     private:
-        const char* name;
         size_t itemSize;
         int binding;
 
     public:
-        BufferInfo(const char* name, size_t itemSize, int binding)
+        BufferInfo(size_t itemSize, int binding)
         {
-            this->name = name;
             this->itemSize = itemSize;
             this->binding = binding;
         }
-
-        const char* Name() const { return this->name; }
 
         const size_t ItemSize() const { return this->itemSize; }
         

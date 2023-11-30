@@ -3,7 +3,7 @@
 SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight)
 {
     this->renderTexture = Texture2D(textureWidth, textureHeight);
-    this->rayTracer = RayTracer(camera, this->renderTexture);
+    this->rayTracer = new RayTracer(camera, this->renderTexture);
 
     this->dispatchGroups = glm::ivec3(
         ceilf(textureWidth / 32.0f),

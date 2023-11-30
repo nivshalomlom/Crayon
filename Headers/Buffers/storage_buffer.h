@@ -18,7 +18,7 @@ class StorageBuffer : public Disposable
         }
 
     public:
-        StorageBuffer(void* data = nullptr, size_t size = 0)
+        StorageBuffer(void* data, size_t size)
         {
             InitializeBuffer(&this->storageBuffer, data, size);
         }

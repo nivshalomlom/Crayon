@@ -16,52 +16,54 @@ const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(gl
 class RayTracer : public ComputeProgram
 {
     private:
-        ObjectBuffer<Camera> cameraBuffer;
-        StorageBuffer reservoirBuffer;
-        ComputeProgram imageLoader;
+        ObjectBuffer<Camera>* cameraBuffer;
+        StorageBuffer* reservoirBuffer;
+        ComputeProgram* imageLoader;
 
     public:
         RayTracer(const Camera& camera, const Texture2D& renderTexture) : ComputeProgram("./Shaders/Compute/rayTrace.comp")
         {
-            this->imageLoader = ComputeProgram("./Shaders/Compute/reservoirsToImage.comp");
+            this->imageLoader = new ComputeProgram("./Shaders/Compute/reservoirsToImage.comp");
             
             renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
             glm::ivec2 texSize = renderTexture.Size();
 
-            this->reservoirBuffer = StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
-            this->cameraBuffer = ObjectBuffer<Camera>(camera, sizeof(Camera));
-            this->cameraBuffer.BindToStorageBlock(this->Id(), CAMERA_BUFFER_BINDING);
+            this->reservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
+            this->cameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
+            this->cameraBuffer->BindToStorageBlock(this->Id(), CAMERA_BUFFER_BINDING);
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
         }
 
-        RayTracer() {}
-
         void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS)
         {
-            this->reservoirBuffer.BindToStorageBlock(this->Id(), RESERVOIR_BUFFER_BINDING);
+            this->reservoirBuffer->BindToStorageBlock(this->Id(), RESERVOIR_BUFFER_BINDING);
             ComputeProgram::Dispatch(groups, barrierMask);
 
-            this->imageLoader.Mount();
-            this->reservoirBuffer.BindToStorageBlock(this->imageLoader.Id(), RESERVOIR_BUFFER_BINDING);
-            this->imageLoader.Dispatch(groups, barrierMask);
+            this->imageLoader->Mount();
+            this->reservoirBuffer->BindToStorageBlock(this->imageLoader->Id(), RESERVOIR_BUFFER_BINDING);
+            this->imageLoader->Dispatch(groups, barrierMask);
 
-            Camera camera = this->cameraBuffer.GetValue();
+            Camera camera = this->cameraBuffer->GetValue();
             camera.frameCounter++;
 
-            this->cameraBuffer.SetValue(camera);
+            this->cameraBuffer->SetValue(camera);
         }
 
         void Dispose()
         {
             ComputeProgram::Dispose();
+            this->cameraBuffer->Dispose();
+            this->reservoirBuffer->Dispose();
+            this->imageLoader->Dispose();
 
-            this->imageLoader.Dispose();
-            this->reservoirBuffer.Dispose();
+            delete this->cameraBuffer;
+            delete this->reservoirBuffer;
+            delete this->imageLoader;
         }
 
-        ObjectBuffer<Camera> ViewCamera() { return this->cameraBuffer; }
+        ObjectBuffer<Camera>* ViewCamera() { return this->cameraBuffer; }
 };
 
 #endif

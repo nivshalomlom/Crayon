@@ -31,19 +31,31 @@ class SceneLoader : public Disposable
         static const int NUM_BUFFERS = PLANE_TYPE + 1;
         static BufferInfo* BUFFERS_INFO;
 
-        ArrayBuffer<Geometry>* geometryBuffers;
+        ArrayBuffer<Geometry>** geometryBuffers;
 
     public:
         SceneLoader() 
         {
-            this->geometryBuffers = NULL;
+            this->geometryBuffers = nullptr;
         }
 
-        void LoadScene(Scene scene, RayTracer rayTracer);
+        void LoadScene(Scene scene, RayTracer* rayTracer);
 
-        void Dispose() { this->geometryBuffers->Dispose(); }
+        void Dispose() 
+        { 
+            if (this->geometryBuffers != nullptr)
+            {
+                for (int i = 0; i < NUM_BUFFERS; i++)
+                {
+                    this->geometryBuffers[i]->Dispose();
+                    delete this->geometryBuffers[i];
+                }
 
-        const ArrayBuffer<Geometry> GetGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
+                delete [] this->geometryBuffers;
+            }
+        }
+
+        const ArrayBuffer<Geometry>* GetGeometry(GEOMETRY_TYPE type) const { return this->geometryBuffers[type]; }
 };
 
 #endif

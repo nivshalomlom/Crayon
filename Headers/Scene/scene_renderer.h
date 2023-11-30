@@ -14,7 +14,7 @@ class SceneRenderer : public Disposable
 {
     private:
         SceneLoader sceneLoader;
-        RayTracer rayTracer;
+        RayTracer* rayTracer;
 
         glm::ivec3 dispatchGroups;
         Texture2D renderTexture;
@@ -26,8 +26,8 @@ class SceneRenderer : public Disposable
 
         void Render()
         {
-            this->rayTracer.Mount();
-            this->rayTracer.Dispatch(
+            this->rayTracer->Mount();
+            this->rayTracer->Dispatch(
                 this->dispatchGroups,
                 GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT
             );
@@ -36,13 +36,15 @@ class SceneRenderer : public Disposable
         void Dispose()
         {
             this->sceneLoader.Dispose();
-            this->rayTracer.Dispose();
+            this->rayTracer->Dispose();
             this->renderTexture.Dispose();
+
+            delete this->rayTracer;
         }
 
         const Texture2D RenderTexture() const { return this->renderTexture; }
 
-        const ArrayBuffer<Geometry> GetGeometry(GEOMETRY_TYPE type) const { return this->sceneLoader.GetGeometry(type); }
+        const ArrayBuffer<Geometry>* GetGeometry(GEOMETRY_TYPE type) const { return this->sceneLoader.GetGeometry(type); }
 };
 
 #endif

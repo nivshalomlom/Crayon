@@ -43,8 +43,6 @@ class ShaderProgram : public Program
             glDeleteShader(vert);
         }
 
-        ShaderProgram() : Program() {}
-
         virtual void Draw() = 0;
 };
 
@@ -59,8 +57,6 @@ class ComputeProgram : public Program
             this->LinkShader();
             glDeleteShader(compute);
         }
-
-        ComputeProgram() : Program() {}
 
         virtual void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS) const 
         { 

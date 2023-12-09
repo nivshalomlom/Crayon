@@ -6,7 +6,8 @@
 #include "../camera.h"
 
 #define CAMERA_BUFFER_BINDING 2
-#define RESERVOIR_BUFFER_BINDING 3
+#define TEMPORAL_RESERVOIR_BUFFER_BINDING 3
+#define SPATIAL_RESERVOIR_BUFFER_BINDING 4
 
 #define RENDER_IMAGE_INDEX 0
 
@@ -16,8 +17,10 @@ const static size_t RESERVOIR_PADDED_BYTE_SIZE = RESERVOIR_BYTE_SIZE + sizeof(gl
 class RayTracer : public ComputeProgram
 {
     private:
+        StorageBuffer* temporalReservoirBuffer;
+        StorageBuffer* spatialReservoirBuffer;
+
         ObjectBuffer<Camera>* cameraBuffer;
-        StorageBuffer* reservoirBuffer;
         ComputeProgram* imageLoader;
 
     public:
@@ -28,9 +31,14 @@ class RayTracer : public ComputeProgram
             renderTexture.BindToImage(RENDER_IMAGE_INDEX, GL_WRITE_ONLY);
             glm::ivec2 texSize = renderTexture.Size();
 
-            this->reservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
+            this->temporalReservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
+            this->temporalReservoirBuffer->BindToStorageBlock(TEMPORAL_RESERVOIR_BUFFER_BINDING);
+
+            this->spatialReservoirBuffer = new StorageBuffer(RESERVOIR_PADDED_BYTE_SIZE * texSize.x * texSize.y);
+            this->spatialReservoirBuffer->BindToStorageBlock(SPATIAL_RESERVOIR_BUFFER_BINDING);
+
             this->cameraBuffer = new ObjectBuffer<Camera>(camera, sizeof(Camera));
-            this->cameraBuffer->BindToStorageBlock(this->Id(), CAMERA_BUFFER_BINDING);
+            this->cameraBuffer->BindToStorageBlock(CAMERA_BUFFER_BINDING);
 
             this->Mount();
             glUniform2i(glGetUniformLocation(this->Id(), "dimensions"), texSize.x, texSize.y);
@@ -38,11 +46,9 @@ class RayTracer : public ComputeProgram
 
         void Dispatch(glm::ivec3 groups, GLuint barrierMask = GL_ALL_BARRIER_BITS)
         {
-            this->reservoirBuffer->BindToStorageBlock(this->Id(), RESERVOIR_BUFFER_BINDING);
             ComputeProgram::Dispatch(groups, barrierMask);
 
             this->imageLoader->Mount();
-            this->reservoirBuffer->BindToStorageBlock(this->imageLoader->Id(), RESERVOIR_BUFFER_BINDING);
             this->imageLoader->Dispatch(groups, barrierMask);
 
             Camera camera = this->cameraBuffer->GetValue();
@@ -55,12 +61,14 @@ class RayTracer : public ComputeProgram
         {
             ComputeProgram::Dispose();
             this->cameraBuffer->Dispose();
-            this->reservoirBuffer->Dispose();
             this->imageLoader->Dispose();
+            this->temporalReservoirBuffer->Dispose();
+            this->spatialReservoirBuffer->Dispose();
 
             delete this->cameraBuffer;
-            delete this->reservoirBuffer;
             delete this->imageLoader;
+            delete this->temporalReservoirBuffer;
+            delete this->spatialReservoirBuffer;
         }
 
         ObjectBuffer<Camera>* ViewCamera() { return this->cameraBuffer; }

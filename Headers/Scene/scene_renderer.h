@@ -22,7 +22,7 @@ class SceneRenderer : public Disposable
     public:
         SceneRenderer(Scene scene, Camera camera, int textureWidth, int textureHeight);
 
-        void LoadScene(Scene scene) { this->sceneLoader.LoadScene(scene, this->rayTracer); }
+        void LoadScene(Scene scene) { this->sceneLoader.LoadScene(scene); }
 
         void Render()
         {

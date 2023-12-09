@@ -57,9 +57,7 @@ void main()
     uint kernal_ID = coords.x + coords.y * dimensions.x;
     Ray cameraRay = CreateCameraRayFromUV(uv);
 
-    reservoirs[kernal_ID] = CreateReservoir();
     RayHit rayHit;
-
     if (FireRay(cameraRay, rayHit))
     {
         Material material = rayHit.material;
@@ -78,12 +76,12 @@ void main()
             vec3 outgoingLight = emission + BRDF(point, material) * incomingLight;
 
             float weight = length(outgoingLight) / RandomDirectionPDF(ray.direction, normal);
-            AddToReservoir(reservoirs[kernal_ID], vec4(outgoingLight, 1.0), weight, state);
+            AddToReservoir(temporalReservoirs[kernal_ID], vec4(outgoingLight, 1.0), weight, state);
         }
     }
     else
     {
         vec3 outgoingLight = EnvironmentLight(cameraRay.direction);
-        AddToReservoir(reservoirs[kernal_ID], vec4(outgoingLight, 1.0), length(outgoingLight), state);
+        AddToReservoir(temporalReservoirs[kernal_ID], vec4(outgoingLight, 1.0), length(outgoingLight), state);
     }
 }

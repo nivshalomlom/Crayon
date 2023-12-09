@@ -12,5 +12,5 @@ SceneRenderer::SceneRenderer(Scene scene, Camera camera, int textureWidth, int t
     );
 
     this->sceneLoader = SceneLoader();
-    this->sceneLoader.LoadScene(scene, this->rayTracer);
+    this->sceneLoader.LoadScene(scene);
 }

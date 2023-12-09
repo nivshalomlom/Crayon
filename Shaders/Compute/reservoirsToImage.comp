@@ -9,13 +9,6 @@
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 layout(rgba32F, binding = 0) uniform image2D renderTarget;
 
-void UpdateImage(ivec2 coords, vec4 value)
-{
-    vec4 prev = imageLoad(renderTarget, coords);
-    vec4 avg = (prev * Camera.frameCounter + value) / (Camera.frameCounter + 1);
-    imageStore(renderTarget, coords, avg);
-}
-
 void main()
 {
     ivec2 dimensions = imageSize(renderTarget);
@@ -25,5 +18,5 @@ void main()
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    UpdateImage(coords, GetReservoirValue(reservoirs[kernal_ID]));
+    imageStore(renderTarget, coords, GetReservoirValue(temporalReservoirs[kernal_ID]));
 }

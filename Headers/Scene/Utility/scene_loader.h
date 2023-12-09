@@ -39,7 +39,7 @@ class SceneLoader : public Disposable
             this->geometryBuffers = nullptr;
         }
 
-        void LoadScene(Scene scene, RayTracer* rayTracer);
+        void LoadScene(Scene scene);
 
         void Dispose() 
         { 

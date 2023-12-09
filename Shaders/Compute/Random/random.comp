@@ -6,6 +6,11 @@ float RandomValue(inout uint state)
     return result / 4294967295.0;
 }
 
+float RandomValue(float low, float high, inout uint state)
+{
+    return RandomValue(state) * (high - low) + low;
+}
+
 vec2 RandomVector2(inout uint state)
 {
     return vec2(

@@ -9,6 +9,33 @@
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 layout(rgba32F, binding = 0) uniform image2D renderTarget;
 
+bool SpatialReuse(ivec2 coords, ivec2 dimensions, ivec2 searchRadius, uint kernal_ID, inout uint state)
+{
+    uint maxIterations = 3;
+    if (spatialReservoirs[kernal_ID].numItems < 250)
+        maxIterations = 9;
+
+    bool foundReuse = false;
+    while (maxIterations-- > 0)
+    {
+        ivec2 neighborCoords = ivec2(
+            RandomValue(max(coords.x - searchRadius.x, 0), min(coords.x + searchRadius.x, dimensions.x), state), 
+            RandomValue(max(coords.y - searchRadius.y, 0), min(coords.y + searchRadius.y, dimensions.y), state)
+        );
+
+        // TODO: Add geometric test
+
+        uint neighbor_ID = neighborCoords.x + neighborCoords.y * dimensions.x;
+        if (temporalReservoirs[neighbor_ID].itemWeight <= EPS)
+            continue;
+
+        foundReuse = true;
+        MergeReservoirs(spatialReservoirs[kernal_ID], temporalReservoirs[kernal_ID], state);
+    }
+
+    return foundReuse;
+}
+
 void main()
 {
     ivec2 dimensions = imageSize(renderTarget);
@@ -18,5 +45,16 @@ void main()
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    imageStore(renderTarget, coords, GetReservoirValue(temporalReservoirs[kernal_ID]));
+    uint state = kernal_ID + Camera.frameCounter * 6647369;
+
+    ivec2 searchRadius = ivec2(dimensions * 0.1);
+    while (searchRadius.x >= 3 && searchRadius.y >= 3)
+    {
+        if (SpatialReuse(coords, dimensions, searchRadius, kernal_ID, state))
+            break;
+
+        searchRadius /= 2;
+    }
+
+    imageStore(renderTarget, coords, GetReservoirValue(spatialReservoirs[kernal_ID]));
 }

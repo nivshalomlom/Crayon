@@ -51,10 +51,10 @@ void main()
     if (coords.x >= dimensions.x || coords.y >= dimensions.y)
         return;
 
-    uint state = coords.x + coords.y * dimensions.x + Camera.frameCounter * 6647369;
-    vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
-
     uint kernal_ID = coords.x + coords.y * dimensions.x;
+    uint state = kernal_ID + Camera.frameCounter * 6647369;
+
+    vec2 uv = vec2(coords + RandomVector2(state)) / dimensions;
     Ray cameraRay = CreateCameraRayFromUV(uv);
 
     RayHit rayHit;

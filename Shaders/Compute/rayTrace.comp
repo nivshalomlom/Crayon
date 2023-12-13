@@ -78,9 +78,14 @@ void main()
             float weight = length(outgoingLight) / RandomDirectionPDF(ray.direction, normal);
             AddToReservoir(temporalReservoirs[kernal_ID], vec4(outgoingLight, 1.0), weight, state);
         }
+
+        LoadIntoReservoirInfo(kernal_ID, normal, distance(rayHit.impact.point, Position(Camera.transform.worldToLocal)));
     }
     else
     {
+        temporalReservoirs[kernal_ID] = CreateReservoir();
+        LoadIntoReservoirInfo(kernal_ID, vec3(0), -1);
+
         vec3 outgoingLight = EnvironmentLight(cameraRay.direction);
         AddToReservoir(temporalReservoirs[kernal_ID], vec4(outgoingLight, 1.0), length(outgoingLight), state);
     }

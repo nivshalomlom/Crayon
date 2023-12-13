@@ -1,5 +1,10 @@
 #include "../Reservoir/reservoir.comp"
 
+struct ReservoirInfo
+{
+    vec4 inormal_idepth;
+};
+
 layout(std430, binding = 3) buffer TemporalReservoirBuffer
 {
     Reservoir temporalReservoirs[];
@@ -9,3 +14,32 @@ layout(std430, binding = 4) buffer SpatialReservoirBuffer
 {
     Reservoir spatialReservoirs[];
 };
+
+layout(std430, binding = 5) buffer ReservoirInfoBuffer
+{
+    ReservoirInfo reservoirsInfo[];
+};
+
+void LoadIntoReservoirInfo(uint id, vec3 impactNormal, float depth)
+{
+    reservoirsInfo[id].inormal_idepth = vec4(impactNormal, depth);
+}
+
+bool CanInfoBeReused(uint current_ID, uint neighbor_ID)
+{
+    ReservoirInfo neighbor = reservoirsInfo[neighbor_ID];
+    ReservoirInfo current = reservoirsInfo[current_ID];
+
+    if (abs(current.inormal_idepth.w - neighbor.inormal_idepth.w) > 0.05 * current.inormal_idepth.w)
+        return false;
+
+    if (dot(current.inormal_idepth.xyz, neighbor.inormal_idepth.xyz) < 0.906)
+        return false;
+
+    return true;
+}
+
+bool IsSkyHit(uint id)
+{
+    return reservoirsInfo[id].inormal_idepth.w < 0;
+}

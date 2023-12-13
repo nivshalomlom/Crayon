@@ -23,10 +23,11 @@ bool SpatialReuse(ivec2 coords, ivec2 dimensions, ivec2 searchRadius, uint kerna
             RandomValue(max(coords.y - searchRadius.y, 0), min(coords.y + searchRadius.y, dimensions.y), state)
         );
 
-        // TODO: Add geometric test
-
         uint neighbor_ID = neighborCoords.x + neighborCoords.y * dimensions.x;
-        if (temporalReservoirs[neighbor_ID].itemWeight <= EPS)
+        if (temporalReservoirs[neighbor_ID].itemWeight <= EPS || IsSkyHit(neighbor_ID))
+            continue;
+
+        if (!CanInfoBeReused(kernal_ID, neighbor_ID))
             continue;
 
         foundReuse = true;
@@ -45,15 +46,20 @@ void main()
         return;
 
     uint kernal_ID = coords.x + coords.y * dimensions.x;
-    uint state = kernal_ID + Camera.frameCounter * 6647369;
-
-    ivec2 searchRadius = ivec2(dimensions * 0.1);
-    while (searchRadius.x >= 3 && searchRadius.y >= 3)
+    if (IsSkyHit(kernal_ID))
+        spatialReservoirs[kernal_ID] = temporalReservoirs[kernal_ID];
+    else
     {
-        if (SpatialReuse(coords, dimensions, searchRadius, kernal_ID, state))
-            break;
+        uint state = kernal_ID + Camera.frameCounter * 6647369;
+        ivec2 searchRadius = ivec2(dimensions * 0.1);
 
-        searchRadius /= 2;
+        while (searchRadius.x >= 3 && searchRadius.y >= 3)
+        {
+            if (SpatialReuse(coords, dimensions, searchRadius, kernal_ID, state))
+                break;
+
+            searchRadius /= 2;
+        }
     }
 
     imageStore(renderTarget, coords, GetReservoirValue(spatialReservoirs[kernal_ID]));

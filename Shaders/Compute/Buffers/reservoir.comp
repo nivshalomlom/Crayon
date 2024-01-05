@@ -1,9 +1,5 @@
+#include "../Reservoir/reservoir_info.comp"
 #include "../Reservoir/reservoir.comp"
-
-struct ReservoirInfo
-{
-    vec4 inormal_idepth;
-};
 
 layout(std430, binding = 3) buffer TemporalReservoirBuffer
 {

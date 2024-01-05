@@ -1,0 +1,4 @@
+struct ReservoirInfo
+{
+    vec4 inormal_idepth;
+};

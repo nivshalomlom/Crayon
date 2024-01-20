@@ -26,31 +26,27 @@ vec4 GetReservoirValue(Reservoir reservoir)
     return reservoir.item * GetReservoirCorrectionWeight(reservoir);
 }
 
-void AddToReservoir(inout Reservoir reservoir, vec4 item, float weight, inout uint state)
+bool AddToReservoir(inout Reservoir reservoir, vec4 item, float weight, inout uint state)
 {
     reservoir.totalWeight += weight;
     reservoir.numItems++;
 
-    float ratio = weight / max(reservoir.totalWeight, EPS);
-    if (reservoir.numItems == 1 || RandomValue(state) <= ratio)
+    bool accepted = reservoir.numItems == 1 || RandomValue(state) <= (weight / max(reservoir.totalWeight, EPS));
+    if (accepted)
     {
         reservoir.item = item;
         reservoir.itemWeight = weight;
     }
+
+    return accepted;
 }
 
 void MergeReservoirs(inout Reservoir into, Reservoir from, inout uint state)
 {
     float weight = from.itemWeight * from.numItems * GetReservoirCorrectionWeight(from);
-    if (weight <= EPS)
-        return;
+    if (AddToReservoir(into, from.item, weight, state))
+        into.itemWeight = from.itemWeight;
 
-    AddToReservoir(
-        into,
-        from.item, 
-        from.itemWeight * from.numItems * GetReservoirCorrectionWeight(from), 
-        state
-    );
-
-    into.numItems += from.numItems - 1;
+    if (weight > EPS)
+        into.numItems += from.numItems - 1;
 }
